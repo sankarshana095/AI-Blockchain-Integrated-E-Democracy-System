@@ -4,7 +4,7 @@
 {% block content %}
 <div class="ec-voter-management">
 
-    <h2>Voter Management</h2>
+    <h2>Electoral Registration Officer – Voter Management</h2>
 
     <!-- =========================
          Info Note
@@ -37,15 +37,15 @@
 
             <div class="form-group">
                 <label>Father / Mother Name</label>
-                <input name="guardian_name" required>
+                <input name="parent_name" required>
             </div>
 
             <div class="form-group">
                 <label>Gender</label>
                 <select name="gender" required>
-                    <option>Male</option>
-                    <option>Female</option>
-                    <option>Other</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
                 </select>
             </div>
 
@@ -79,88 +79,6 @@
     <section class="table-section">
         <h3>Registered Voters</h3>
 
-        {% if voters and voters|length > 0 %}
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Voter ID</th>
-                        <th>Booth</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for voter in voters %}
-                        <tr>
-                            <td>{{ voter.full_name }}</td>
-                            <td>{{ voter.voter_id_number }}</td>
-                            <td>{{ voter.booth_id }}</td>
-                            <td>
-                                {% if voter.is_active %}
-                                    Active
-                                {% else %}
-                                    Inactive
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if voter.is_active %}
-                                <form
-                                    method="POST"
-                                    action="{{ url_for('election_commission.remove_voter', voter_id=voter.id) }}"
-                                >
-                                    <button class="btn-danger">
-                                        Remove
-                                    </button>
-                                </form>
-                                {% else %}
-                                    Removed
-                                {% endif %}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p>No voters found.</p>
-        {% endif %}
-    </section>
-
-</div>
-{% endblock %}
-{% extends "base.html" %}
-{% set title = "Voter Management (ERO)" %}
-
-{% block content %}
-<div class="ec-voter">
-
-    <h2>Electoral Registration Officer – Voter Management</h2>
-
-    <!-- =========================
-         Add New Voter
-    ========================== -->
-    <section class="form-section">
-        <h3>Add New Voter</h3>
-
-        <form method="POST" action="{{ url_for('election_commission.add_voter') }}">
-            <input name="voter_id_number" placeholder="Voter ID Number" required>
-            <input name="full_name" placeholder="Full Name" required>
-            <input name="parent_name" placeholder="Father/Mother Name" required>
-            <input name="age" type="number" placeholder="Age" required>
-            <input name="gender" placeholder="Gender" required>
-            <input name="date_of_birth" type="date" required>
-            <input name="address" placeholder="Address" required>
-            <input name="booth_id" placeholder="Booth ID" required>
-            <button class="btn-primary">Add Voter</button>
-        </form>
-    </section>
-
-    <!-- =========================
-         Existing Voters
-    ========================== -->
-    <section class="table-section">
-        <h3>Electoral Roll</h3>
-
         {% if voters %}
         <table class="data-table">
             <thead>
@@ -180,12 +98,14 @@
                     <td>{{ voter.booth_id }}</td>
                     <td>{{ "Active" if voter.is_active else "Inactive" }}</td>
                     <td>
-                        <a
-                            href="{{ url_for('election_commission.remove_voter', voter_id=voter.id) }}"
-                            class="btn-small danger"
-                        >
-                            Remove
-                        </a>
+                        {% if voter.is_active %}
+                        <form method="POST"
+                              action="{{ url_for('election_commission.remove_voter', voter_id=voter.id) }}">
+                            <button class="btn-danger">Remove</button>
+                        </form>
+                        {% else %}
+                            Removed
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}

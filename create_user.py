@@ -30,14 +30,14 @@ supabase = create_client(
 # -----------------------------
 
 USER_DATA = {
-    "email": "ceo@eci.gov.in",
-    "password": "ceo@12345678",
-    "role": "CEO",
+    "email": "ero.mangalore_city_north.dakshina_kannada.karnataka@eci.gov.in",
+    "password": "admin@123",
+    "role": "ERO",
 
     # Hierarchy (set None if not applicable)
     "state_id": 'c44b37b1-ced8-4344-b091-4e60465dbbf3',
-    "district_id": None,
-    "constituency_id": None,
+    "district_id": '0f6cc110-7e8c-4f1f-9ed1-25621e414765',
+    "constituency_id":'c6cefb8a-1c89-4818-b278-80c17ad34bbf',
     "booth_id": None
 }
 
@@ -80,6 +80,27 @@ def create_user():
     print("User created successfully!")
     print(db_response.data)
 
+def update_user_credentials(user_id, new_email=None, new_password=None):
+    payload = {}
+
+    if new_email:
+        payload["email"] = new_email
+        payload["email_confirm"] = True
+
+    if new_password:
+        payload["password"] = new_password
+
+    supabase.auth.admin.update_user_by_id(user_id, payload)
+
+    if new_email:
+        supabase.table("users").update({
+            "email": new_email
+        }).eq("id", user_id).execute()
+
+    print("User updated successfully")
+
+
 
 if __name__ == "__main__":
     create_user()
+    #update_user_credentials('f7a63834-4fe3-4d92-97c3-7bc881aff227', new_email='ro.mangalore_city_north.dakshina_kannada.karnataka@eci.gov.in', new_password='admin@123')
