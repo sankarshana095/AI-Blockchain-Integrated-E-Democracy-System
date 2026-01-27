@@ -11,7 +11,7 @@ from services.citizen_service import (
     get_representative_posts
 )
 from models.election import get_active_elections_by_constituency
-from models.candidate import get_candidates_by_election_and_constituency
+from models.candidate import get_candidates_with_names
 bp = Blueprint("citizen", __name__, url_prefix="/citizen")
 
 
@@ -68,7 +68,7 @@ def vote():
     candidates = []
 
     if selected_election_id:
-        candidates = get_candidates_by_election_and_constituency(
+        candidates = get_candidates_with_names(
             election_id=selected_election_id,
             constituency_id=constituency_id
         )

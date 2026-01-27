@@ -90,3 +90,40 @@ def get_representative_by_user(user_id: str):
 
 def get_representatives_by_constituency(constituency_id: str):
     return fetch_all(REPRESENTATIVES_TABLE, {"constituency_id": constituency_id})
+
+def get_candidates_with_names(election_id: str, constituency_id: str):
+    candidates = fetch_all(
+        "candidates",
+        {
+            "election_id": election_id,
+            "constituency_id": constituency_id
+        }
+    )
+
+    enriched = []
+
+    for c in candidates:
+        # Step 1: user → voter mapping
+        mapping = fetch_one(
+            "voter_user_map",
+            {"user_id": c["user_id"]}
+        )
+
+        if not mapping:
+            continue
+
+        # Step 2: voter → name
+        voter = fetch_one(
+            "voters",
+            {"id": mapping["voter_id"]}
+        )
+
+        if not voter:
+            continue
+
+        enriched.append({
+            **c,
+            "candidate_name": voter["full_name"]
+        })
+
+    return enriched

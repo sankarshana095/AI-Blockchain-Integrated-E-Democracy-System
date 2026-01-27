@@ -25,7 +25,7 @@ def create_ledger_entry(
         "entity_id": entity_id,
         "transaction_hash": transaction_hash,
         "block_number": block_number,
-        "timestamp": utc_now()
+        "timestamp": utc_now().isoformat()
     }
     return insert_record(LEDGER_TABLE, payload, use_admin=True)
 

@@ -30,7 +30,7 @@ def cast_vote(
         "vote_hash": vote_hash,
         "block_number": block_number,
         "transaction_id": transaction_id,
-        "timestamp": utc_now()
+        "timestamp": utc_now().isoformat()
     }
     return insert_record(VOTES_TABLE, payload, use_admin=True)
 
@@ -70,7 +70,7 @@ def mark_voter_as_voted(voter_id: str, election_id: str):
         },
         {
             "has_voted": True,
-            "voted_at": utc_now()
+            "voted_at": utc_now().isoformat()
         },
         use_admin=True
     )

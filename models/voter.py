@@ -86,7 +86,7 @@ def map_voter_to_user(voter_id: str, user_id: str):
         "id": generate_uuid(),
         "voter_id": voter_id,
         "user_id": user_id,
-        "created_at": utc_now()
+        "created_at": utc_now().isoformat()
     }
     return insert_record(VOTER_USER_MAP_TABLE, payload, use_admin=True)
 
