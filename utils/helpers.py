@@ -27,6 +27,9 @@ def generate_uuid():
     """Generate UUID4 string"""
     return str(uuid.uuid4())
 
+def generate_voter_id():
+    return f"VTR-{uuid.uuid4().hex[:10].upper()}"
+
 
 def sha256_hash(value: str) -> str:
     """Generate SHA256 hash for any string value"""

@@ -1,6 +1,5 @@
 from supabase_db.db import fetch_one, fetch_all, insert_record, update_record
-from utils.helpers import generate_uuid, utc_now
-
+from utils.helpers import generate_uuid,generate_voter_id, utc_now
 
 
 # -----------------------------
@@ -16,12 +15,10 @@ VOTER_USER_MAP_TABLE = "voter_user_map"
 # -----------------------------
 
 def create_voter(
-    voter_id_number: str,
     full_name: str,
-    father_or_mother_name: str,
+    guardian_name: str,
     gender: str,
     date_of_birth,
-    age: int,
     address: str,
     state_id: str,
     district_id: str,
@@ -31,12 +28,11 @@ def create_voter(
 ):
     payload = {
         "id": generate_uuid(),
-        "voter_id_number": voter_id_number,
+        "voter_id_number": generate_voter_id(),
         "full_name": full_name,
-        "father_or_mother_name": father_or_mother_name,
+        "guardian_name": guardian_name,
         "gender": gender,
-        "date_of_birth": date_of_birth,
-        "age": age,
+        "date_of_birth": date_of_birth.isoformat() if hasattr(date_of_birth, "isoformat") else date_of_birth,
         "address": address,
         "photo_url": photo_url,
         "state_id": state_id,
@@ -44,8 +40,8 @@ def create_voter(
         "constituency_id": constituency_id,
         "booth_id": booth_id,
         "is_active": True,
-        "created_at": utc_now(),
-        "updated_at": utc_now()
+        "created_at": utc_now().isoformat(),
+        "updated_at": utc_now().isoformat()
     }
     return insert_record(VOTERS_TABLE, payload, use_admin=True)
 
@@ -63,7 +59,7 @@ def get_voters_by_constituency(constituency_id: str):
 
 
 def update_voter_details(voter_id: str, update_data: dict):
-    update_data["updated_at"] = utc_now()
+    update_data["updated_at"] = utc_now().isoformat()
     return update_record(
         VOTERS_TABLE,
         {"id": voter_id},
@@ -76,7 +72,7 @@ def deactivate_voter(voter_id: str):
     return update_record(
         VOTERS_TABLE,
         {"id": voter_id},
-        {"is_active": False, "updated_at": utc_now()},
+        {"is_active": False, "updated_at": utc_now().isoformat()},
         use_admin=True
     )
 

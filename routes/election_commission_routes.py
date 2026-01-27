@@ -177,12 +177,10 @@ def add_candidate():
 def add_voter():
     try:
         create_voter(
-            voter_id_number=request.form.get("voter_id_number"),
             full_name=request.form.get("full_name"),
-            father_or_mother_name=request.form.get("parent_name"),
+            guardian_name=request.form.get("guardian_name"),
             gender=request.form.get("gender"),
             date_of_birth=request.form.get("date_of_birth"),
-            age=int(request.form.get("age")),
             address=request.form.get("address"),
             state_id=session.get("state_id"),
             district_id=session.get("district_id"),
