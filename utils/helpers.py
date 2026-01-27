@@ -112,3 +112,8 @@ def normalize_role(role: str) -> str:
 
 def is_commission_role(role: str) -> bool:
     return normalize_role(role) in {"CEC", "CEO", "DEO", "RO", "ERO", "BLO"}
+
+def assign_constituencies_to_election(election_id: str, constituency_ids: list[str]):
+    for cid in constituency_ids:
+        add_constituency_to_election(election_id, cid)
+

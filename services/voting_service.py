@@ -1,3 +1,5 @@
+import hashlib
+import json
 from models.vote import (
     cast_vote,
     has_voter_voted,
@@ -5,7 +7,6 @@ from models.vote import (
 )
 from models.ledger import create_ledger_entry
 from utils.helpers import sha256_hash, generate_transaction_id
-
 
 # -----------------------------
 # Voting Service
@@ -58,3 +59,13 @@ def submit_vote(
         "transaction_id": transaction_id,
         "vote_hash": vote_hash
     }
+
+def hash_vote(candidate_id, election_id, voter_id):
+    payload = {
+        "candidate_id": candidate_id,
+        "election_id": election_id,
+        "voter_id": voter_id
+    }
+
+    raw = json.dumps(payload, sort_keys=True)
+    return hashlib.sha256(raw.encode()).hexdigest()

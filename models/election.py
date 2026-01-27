@@ -49,14 +49,6 @@ def get_all_elections():
     return fetch_all(ELECTIONS_TABLE)
 
 
-def update_election_status(election_id: str, status: str):
-    return update_record(
-        ELECTIONS_TABLE,
-        {"id": election_id},
-        {"status": status},
-        use_admin=True
-    )
-
 
 def approve_election(election_id: str, approved_by: str):
     return update_record(
@@ -96,3 +88,42 @@ def is_constituency_in_election(election_id: str, constituency_id: str) -> bool:
         }
     )
     return record is not None
+
+def get_active_elections_by_constituency(constituency_id: str):
+    """
+    Step 1: Find election_ids mapped to this constituency
+    Step 2: Fetch only approved + active elections
+    """
+
+    now = utc_now().isoformat()
+
+    # 1️⃣ Get election IDs for constituency
+    mappings = fetch_all(
+        ELECTION_CONSTITUENCIES_TABLE,
+        {"constituency_id": constituency_id}
+    )
+
+    if not mappings:
+        return []
+
+    election_ids = [row["election_id"] for row in mappings]
+
+    # 2️⃣ Fetch elections one-by-one (safe + simple)
+    elections = []
+    for eid in election_ids:
+        election = fetch_one(
+            ELECTIONS_TABLE,
+            {
+                "id": eid,
+                "status": "Approved"
+            }
+        )
+
+        if not election:
+            continue
+
+        # Date window check
+        if election["start_time"] <= now <= election["end_time"]:
+            elections.append(election)
+
+    return elections

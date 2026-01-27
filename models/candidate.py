@@ -43,6 +43,15 @@ def get_candidates_by_election(election_id: str):
 def get_candidates_by_constituency(constituency_id: str):
     return fetch_all(CANDIDATES_TABLE, {"constituency_id": constituency_id})
 
+def get_candidates_by_election_and_constituency(election_id: str, constituency_id: str):
+    return fetch_all(
+        "candidates",
+        {
+            "election_id": election_id,
+            "constituency_id": constituency_id
+        }
+    )
+
 
 def update_candidate_status(candidate_id: str, status: str):
     return update_record(

@@ -11,25 +11,50 @@
         ========================== -->
         <div class="form-group">
             <label for="election_id">Election</label>
-            <select id="election_id" name="election_id" required>
-                <option value="">Select Election</option>
-                <!-- Election options will be populated from backend -->
-            </select>
+            <select
+    id="election_id"
+    name="election_id"
+    onchange="window.location='?election_id=' + this.value"
+    required
+>
+    <option value="">Select Election</option>
+    {% for election in elections %}
+        <option value="{{ election.id }}"
+            {% if election.id == selected_election_id %}selected{% endif %}
+        >
+            {{ election.election_name }}
+        </option>
+    {% endfor %}
+</select>
+
+
         </div>
 
         <!-- =========================
              Vote Payload (Encrypted / Hashed)
         ========================== -->
-        <div class="form-group">
-            <label for="vote_payload">Your Choice</label>
+
+   {% if candidates and candidates|length > 0 %}
+<div class="form-group">
+    <label>Your Choice</label>
+
+    {% for candidate in candidates %}
+        <label class="candidate-option">
             <input
-                type="text"
-                id="vote_payload"
+                type="radio"
                 name="vote_payload"
-                placeholder="Enter candidate or option"
+                value="{{ candidate.id }}"
                 required
             >
-        </div>
+            {{ candidate.full_name }} ({{ candidate.party_name }})
+        </label>
+    {% endfor %}
+</div>
+{% else %}
+<p class="info-note">Select an election to view candidates.</p>
+{% endif %}
+
+
 
         <button type="submit" class="btn-primary">
             Submit Vote

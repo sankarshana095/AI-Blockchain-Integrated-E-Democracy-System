@@ -10,7 +10,8 @@ from services.citizen_service import (
     get_representatives,
     get_representative_posts
 )
-
+from models.election import get_active_elections_by_constituency
+from models.candidate import get_candidates_by_election_and_constituency
 bp = Blueprint("citizen", __name__, url_prefix="/citizen")
 
 
@@ -35,6 +36,11 @@ def dashboard():
 @login_required
 @role_required("CITIZEN")
 def vote():
+    constituency_id = session.get("constituency_id")
+
+    # -----------------------------
+    # POST: Submit Vote
+    # -----------------------------
     if request.method == "POST":
         try:
             election_id = request.form.get("election_id")
@@ -42,7 +48,7 @@ def vote():
 
             result = submit_vote(
                 election_id=election_id,
-                constituency_id=session.get("constituency_id"),
+                constituency_id=constituency_id,
                 voter_id=session.get("user_id"),
                 vote_payload=vote_payload
             )
@@ -53,7 +59,27 @@ def vote():
         except Exception as e:
             flash(str(e), "error")
 
-    return render_template("citizen/vote.html")
+    # -----------------------------
+    # GET: Load Elections & Candidates
+    # -----------------------------
+    elections = get_active_elections_by_constituency(constituency_id)
+
+    selected_election_id = request.args.get("election_id")
+    candidates = []
+
+    if selected_election_id:
+        candidates = get_candidates_by_election_and_constituency(
+            election_id=selected_election_id,
+            constituency_id=constituency_id
+        )
+
+    return render_template(
+        "citizen/vote.html",
+        elections=elections,
+        candidates=candidates,
+        selected_election_id=selected_election_id
+    )
+
 
 
 # -----------------------------
