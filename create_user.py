@@ -30,9 +30,9 @@ supabase = create_client(
 # -----------------------------
 
 USER_DATA = {
-    "email": "trump@gmail.com",
-    "password": "user@123",
-    "role": "CITIZEN",
+    "email": "po.1.mangalore_city_north.dakshina_kannada.karnataka@eci.gov.in",
+    "password": "admin@123",
+    "role": "PO",
 
     # Hierarchy (set None if not applicable)
     "state_id": 'c44b37b1-ced8-4344-b091-4e60465dbbf3',

@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Presiding Officer Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <h2>Presiding Officer Dashboard</h2>
+
+    <p class="mt-1">
+        Booth ID: <strong>{{ session.get("booth_id") }}</strong>
+    </p>
+
+    <!-- =========================
+         Flash Messages
+    ========================= -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-container mt-2">
+          {% for category, message in messages %}
+            <div class="flash {{ category }}">
+                {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- =========================
+         Authorize Voter (OTP Based)
+    ========================= -->
+    <div class="mt-3">
+        <h3>Authorize Voter</h3>
+
+        <form method="POST"
+              action="{{ url_for('presiding_officer.authorize_voter') }}"
+              class="mt-1">
+
+            <!-- Voter ID -->
+            <label for="voter_user_id">
+                Voter User ID
+            </label>
+
+            <input
+                type="text"
+                id="voter_user_id"
+                name="voter_user_id"
+                required
+                value="{{ request.args.get('voter', '') }}"
+                placeholder="Enter voter user ID"
+                class="mt-1"
+            >
+
+            <!-- OTP -->
+            <label for="otp" class="mt-2">
+                OTP (sent to voter email)
+            </label>
+
+            <input
+                type="text"
+                id="otp"
+                name="otp"
+                placeholder="Enter OTP after requesting"
+                class="mt-1"
+            >
+
+            <!-- Buttons -->
+            <div class="mt-2">
+
+                <!-- Request OTP -->
+                <button type="submit" name="action" value="request_otp">
+                    Request OTP
+                </button>
+
+                <!-- Verify & Authorize -->
+                <button type="submit" name="action" value="verify_otp" class="mt-1">
+                    Verify OTP & Open Voting
+                </button>
+
+            </div>
+
+        </form>
+    </div>
+
+    <!-- =========================
+         End Active Voter Session
+    ========================= -->
+    <div class="mt-3">
+        <h3>End Current Voter Session</h3>
+
+        <form method="POST" action="{{ url_for('presiding_officer.end_session') }}">
+            <button type="submit">
+                Force End Session
+            </button>
+        </form>
+
+        <p class="mt-1">
+            <small>
+                Use this only if the voter leaves without completing the vote.
+            </small>
+        </p>
+    </div>
+
+    <!-- =========================
+         Voting Terminal Control
+    ========================= -->
+    <div class="mt-3">
+        <h3>Voting Terminal</h3>
+
+        <p class="mt-1">
+            Ensure the voting terminal is opened at:
+        </p>
+
+        <p>
+            <code>/evote/waiting</code>
+        </p>
+
+        <p class="mt-1">
+            The voting screen will automatically unlock when a voter is authorized.
+        </p>
+    </div>
+
+</div>
+<form method="POST" action="{{ url_for('presiding_officer.release_terminal') }}">
+    <button type="submit">
+        Release Voting Terminal
+    </button>
+</form>
+
+
+{% endblock %}
