@@ -12,6 +12,8 @@ from routes.admin_routes import bp as admin_bp
 from routes.public_routes import bp as public_bp
 from routes.evote_routes import bp as evote_bp
 from routes.presiding_officer_routes import bp as po_bp
+from routes.verify_vote_routes import bp as verify_vote_bp
+
 
 def create_app():
     import os
@@ -40,6 +42,8 @@ def create_app():
     app.register_blueprint(public_bp)
     app.register_blueprint(evote_bp)
     app.register_blueprint(po_bp)
+    app.register_blueprint(verify_vote_bp)
+
 
 
 

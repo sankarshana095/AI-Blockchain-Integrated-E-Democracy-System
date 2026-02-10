@@ -3,10 +3,13 @@ from utils.decorators import login_required, role_required
 
 from models.voter import get_voter_by_user_id
 from models.user import get_user_by_id
+from models.election import get_active_elections_by_constituency
 
 from services.booth_session_service import start_voter_session, end_voter_session
 from services.otp_service import generate_otp, verify_otp
 from services.email_service import send_otp_email
+
+
 
 
 bp = Blueprint("presiding_officer", __name__, url_prefix="/po")
@@ -15,11 +18,38 @@ bp = Blueprint("presiding_officer", __name__, url_prefix="/po")
 # =====================================================
 # PO Dashboard
 # =====================================================
-@bp.route("/dashboard")
+@bp.route("/dashboard", methods=["GET", "POST"])
 @login_required
 @role_required("PO")
 def dashboard():
-    return render_template("election_commission/po/dashboard.html")
+    constituency_id = session.get("constituency_id")
+
+    # Fetch active elections for this constituency
+    elections = get_active_elections_by_constituency(constituency_id)
+
+    # PO selects election
+    if request.method == "POST":
+        election_id = request.form.get("election_id")
+
+        if not election_id:
+            flash("Please select an election", "error")
+            return redirect(url_for("presiding_officer.dashboard"))
+
+        # Lock election for booth
+        session["active_election_id"] = election_id
+
+        # Store election name for display
+        selected = next(e for e in elections if e["id"] == election_id)
+        session["active_election_name"] = selected["election_name"]
+
+        flash("Election locked for this booth", "success")
+        return redirect(url_for("presiding_officer.dashboard"))
+
+    return render_template(
+        "election_commission/po/dashboard.html",
+        elections=elections
+    )
+
 
 
 # =====================================================

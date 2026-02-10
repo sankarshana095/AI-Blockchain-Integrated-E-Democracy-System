@@ -6,6 +6,12 @@
 
 <h2 class="text-center">Polling Booth e-Voting Dashboard</h2>
 
+<p class="mt-1">
+    <strong>Election:</strong>
+    {{ session.get("active_election_name", "Not Set") }}
+</p>
+
+
 <p class="text-center mt-2">
     Welcome to the secure digital voting system.
     Please proceed to cast your vote using the official polling booth device.

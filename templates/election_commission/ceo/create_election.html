@@ -51,21 +51,47 @@
             >
         </div>
 
-        <div class="form-group">
-            <label for="end_time">End Date & Time</label>
-            <input
-                type="datetime-local"
-                id="end_time"
-                name="end_time"
-                required
-            >
-        </div>
+<div class="form-group">
+    <label for="end_time">End Date & Time</label>
+    <input
+        type="datetime-local"
+        id="end_time"
+        name="end_time"
+        required
+    >
+</div>
 
-        <div class="form-actions">
-            <button type="submit" class="btn-primary">
-                Create Election
-            </button>
-        </div>
+<!-- =========================
+     Select Constituencies
+========================== -->
+<div class="form-group">
+    <label>Select Constituencies</label>
+
+    <div class="checkbox-group">
+        {% for c in constituencies %}
+            <label class="checkbox-item">
+                <input
+                    type="checkbox"
+                    name="constituencies"
+                    value="{{ c.id }}"
+                >
+                {{ c.constituency_name }}
+            </label>
+        {% endfor %}
+    </div>
+
+    <small>
+        Select all constituencies covered by this election
+    </small>
+</div>
+
+
+<div class="form-actions">
+    <button type="submit" class="btn-primary">
+        Create Election
+    </button>
+</div>
+
 
     </form>
 

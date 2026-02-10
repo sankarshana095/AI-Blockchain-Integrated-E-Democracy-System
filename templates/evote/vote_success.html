@@ -3,28 +3,59 @@
 
 {% block content %}
 <div class="vote-success">
+
     <h2>Vote Submitted Successfully</h2>
 
     <p>
         Thank you for participating in the democratic process.
-        Your vote has been securely recorded.
+        Your vote has been securely recorded on the blockchain.
     </p>
 
-    <div class="transaction-details">
-        <h4>Vote Verification Details</h4>
+    <!-- =========================
+         Vote Receipt (IMPORTANT)
+    ========================= -->
+    <div class="transaction-details mt-3">
+        <h4>Vote Receipt (Save This)</h4>
+
         <p>
-            <strong>Transaction ID:</strong>
-            <span class="tx-id">{{ result.transaction_id }}</span>
+            <strong>Receipt Hash:</strong><br>
+            <code style="word-break: break-all;">
+                {{ result.receipt_hash }}
+            </code>
+        </p>
+
+        <p class="mt-1">
+            <small>
+                This receipt can be used later to verify that your vote
+                is included in the final count.
+            </small>
         </p>
     </div>
 
-    <div class="action-bar">
-        <a href="{{ url_for('ledger.explorer') }}" class="btn-secondary">
-            Verify on Ledger
+    <!-- =========================
+         Blockchain Reference
+    ========================= -->
+    <div class="transaction-details mt-2">
+        <p>
+            <strong>Blockchain Transaction Hash:</strong><br>
+            <code style="word-break: break-all;">
+                {{ result.tx_hash }}
+            </code>
+        </p>
+    </div>
+
+    <!-- =========================
+         Actions
+    ========================= -->
+    <div class="action-bar mt-3">
+        <a href="{{ url_for('evote.verify_vote') }}" class="btn-secondary">
+            Verify My Vote
         </a>
+
         <a href="{{ url_for('citizen.dashboard') }}" class="btn-primary">
             Back to Dashboard
         </a>
     </div>
+
 </div>
 {% endblock %}

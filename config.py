@@ -52,3 +52,8 @@ class Config:
     # Security
     # -----------------------
     PASSWORD_MIN_LENGTH = 8
+
+    BLOCKCHAIN_MODE = os.getenv("BLOCKCHAIN_MODE", "STUB")
+    WEB3_PROVIDER_URL = os.getenv("WEB3_PROVIDER_URL")
+    VOTING_CONTRACT_ADDRESS = os.getenv("VOTING_CONTRACT_ADDRESS")
+    BOOTH_PRIVATE_KEY = os.getenv("BOOTH_PRIVATE_KEY")

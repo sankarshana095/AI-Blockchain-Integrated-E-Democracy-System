@@ -2,10 +2,41 @@
 {% set title = "Verify Vote" %}
 
 {% block content %}
-<h2>Verify Your Vote</h2>
+<div class="container">
 
-<form method="GET" action="{{ url_for('ledger.explorer') }}">
-    <input type="text" name="hash" placeholder="Enter Transaction ID" required>
-    <button type="submit" class="btn-primary">Verify</button>
-</form>
+    <h2>Verify Your Vote</h2>
+
+    <p class="mt-1">
+        Enter your vote receipt to verify that your vote
+        was included in the election.
+    </p>
+
+    <form method="POST" class="mt-3">
+
+        <label>Election ID</label>
+        <input type="text" name="election_id" required class="mt-1">
+
+        <label class="mt-2">Receipt Hash</label>
+        <input type="text" name="receipt_hash" required class="mt-1">
+
+        <div class="mt-2">
+            <button type="submit">Verify Vote</button>
+        </div>
+    </form>
+
+    {% if result is not none %}
+        <div class="mt-3">
+            {% if result %}
+                <p style="color: green;">
+                    ✅ Your vote was included in the election.
+                </p>
+            {% else %}
+                <p style="color: red;">
+                    ❌ Vote not found or invalid receipt.
+                </p>
+            {% endif %}
+        </div>
+    {% endif %}
+
+</div>
 {% endblock %}

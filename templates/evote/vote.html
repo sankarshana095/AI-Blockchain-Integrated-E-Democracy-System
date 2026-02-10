@@ -5,30 +5,13 @@
 <div class="vote-page">
     <h2>Cast Your Vote</h2>
 
+    <p class="mt-1">
+    <strong>Election:</strong>
+    {{ session.get("active_election_name") }}
+</p>
+
     <form id="vote-form" method="POST" class="vote-form">
-        <!-- =========================
-             Election Selection
-        ========================== -->
-        <div class="form-group">
-            <label for="election_id">Election</label>
-            <select
-    id="election_id"
-    name="election_id"
-    onchange="window.location='?election_id=' + this.value"
-    required
->
-    <option value="">Select Election</option>
-    {% for election in elections %}
-        <option value="{{ election.id }}"
-            {% if election.id == selected_election_id %}selected{% endif %}
-        >
-            {{ election.election_name }}
-        </option>
-    {% endfor %}
-</select>
 
-
-        </div>
 
         <!-- =========================
              Vote Payload (Encrypted / Hashed)
@@ -42,7 +25,7 @@
         <label class="candidate-option">
             <input
                 type="radio"
-                name="vote_payload"
+                name="candidate_id"
                 value="{{ candidate.id }}"
                 required
             >
@@ -51,8 +34,9 @@
     {% endfor %}
 </div>
 {% else %}
-<p class="info-note">Select an election to view candidates.</p>
+<p class="info-note">No candidates available for this election.</p>
 {% endif %}
+
 
 
 

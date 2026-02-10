@@ -3,7 +3,7 @@
 from flask import Blueprint, render_template, jsonify, session, request, redirect, flash
 from utils.decorators import login_required, role_required
 from services.voting_service import submit_vote
-from models.candidate import get_candidates_by_constituency
+from models.candidate import  get_candidates_by_election_and_constituency
 from services.booth_session_service import (
     get_active_voter,
     register_voting_terminal,
@@ -12,6 +12,8 @@ from services.booth_session_service import (
     end_voter_session
 )
 import uuid
+from datetime import datetime
+from models.election import get_election_by_id
 
 
 bp = Blueprint("evote", __name__, url_prefix="/evote")
@@ -25,12 +27,29 @@ bp = Blueprint("evote", __name__, url_prefix="/evote")
 @role_required("PO")
 def waiting():
     booth_id = session.get("booth_id")
+    election_id = session.get("active_election_id")
+    if not election_id:
+        flash("No election set for this booth", "error")
+        return redirect(url_for("presiding_officer.dashboard"))
+    if election_id:
+        election = get_election_by_id(election_id)
+        now = datetime.utcnow().isoformat()
+
+        if now > election["end_time"]:
+        # Election over → deactivate
+            session.pop("active_election_id", None)
+            session.pop("active_election_name", None)
+
+            flash("Election has ended", "error")
+            return redirect(url_for("presiding_officer.dashboard"))
 
     # Assign a unique ID ONCE per browser session
     if "terminal_session_id" not in session:
         session["terminal_session_id"] = str(uuid.uuid4())
 
     terminal_session_id = session["terminal_session_id"]
+
+
 
     # ✅ CASE 1: This browser is already the registered terminal (reload)
     if is_valid_voting_terminal(booth_id, terminal_session_id):
@@ -71,6 +90,23 @@ def booth_status():
 def vote():
     booth_id = session.get("booth_id")
     voter_id = get_active_voter(booth_id)
+    election_id = session.get("active_election_id")
+    constituency_id = session.get("constituency_id")
+    if not election_id:
+        flash("No election set for this booth", "error")
+        return redirect(url_for("presiding_officer.dashboard"))
+
+    if election_id:
+        election = get_election_by_id(election_id)
+        now = datetime.utcnow().isoformat()
+
+        if now > election["end_time"]:
+        # Election over → deactivate
+            session.pop("active_election_id", None)
+            session.pop("active_election_name", None)
+
+            flash("Election has ended", "error")
+            return redirect(url_for("presiding_officer.dashboard"))
 
     # 🚫 No active voter → lock screen
     if not voter_id:
@@ -84,7 +120,7 @@ def vote():
             submit_vote(
                 voter_id=voter_id,
                 constituency_id=session.get("constituency_id"),
-                election_id=request.form.get("election_id"),
+                election_id = session.get("active_election_id"),
                 vote_payload=request.form.get("candidate_id")
             )
 
@@ -100,5 +136,8 @@ def vote():
     # -----------------------------
     # GET → Show voting UI
     # -----------------------------
-    candidates = get_candidates_by_constituency(session.get("constituency_id"))
+    candidates = get_candidates_by_election_and_constituency(
+        election_id=election_id,
+        constituency_id=constituency_id
+    )
     return render_template("evote/vote.html", candidates=candidates)

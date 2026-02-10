@@ -1,12 +1,14 @@
-import hashlib
-import json
+from datetime import datetime
+
 from models.vote import (
-    cast_vote,
     has_voter_voted,
     mark_voter_as_voted
 )
-from models.ledger import create_ledger_entry
-from utils.helpers import sha256_hash, generate_transaction_id
+
+from models.vote_receipt import store_receipt
+from utils.crypto import generate_vote_receipt
+from services.blockchain_service import cast_vote_on_chain
+
 
 # -----------------------------
 # Voting Service
@@ -19,52 +21,57 @@ def submit_vote(
     vote_payload: str
 ):
     """
-    Handles secure vote casting:
-    - Prevents double voting
-    - Hashes vote payload
-    - Writes vote to DB
-    - Creates ledger entry
+    Privacy-preserving blockchain vote casting:
+
+    - DB prevents double voting
+    - Generates anonymous receipt hash
+    - Records vote on blockchain (event only)
+    - Stores receipt off-chain for Merkle proof
     """
 
-    # Prevent double voting
+    # ------------------------------------------------
+    # 1. Prevent double voting
+    # ------------------------------------------------
     if has_voter_voted(voter_id, election_id):
         raise ValueError("Voter has already voted in this election")
 
-    # Create vote hash (privacy-safe)
-    vote_hash = sha256_hash(vote_payload)
+    candidate_id = vote_payload
 
-    # Generate transaction ID
-    transaction_id = generate_transaction_id(prefix="VOTE")
-
-    # Store vote
-    cast_vote(
+    # ------------------------------------------------
+    # 2. Generate anonymous receipt
+    # ------------------------------------------------
+    receipt_hash = generate_vote_receipt(
         election_id=election_id,
         constituency_id=constituency_id,
-        voter_id=voter_id,
-        vote_hash=vote_hash,
-        transaction_id=transaction_id
+        candidate_id=candidate_id
     )
 
-    # Mark voter as voted
+    # ------------------------------------------------
+    # 3. Cast vote on blockchain (NO receipt stored)
+    # ------------------------------------------------
+    tx_hash = cast_vote_on_chain(
+        election_id=election_id,
+        candidate_id=candidate_id,
+        receipt_hash=receipt_hash
+    )
+
+    # ------------------------------------------------
+    # 4. Store receipt off-chain (for Merkle proof)
+    # ------------------------------------------------
+    store_receipt(
+        election_id=election_id,
+        receipt_hash=receipt_hash
+    )
+
+    # ------------------------------------------------
+    # 5. Mark voter as voted
+    # ------------------------------------------------
     mark_voter_as_voted(voter_id, election_id)
 
-    # Create ledger entry
-    create_ledger_entry(
-        entity_type="VOTE",
-        entity_id=voter_id,
-        transaction_hash=transaction_id
-    )
-
+    # ------------------------------------------------
+    # 6. Return receipt to UI
+    # ------------------------------------------------
     return {
-        "transaction_id": transaction_id
+        "receipt_hash": receipt_hash,
+        "tx_hash": tx_hash
     }
-
-def hash_vote(candidate_id, election_id, voter_id):
-    payload = {
-        "candidate_id": candidate_id,
-        "election_id": election_id,
-        "voter_id": voter_id
-    }
-
-    raw = json.dumps(payload, sort_keys=True)
-    return hashlib.sha256(raw.encode()).hexdigest()

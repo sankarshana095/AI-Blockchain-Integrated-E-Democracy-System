@@ -15,6 +15,8 @@ from models.voter import (
 from models.user import get_users_by_role
 from models.candidate import get_candidates_by_constituency, create_candidate
 from datetime import datetime
+from models.election import add_constituency_to_election
+from models.constituency import get_constituencies_by_state
 
 
 bp = Blueprint("election_commission", __name__, url_prefix="/commission")
@@ -63,9 +65,13 @@ def dashboard():
 @login_required
 @role_required("CEO")
 def create_election():
+
+    # Always runs (GET + POST)
+    print("DEBUG state_id:", session.get("state_id"))
+
     if request.method == "POST":
         try:
-            create_state_election(
+            election = create_state_election(
                 election_name=request.form.get("name"),
                 election_type=request.form.get("type"),
                 state_id=session.get("state_id"),
@@ -73,12 +79,31 @@ def create_election():
                 end_time=request.form.get("end_time"),
                 created_by=session.get("user_id")
             )
-            flash("Election created successfully", "success")
+
+            election_id = election[0]["id"]
+
+            constituency_ids = request.form.getlist("constituencies")
+
+            for cid in constituency_ids:
+                add_constituency_to_election(
+                    election_id=election_id,
+                    constituency_id=cid
+                )
+
+            flash("Election created and constituencies assigned", "success")
             return redirect(url_for("election_commission.dashboard"))
+
         except Exception as e:
             flash(str(e), "error")
 
-    return render_template("election_commission/ceo/create_election.html")
+    constituencies = get_constituencies_by_state(session.get("state_id"))
+
+    return render_template(
+        "election_commission/ceo/create_election.html",
+        constituencies=constituencies
+    )
+
+
 
 # =====================================================
 # CEC – APPROVE ELECTION

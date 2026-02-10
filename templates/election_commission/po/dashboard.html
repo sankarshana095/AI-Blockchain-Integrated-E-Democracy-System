@@ -28,6 +28,47 @@
     {% endwith %}
 
     <!-- =========================
+     Select Active Election
+========================= -->
+<div class="mt-3">
+    <h3>Select Active Election (Booth)</h3>
+
+    {% if session.get("active_election_id") %}
+        <p class="mt-1">
+            <strong>Active Election:</strong>
+            {{ session.get("active_election_name") }}
+        </p>
+    {% else %}
+        <form method="POST" class="mt-1">
+            <label for="election_id">
+                Choose Election
+            </label>
+
+            <select
+                id="election_id"
+                name="election_id"
+                required
+                class="mt-1"
+            >
+                <option value="">-- Select Election --</option>
+                {% for e in elections %}
+                    <option value="{{ e.id }}">
+                        {{ e.election_name }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <div class="mt-2">
+                <button type="submit">
+                    Lock Election for Booth
+                </button>
+            </div>
+        </form>
+    {% endif %}
+</div>
+
+        
+    <!-- =========================
          Authorize Voter (OTP Based)
     ========================= -->
     <div class="mt-3">
