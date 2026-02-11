@@ -1,0 +1,49 @@
+<div class="comment-card" style="margin-left: {{ level * 20 }}px;">
+
+    <!-- Comment Header -->
+    <div class="comment-header">
+        <a href="#"
+           class="toggle-thread"
+           onclick="toggleThread('{{ comment.id }}'); return false;">
+            <span id="toggle-icon-{{ comment.id }}">[–]</span>
+        </a>
+        <span class="comment-date">{{ comment.created_at }}</span>
+    </div>
+
+    <!-- Comment Body -->
+    <p class="comment-text">
+        {{ comment.comment }}
+    </p>
+
+    <!-- Actions -->
+    <div class="comment-actions">
+        <a href="#" onclick="toggleReply('{{ comment.id }}'); return false;">
+            Reply
+        </a>
+    </div>
+
+    <!-- Reply Form -->
+    <form
+        id="reply-form-{{ comment.id }}"
+        method="POST"
+        action="{{ url_for('citizen.add_issue_comment', issue_id=issue_id) }}"
+        style="display:none;"
+    >
+        <input type="hidden" name="parent_comment_id" value="{{ comment.id }}">
+        <textarea name="comment" rows="2" required></textarea>
+        <button class="btn-secondary">Reply</button>
+    </form>
+
+    <!-- Replies Container -->
+    <div
+        id="replies-{{ comment.id }}"
+        class="comment-replies"
+    >
+        {% for reply in comment.replies %}
+{% set level = level + 1 %}
+{% set comment = reply %}
+{% include "citizen/_comment.html" %}
+
+        {% endfor %}
+    </div>
+</div>

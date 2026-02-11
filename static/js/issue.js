@@ -89,3 +89,39 @@ document.addEventListener("DOMContentLoaded", () => {
         btn.disabled = true;
     });
 });
+
+function voteIssue(issueId, voteType) {
+    fetch(`/citizen/issues/${issueId}/vote`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ vote: voteType })
+    }).then(() => location.reload());
+}
+
+function confirmResolution(issueId) {
+    fetch(`/citizen/issues/${issueId}/resolve`, {
+        method: "POST"
+    }).then(() => location.reload());
+}
+
+function toggleReply(commentId) {
+    const form = document.getElementById(`reply-form-${commentId}`);
+    form.style.display = form.style.display === "none" ? "block" : "none";
+}
+
+function toggleThread(commentId) {
+    const replies = document.getElementById(`replies-${commentId}`);
+    const icon = document.getElementById(`toggle-icon-${commentId}`);
+
+    if (!replies) return;
+
+    if (replies.style.display === "none") {
+        replies.style.display = "block";
+        icon.textContent = "[–]";
+    } else {
+        replies.style.display = "none";
+        icon.textContent = "[+]";
+    }
+}

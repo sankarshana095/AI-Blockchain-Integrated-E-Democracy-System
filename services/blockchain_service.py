@@ -68,6 +68,7 @@ def _web3_cast_vote(election_id, candidate_id, receipt_hash):
     nonce = w3.eth.get_transaction_count(account.address)
     # 🔑 Convert receipt hash → bytes32
     receipt_bytes32 = Web3.to_bytes(hexstr=receipt_hash)
+    assert len(receipt_bytes32) == 32
     print('after:',receipt_bytes32)
     print('election_id:', election_id)
     print('candidate_id:', candidate_id)
@@ -129,3 +130,89 @@ def count_votes_from_blockchain(election_id: str) -> dict:
         results[candidate_id] = results.get(candidate_id, 0) + 1
 
     return results
+
+def publish_merkle_root_on_chain(election_id, merkle_root):
+    if BLOCKCHAIN_MODE == "STUB":
+        print(f"[STUB] Published Merkle Root for election {election_id}: {merkle_root}")
+        return True
+
+    from web3 import Web3
+    import json
+
+    w3 = Web3(Web3.HTTPProvider(Config.WEB3_PROVIDER_URL))
+
+    with open("blockchain/abi/VotingContractABI.json") as f:
+        abi = json.load(f)
+
+    contract = w3.eth.contract(
+        address=Web3.to_checksum_address(Config.VOTING_CONTRACT_ADDRESS),
+        abi=abi
+    )
+
+    account = w3.eth.account.from_key(Config.BOOTH_PRIVATE_KEY)
+    nonce = w3.eth.get_transaction_count(account.address)
+
+    txn = contract.functions.publishMerkleRoot(
+        uuid_to_uint256(election_id),
+        Web3.to_bytes(hexstr=merkle_root)
+    ).build_transaction({
+        "from": account.address,
+        "nonce": nonce,
+        "chainId": 11155111,
+        "gas": 200000,
+        "gasPrice": w3.eth.gas_price
+    })
+
+    signed = w3.eth.account.sign_transaction(txn, Config.BOOTH_PRIVATE_KEY)
+    tx_hash = w3.eth.send_raw_transaction(signed.raw_transaction)
+
+    return tx_hash.hex()
+
+def _web3_verify_receipt(election_id, receipt_hash, proof):
+    from web3 import Web3
+    import json
+    from config import Config
+    from utils.crypto import uuid_to_uint256
+
+    w3 = Web3(Web3.HTTPProvider(Config.WEB3_PROVIDER_URL))
+
+    if not w3.is_connected():
+        raise Exception("Blockchain node not reachable")
+
+    # Load ABI
+    with open("blockchain/abi/VotingContractABI.json") as f:
+        abi = json.load(f)
+
+    contract = w3.eth.contract(
+        address=Web3.to_checksum_address(Config.VOTING_CONTRACT_ADDRESS),
+        abi=abi
+    )
+
+    # Convert values to correct Solidity types
+    election_uint = uuid_to_uint256(election_id)
+    receipt_bytes32 = Web3.to_bytes(hexstr=receipt_hash)
+    proof_bytes32 = [Web3.to_bytes(hexstr=p) for p in proof]
+
+    # Call view function (NO GAS, NO TX)
+    return contract.functions.verifyReceipt(
+        election_uint,
+        receipt_bytes32,
+        proof_bytes32
+    ).call()
+
+def verify_receipt_on_chain(election_id, receipt_hash, proof):
+    """
+    Verifies a vote receipt using Merkle proof on blockchain.
+    """
+
+    if BLOCKCHAIN_MODE == "STUB":
+        # In stub mode, always return True for demo
+        print("[STUB] Verifying receipt:", receipt_hash)
+        return True
+
+    if BLOCKCHAIN_MODE == "WEB3":
+        return _web3_verify_receipt(election_id, receipt_hash, proof)
+
+    raise Exception("Invalid BLOCKCHAIN_MODE")
+
+

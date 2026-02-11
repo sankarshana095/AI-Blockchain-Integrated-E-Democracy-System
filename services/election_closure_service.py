@@ -4,7 +4,7 @@ from services.result_service import get_constituency_results
 from models.election import get_constituencies_for_election
 from utils.helpers import parse_iso_date
 import random
-
+from services.merkle_service import finalize_merkle_tree_for_election
 
 
 def close_election_and_assign_reps(election):
@@ -76,3 +76,5 @@ def close_election_and_assign_reps(election):
                 term_start=term_start,
                 term_end=term_end
             )
+
+    finalize_merkle_tree_for_election(election["id"])

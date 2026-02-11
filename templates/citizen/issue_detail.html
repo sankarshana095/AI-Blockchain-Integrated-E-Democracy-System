@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% set title = issue.title %}
+
+{% block content %}
+<div class="issue-detail">
+
+    <!-- =========================
+         Issue Header
+    ========================== -->
+    <div class="issue-header">
+        <div class="vote-panel">
+            <button onclick="voteIssue('{{ issue.id }}', 'up')">▲</button>
+            <div class="score">{{ issue.score or 0 }}</div>
+            <button onclick="voteIssue('{{ issue.id }}', 'down')">▼</button>
+        </div>
+
+        <div class="issue-info">
+            <h2>{{ issue.title }}</h2>
+
+            <p class="meta">
+                <span class="category">{{ issue.category }}</span>
+                •
+                <span class="status status-{{ issue.status|lower }}">
+                    {{ issue.status }}
+                </span>
+            </p>
+
+            <p class="description">
+                {{ issue.description }}
+            </p>
+
+            <p class="timestamp">
+                Raised on {{ issue.created_at }}
+            </p>
+        </div>
+    </div>
+
+    <!-- =========================
+         Resolution Section
+    ========================== -->
+    {% if resolution %}
+        <div class="resolution-box">
+            <h4>✅ Issue Resolution</h4>
+
+            <p>
+                <strong>Resolved by:</strong> Representative
+            </p>
+
+            {% if resolution.citizen_confirmed %}
+                <p class="confirmed">✔ Confirmed by citizen</p>
+            {% else %}
+                {% if is_issue_owner %}
+                    <button
+                        class="btn-primary"
+                        onclick="confirmResolution('{{ issue.id }}')"
+                    >
+                        Confirm Resolution
+                    </button>
+                {% else %}
+                    <p>Awaiting citizen confirmation</p>
+                {% endif %}
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <!-- =========================
+         Comments Section
+    ========================== -->
+    <section class="comments-section">
+    <h3>💬 Discussion</h3>
+
+    {% if comments %}
+        {% for comment in comments %}
+            {% set level = 0 %}
+{% set issue_id = issue.id %}
+{% set comment = comment %}
+{% include "citizen/_comment.html" %}
+
+        {% endfor %}
+    {% else %}
+        <p>No comments yet. Be the first to comment.</p>
+    {% endif %}
+
+    <!-- New top-level comment -->
+    <form method="POST" action="{{ url_for('citizen.add_issue_comment', issue_id=issue.id) }}">
+        <textarea name="comment" rows="3" required></textarea>
+        <button class="btn-primary">Add Comment</button>
+    </form>
+</section>
+
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/issue.js') }}"></script>
+{% endblock %}

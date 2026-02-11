@@ -1,53 +1,38 @@
 # utils/merkle.py
 
-import hashlib
+from eth_hash.auto import keccak
 from typing import List
 
 
 def _hash(data: bytes) -> bytes:
-    """SHA-256 hash helper"""
-    return hashlib.sha256(data).digest()
+    return keccak(data)
 
 
 def hash_leaf(value: str) -> bytes:
-    """
-    Hash a receipt hash string into a Merkle leaf.
-    """
-    return _hash(value.encode("utf-8"))
+    # value is already a hash (hex string)
+    return bytes.fromhex(value)
 
 
-def build_merkle_tree(receipt_hashes: List[str]) -> List[List[bytes]]:
-    """
-    Builds a Merkle tree from receipt hashes.
 
-    Returns:
-        tree[level][index]
-        level 0 = leaves
-        last level = root
-    """
-
-    if not receipt_hashes:
-        raise ValueError("No receipt hashes provided")
-
-    # Level 0: leaf hashes
-    level = [hash_leaf(r) for r in receipt_hashes]
+def build_merkle_tree(receipt_hashes):
+    level = [bytes.fromhex(r) for r in receipt_hashes]
     tree = [level]
 
-    # Build upwards
     while len(level) > 1:
         next_level = []
-
         for i in range(0, len(level), 2):
             left = level[i]
             right = level[i + 1] if i + 1 < len(level) else left
 
-            parent = _hash(left + right)
-            next_level.append(parent)
+            # ✅ SORT before hashing
+            combined = left + right if left < right else right + left
+            next_level.append(_hash(combined))
 
         level = next_level
         tree.append(level)
 
     return tree
+
 
 
 def get_merkle_root(receipt_hashes: List[str]) -> str:

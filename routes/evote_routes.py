@@ -116,18 +116,22 @@ def vote():
     # -----------------------------
     if request.method == "POST":
         try:
-            submit_vote(
+            result = submit_vote(
                 voter_id=voter_id,
                 constituency_id=session.get("constituency_id"),
-                election_id = session.get("active_election_id"),
+                election_id=session.get("active_election_id"),
                 vote_payload=request.form.get("candidate_id")
             )
 
-            # ✅ END VOTER SESSION HERE
+            # End voter session AFTER vote
             end_voter_session(booth_id)
 
-            flash("Vote recorded successfully", "success")
-            return redirect("/evote/waiting")
+            # ✅ Show success page instead of redirect
+            return render_template(
+                "evote/vote_success.html",
+                result=result
+            )
+
 
         except Exception as e:
             flash(str(e), "error")

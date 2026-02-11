@@ -2,17 +2,86 @@
 {% set title = "Issues Feed" %}
 
 {% block content %}
-<h2>Constituency Issues</h2>
+<div class="issues-feed">
 
-{% for issue in issues %}
-<div class="issue-card">
-    <h4>{{ issue.title }}</h4>
-    <p>{{ issue.description }}</p>
-    <p>Status: {{ issue.status }}</p>
+    <div class="feed-header">
+        <h2>🏛️ Constituency Issues</h2>
+        <a href="{{ url_for('citizen.new_issue') }}" class="btn-primary">
+            Raise Issue
+        </a>
+    </div>
+
+    {% if issues %}
+        {% for issue in issues %}
+            <div class="issue-card">
+
+                <!-- =========================
+                     Voting Column
+                ========================== -->
+                <div class="vote-column">
+                    <button
+                        class="vote-btn"
+                        onclick="voteIssue('{{ issue.id }}', 'up')"
+                    >
+                        ▲
+                    </button>
+
+                    <div class="vote-score">
+                        {{ issue.score or 0 }}
+                    </div>
+
+                    <button
+                        class="vote-btn"
+                        onclick="voteIssue('{{ issue.id }}', 'down')"
+                    >
+                        ▼
+                    </button>
+                </div>
+
+                <!-- =========================
+                     Issue Content
+                ========================== -->
+                <div class="issue-content">
+
+                    <a
+                        href="{{ url_for('citizen.issue_detail', issue_id=issue.id) }}"
+                        class="issue-title"
+                    >
+                        {{ issue.title }}
+                    </a>
+
+                    <div class="issue-meta">
+                        <span class="category">
+                            {{ issue.category }}
+                        </span>
+
+                        <span class="status status-{{ issue.status|lower }}">
+                            {{ issue.status }}
+                        </span>
+
+                        <span class="date">
+                            {{ issue.created_at }}
+                        </span>
+                    </div>
+
+                    <p class="issue-preview">
+                        {{ issue.description[:140] }}{% if issue.description|length > 140 %}...{% endif %}
+                    </p>
+
+                    <div class="issue-actions">
+                        <a href="{{ url_for('citizen.issue_detail', issue_id=issue.id) }}">
+                            💬 View Discussion
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No issues raised in your constituency yet.</p>
+    {% endif %}
+
 </div>
-{% else %}
-<p>No issues found.</p>
-{% endfor %}
 {% endblock %}
 
 {% block scripts %}

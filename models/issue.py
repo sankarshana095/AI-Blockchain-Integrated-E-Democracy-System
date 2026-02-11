@@ -22,7 +22,6 @@ def create_issue(
     category: str,
     created_by: str,
     constituency_id: str,
-    blockchain_hash: str = None
 ):
     payload = {
         "id": generate_uuid(),
@@ -32,8 +31,7 @@ def create_issue(
         "created_by": created_by,
         "constituency_id": constituency_id,
         "status": "Open",
-        "blockchain_hash": blockchain_hash,
-        "created_at": utc_now()
+        "created_at": utc_now().isoformat()
     }
     return insert_record(ISSUES_TABLE, payload, use_admin=True)
 
@@ -60,14 +58,33 @@ def update_issue_status(issue_id: str, status: str):
 # -----------------------------
 
 def vote_on_issue(issue_id: str, user_id: str, vote_type: str):
+    existing = fetch_one(
+        ISSUE_VOTES_TABLE,
+        {"issue_id": issue_id, "user_id": user_id}
+    )
+
+    if existing:
+        if existing["vote_type"] == vote_type:
+            return {"status": "ignored"}
+        else:
+            # update vote
+            update_record(
+                ISSUE_VOTES_TABLE,
+                {"id": existing["id"]},
+                {"vote_type": vote_type},
+                use_admin=True
+            )
+            return {"status": "updated"}
+
     payload = {
         "id": generate_uuid(),
         "issue_id": issue_id,
         "user_id": user_id,
         "vote_type": vote_type,
-        "created_at": utc_now()
+        "created_at": utc_now().isoformat()
     }
     return insert_record(ISSUE_VOTES_TABLE, payload, use_admin=True)
+
 
 
 def get_issue_votes(issue_id: str):
@@ -78,19 +95,29 @@ def get_issue_votes(issue_id: str):
 # Issue Comments
 # -----------------------------
 
-def add_issue_comment(issue_id: str, user_id: str, comment: str):
+def add_issue_comment(
+    issue_id: str,
+    user_id: str,
+    comment: str,
+    parent_comment_id: str = None
+):
     payload = {
         "id": generate_uuid(),
         "issue_id": issue_id,
         "user_id": user_id,
         "comment": comment,
-        "created_at": utc_now()
+        "parent_comment_id": parent_comment_id,
+        "created_at": utc_now().isoformat()
     }
     return insert_record(ISSUE_COMMENTS_TABLE, payload, use_admin=True)
 
 
 def get_issue_comments(issue_id: str):
-    return fetch_all(ISSUE_COMMENTS_TABLE, {"issue_id": issue_id})
+    return fetch_all(
+        ISSUE_COMMENTS_TABLE,
+        {"issue_id": issue_id}
+    )
+
 
 
 # -----------------------------
@@ -114,7 +141,7 @@ def confirm_issue_resolution(issue_id: str):
         {"issue_id": issue_id},
         {
             "citizen_confirmed": True,
-            "confirmed_at": utc_now()
+            "confirmed_at": utc_now().isoformat()
         },
         use_admin=True
     )
@@ -125,4 +152,7 @@ def get_issue_resolution(issue_id: str):
 
 def get_issues_by_user(user_id: str):
     return fetch_all(ISSUES_TABLE, {"created_by": user_id})
+
+
+
 

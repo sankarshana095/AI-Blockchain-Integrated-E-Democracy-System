@@ -5,85 +5,102 @@
 <div class="public-landing">
 
     <!-- =========================
-         Hero Section
+         HERO
     ========================== -->
     <section class="hero">
-        <h1>AI–Blockchain Integrated E-Democracy System</h1>
+        <div class="hero-content">
+            <h1>AI–Blockchain Integrated<br>E-Democracy System</h1>
 
-        <p class="hero-subtitle">
-            Secure. Transparent. Accountable.
-        </p>
+            <p class="hero-subtitle">
+                Secure • Transparent • Accountable Digital Elections
+            </p>
 
-        <div class="hero-actions">
-            <a href="{{ url_for('auth.login') }}" class="btn-primary">
-                Login
-            </a>
+            <div class="hero-actions">
+                <a href="{{ url_for('auth.login') }}" class="btn-primary">
+                    Login
+                </a>
 
-            <a href="{{ url_for('public.election_schedule') }}" class="btn-secondary">
-                View Election Schedule
-            </a>
+                <a href="{{ url_for('public.election_schedule') }}" class="btn-outline">
+                    Election Schedule
+                </a>
+
+                <a href="{{ url_for('public_results.dashboard') }}" class="btn-outline">
+                    Final Results
+                </a>
+
+                <a href="{{ url_for('verify_vote.verify_vote_page') }}" class="btn-outline">
+                    Verify My Vote
+                </a>
+
+                <a href="https://sepolia.etherscan.io/address/0x51bE814c9F2C2ec5799fA872A25A0735723fae0e"
+                   class="btn-link"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                    View Smart Contract ↗
+                </a>
+            </div>
         </div>
     </section>
 
     <!-- =========================
-         About Section
+         ABOUT
     ========================== -->
     <section class="about">
         <h2>What is this Platform?</h2>
-
-        <p>
-            This platform enables secure digital elections and transparent
-            governance using blockchain technology and AI-driven analytics.
+        <p class="about-text">
+            A next-generation e-governance platform combining blockchain security
+            and AI-driven analytics to deliver transparent, tamper-proof elections.
         </p>
 
-        <ul>
-            <li>End-to-end verifiable voting</li>
-            <li>Constituency-based issue reporting</li>
-            <li>Performance accountability for representatives</li>
-            <li>Public ledger for vote verification</li>
+        <ul class="feature-list">
+            <li>✔ End-to-end verifiable voting</li>
+            <li>✔ Blockchain-backed vote receipts</li>
+            <li>✔ Constituency-wise accountability</li>
+            <li>✔ Public auditability & transparency</li>
         </ul>
     </section>
 
     <!-- =========================
-         Roles Overview
+         ROLES
     ========================== -->
     <section class="roles">
-        <h2>User Roles</h2>
+        <h2>Who Uses This Platform?</h2>
 
         <div class="role-grid">
             <div class="role-card">
                 <h3>Citizens</h3>
                 <p>
-                    Vote securely, raise issues, and verify votes using
-                    the public ledger.
+                    Vote securely, verify your vote using blockchain,
+                    and track election results transparently.
                 </p>
             </div>
 
             <div class="role-card">
                 <h3>Representatives</h3>
                 <p>
-                    Publish updates, resolve issues, and engage in
-                    structured debates.
+                    Engage with constituents, publish updates,
+                    and maintain measurable accountability.
                 </p>
             </div>
 
             <div class="role-card">
                 <h3>Election Commission</h3>
                 <p>
-                    Manage election workflows from national to booth level
-                    with complete auditability.
+                    Manage elections end-to-end with complete
+                    auditability and tamper resistance.
                 </p>
             </div>
         </div>
     </section>
 
     <!-- =========================
-         Footer CTA
+         CTA
     ========================== -->
     <section class="cta">
         <h2>Ready to Participate?</h2>
+        <p>Join the future of secure digital democracy.</p>
 
-        <a href="{{ url_for('auth.login') }}" class="btn-primary">
+        <a href="{{ url_for('auth.login') }}" class="btn-primary btn-large">
             Access the Platform
         </a>
     </section>

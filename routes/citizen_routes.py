@@ -16,6 +16,8 @@ from models.voter import (
     get_voters_by_constituency,
     get_voter_by_user_id
 )
+from services.issue_service import get_threaded_comments
+
 
 
 bp = Blueprint("citizen", __name__, url_prefix="/citizen")
@@ -30,8 +32,20 @@ bp = Blueprint("citizen", __name__, url_prefix="/citizen")
 @role_required("CITIZEN")
 def dashboard():
     constituency_id = session.get("constituency_id")
-    issues = get_issues_by_constituency(constituency_id)
-    return render_template("citizen/dashboard.html", issues=issues)
+    user_id = session.get("user_id")
+
+    all_issues = get_constituency_issues(constituency_id)
+    my_issues = get_my_issues(user_id)
+
+    trending_issues = all_issues[:5]
+    resolved_issues = [i for i in all_issues if i["status"] == "Resolved"][:5]
+
+    return render_template(
+        "citizen/dashboard.html",
+        trending_issues=trending_issues,
+        my_issues=my_issues[:5],
+        resolved_issues=resolved_issues
+    )
 
 
 # -----------------------------
@@ -194,7 +208,7 @@ def profile():
 @login_required
 @role_required("CITIZEN")
 def vote_issue(issue_id):
-    vote = request.json.get("vote")
+    vote = request.json.get("vote").lower()
 
     if vote not in {"up", "down"}:
         return "Invalid vote", 400
@@ -204,7 +218,7 @@ def vote_issue(issue_id):
     upvote_downvote_issue(
         issue_id=issue_id,
         user_id=session.get("user_id"),
-        vote_type=vote.upper()
+        vote_type=vote
     )
 
     return "", 204
@@ -221,4 +235,51 @@ def confirm_resolution(issue_id):
     )
 
     return "", 204
+
+@bp.route("/issues/<issue_id>")
+@login_required
+@role_required("CITIZEN")
+def issue_detail(issue_id):
+    from models.issue import (
+        get_issue_by_id,
+        get_issue_comments,
+        get_issue_resolution
+    )
+
+    issue = get_issue_by_id(issue_id)
+    if not issue:
+        flash("Issue not found", "error")
+        return redirect(url_for("citizen.issues_feed"))
+
+    comments = get_threaded_comments(issue_id)
+    resolution = get_issue_resolution(issue_id)
+
+    is_issue_owner = issue["created_by"] == session.get("user_id")
+
+    return render_template(
+        "citizen/issue_detail.html",
+        issue=issue,
+        comments=comments,
+        resolution=resolution,
+        is_issue_owner=is_issue_owner
+    )
+
+@bp.route("/issues/<issue_id>/comment", methods=["POST"])
+@login_required
+@role_required("CITIZEN")
+def add_issue_comment(issue_id):
+    from services.issue_service import comment_on_issue
+
+    comment = request.form.get("comment")
+    parent_id = request.form.get("parent_comment_id")
+
+    comment_on_issue(
+        issue_id=issue_id,
+        user_id=session.get("user_id"),
+        comment=comment,
+        parent_comment_id=parent_id
+    )
+
+    return redirect(url_for("citizen.issue_detail", issue_id=issue_id))
+
 

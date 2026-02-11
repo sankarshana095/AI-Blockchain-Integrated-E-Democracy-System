@@ -165,9 +165,8 @@ def get_current_active_election():
     return None
 
 def get_completed_elections():
-    now = utc_now().isoformat()
-    elections = fetch_all("elections", {"status": "Approved"})
-    return [e for e in elections if e["end_time"] < now]
+    elections = fetch_all("elections", {"status": "COMPLETED"})
+    return [e for e in elections]
 
 def mark_election_completed(election_id: str):
     """

@@ -19,6 +19,7 @@ from routes.public_results_routes import bp as public_results_bp
 
 
 
+
 def create_app():
     import os
     from dotenv import load_dotenv

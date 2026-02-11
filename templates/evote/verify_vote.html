@@ -1,42 +1,48 @@
 {% extends "base.html" %}
-{% set title = "Verify Vote" %}
+{% block title %}Verify Vote{% endblock %}
 
 {% block content %}
-<div class="container">
+<h2>Verify Your Vote</h2>
 
-    <h2>Verify Your Vote</h2>
+<form id="verify-form">
+    <label>Election ID</label>
+    <input type="text" id="election_id" required>
 
-    <p class="mt-1">
-        Enter your vote receipt to verify that your vote
-        was included in the election.
-    </p>
+    <label>Receipt Hash</label>
+    <input type="text" id="receipt_hash" required>
 
-    <form method="POST" class="mt-3">
+    <button type="submit">Verify</button>
+</form>
 
-        <label>Election ID</label>
-        <input type="text" name="election_id" required class="mt-1">
+<div id="result" style="margin-top: 1rem;"></div>
 
-        <label class="mt-2">Receipt Hash</label>
-        <input type="text" name="receipt_hash" required class="mt-1">
+<script>
+document.getElementById("verify-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-        <div class="mt-2">
-            <button type="submit">Verify Vote</button>
-        </div>
-    </form>
+    const electionId = document.getElementById("election_id").value;
+    const receiptHash = document.getElementById("receipt_hash").value;
+    const resultEl = document.getElementById("result");
 
-    {% if result is not none %}
-        <div class="mt-3">
-            {% if result %}
-                <p style="color: green;">
-                    ✅ Your vote was included in the election.
-                </p>
-            {% else %}
-                <p style="color: red;">
-                    ❌ Vote not found or invalid receipt.
-                </p>
-            {% endif %}
-        </div>
-    {% endif %}
+    resultEl.innerHTML = "🔍 Verifying...";
 
-</div>
+    const res = await fetch("/verify-vote/check", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            election_id: electionId,
+            receipt_hash: receiptHash
+        })
+    });
+
+    const data = await res.json();
+
+    if (data.valid) {
+        resultEl.innerHTML = "✅ " + (data.message || "Vote verified");
+    } else {
+        resultEl.innerHTML = "❌ " + (data.message || "Verification failed");
+    }
+});
+</script>
+
 {% endblock %}

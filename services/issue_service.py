@@ -9,6 +9,7 @@ from models.issue import (
 from models.audit import create_audit_log
 from models.ledger import create_ledger_entry
 from utils.helpers import sha256_hash
+from models.issue import get_issue_comments as fetch_comments
 
 
 # -----------------------------
@@ -34,8 +35,7 @@ def raise_issue(
         description=description,
         category=category,
         created_by=created_by,
-        constituency_id=constituency_id,
-        blockchain_hash=issue_hash
+        constituency_id=constituency_id
     )
 
     issue_id = issue[0]["id"]
@@ -73,7 +73,7 @@ def upvote_downvote_issue(issue_id: str, user_id: str, vote_type: str):
     )
 
 
-def comment_on_issue(issue_id: str, user_id: str, comment: str):
+def comment_on_issue(issue_id: str, user_id: str, comment: str,parent_comment_id: str = None):
     add_issue_comment(issue_id, user_id, comment)
 
     create_audit_log(
@@ -114,3 +114,20 @@ def citizen_confirm_resolution(issue_id: str, user_id: str):
         entity_type="ISSUE",
         entity_id=issue_id
     )
+
+def build_comment_tree(comments):
+    comment_map = {c["id"]: {**c, "replies": []} for c in comments}
+    roots = []
+
+    for c in comment_map.values():
+        parent_id = c.get("parent_comment_id")
+        if parent_id and parent_id in comment_map:
+            comment_map[parent_id]["replies"].append(c)
+        else:
+            roots.append(c)
+
+    return roots
+
+def get_threaded_comments(issue_id: str):
+    comments = fetch_comments(issue_id)
+    return build_comment_tree(comments)

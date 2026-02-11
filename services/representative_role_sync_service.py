@@ -16,7 +16,6 @@ def sync_user_roles_from_representatives():
 
     # 1️⃣ Active representatives (today within term)
     active_reps = get_active_representatives(today)
-    print(get_active_representatives(today))
     active_user_roles = {}  # user_id -> role
 
     for rep in active_reps:
