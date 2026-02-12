@@ -8,6 +8,13 @@ from services.representative_service import (
     get_constituency_issues_for_rep,
     get_my_performance_score
 )
+from services.issue_service import (
+    accept_issue,
+    mark_in_progress,
+    resolve_issue,
+    reject_issue
+)
+
 
 bp = Blueprint("representative", __name__, url_prefix="/representative")
 
@@ -123,4 +130,81 @@ def resolve_issue(issue_id):
 
     return redirect(url_for("representative.issue_management"))
 
+@bp.route("/issues/<issue_id>/accept", methods=["POST"])
+@login_required
+@role_required("ELECTED_REP")
+def accept(issue_id):
+    note = request.form.get("note")
+    estimated_start = request.form.get("estimated_start")
 
+    if not note or not estimated_start:
+        flash("Note and estimated start time are required.", "error")
+        return redirect(url_for("representative.issue_management"))
+
+    accept_issue(
+        issue_id=issue_id,
+        rep_id=session["user_id"],
+        note=note,
+        estimated_start=estimated_start
+    )
+
+    flash("Issue accepted successfully.", "success")
+    return redirect(url_for("representative.issue_management"))
+
+@bp.route("/issues/<issue_id>/progress", methods=["POST"])
+@login_required
+@role_required("ELECTED_REP")
+def progress(issue_id):
+    note = request.form.get("note")
+    estimated_completion = request.form.get("estimated_completion")
+
+    if not note or not estimated_completion:
+        flash("Note and estimated completion time are required.", "error")
+        return redirect(url_for("representative.issue_management"))
+
+    mark_in_progress(
+        issue_id=issue_id,
+        rep_id=session["user_id"],
+        note=note,
+        estimated_completion=estimated_completion
+    )
+
+    flash("Issue marked as in progress.", "success")
+    return redirect(url_for("representative.issue_management"))
+@bp.route("/issues/<issue_id>/resolve", methods=["POST"])
+@login_required
+@role_required("ELECTED_REP")
+def resolve(issue_id):
+    note = request.form.get("note")
+
+    if not note:
+        flash("Resolution note is required.", "error")
+        return redirect(url_for("representative.issue_management"))
+
+    resolve_issue(
+        issue_id=issue_id,
+        rep_id=session["user_id"],
+        note=note
+    )
+
+    flash("Issue marked as resolved.", "success")
+    return redirect(url_for("representative.issue_management"))
+
+@bp.route("/issues/<issue_id>/reject", methods=["POST"])
+@login_required
+@role_required("ELECTED_REP")
+def reject(issue_id):
+    note = request.form.get("note")
+
+    if not note:
+        flash("Rejection reason is required.", "error")
+        return redirect(url_for("representative.issue_management"))
+
+    reject_issue(
+        issue_id=issue_id,
+        rep_id=session["user_id"],
+        note=note
+    )
+
+    flash("Issue rejected.", "success")
+    return redirect(url_for("representative.issue_management"))

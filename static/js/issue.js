@@ -90,15 +90,33 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
+// ==============================
+// Issue Voting (Upvote / Downvote)
+// ==============================
+
 function voteIssue(issueId, voteType) {
     fetch(`/citizen/issues/${issueId}/vote`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ vote: voteType })
-    }).then(() => location.reload());
+        body: JSON.stringify({
+            vote: voteType
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Vote failed");
+        }
+        // Reload page to reflect updated score
+        window.location.reload();
+    })
+    .catch(error => {
+        console.error("Voting error:", error);
+        alert("Unable to register vote. Please try again.");
+    });
 }
+
 
 function confirmResolution(issueId) {
     fetch(`/citizen/issues/${issueId}/resolve`, {
@@ -125,3 +143,4 @@ function toggleThread(commentId) {
         icon.textContent = "[+]";
     }
 }
+

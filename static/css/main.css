@@ -610,3 +610,71 @@ button {
 .page-actions {
     margin-top: 20px;
 }
+
+.timeline {
+    list-style: none;
+    padding-left: 0;
+}
+
+.timeline-item {
+    border-left: 3px solid #007bff;
+    padding-left: 15px;
+    margin-bottom: 15px;
+}
+
+.timeline-header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+}
+
+.timeline-note {
+    margin: 5px 0;
+}
+
+.timeline-extra {
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.feedback-box {
+    background: #f8f9fa;
+    padding: 15px;
+    margin-top: 15px;
+    border-radius: 5px;
+}
+
+.vote-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.vote-btn {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: #9aa0a6; /* neutral grey */
+    transition: color 0.2s ease, transform 0.1s ease;
+}
+
+.vote-btn:hover {
+    transform: scale(1.1);
+    color: #444;
+}
+
+.vote-btn.upvote.active {
+    color: #ff6a00; /* warm orange */
+}
+
+.vote-btn.downvote.active {
+    color: #4a6cff; /* calm blue */
+}
+
+.score {
+    font-weight: 600;
+    font-size: 15px;
+}
+

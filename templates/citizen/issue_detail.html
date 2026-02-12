@@ -9,10 +9,37 @@
     ========================== -->
     <div class="issue-header">
         <div class="vote-panel">
-            <button onclick="voteIssue('{{ issue.id }}', 'up')">▲</button>
-            <div class="score">{{ issue.score or 0 }}</div>
-            <button onclick="voteIssue('{{ issue.id }}', 'down')">▼</button>
-        </div>
+
+    <!-- UPVOTE -->
+    <button
+        class="vote-btn upvote {% if user_vote == 'up' %}active{% endif %}"
+        onclick="voteIssue('{{ issue.id }}', 'up')"
+        aria-label="Upvote"
+    >
+        {% if user_vote == 'up' %}
+            ▲
+        {% else %}
+            △
+        {% endif %}
+    </button>
+
+    <!-- SCORE -->
+    <div class="score">{{ issue.score }}</div>
+
+    <!-- DOWNVOTE -->
+    <button
+        class="vote-btn downvote {% if user_vote == 'down' %}active{% endif %}"
+        onclick="voteIssue('{{ issue.id }}', 'down')"
+        aria-label="Downvote"
+    >
+        {% if user_vote == 'down' %}
+            ▼
+        {% else %}
+            ▽
+        {% endif %}
+    </button>
+
+</div>
 
         <div class="issue-info">
             <h2>{{ issue.title }}</h2>
@@ -30,66 +57,144 @@
             </p>
 
             <p class="timestamp">
-                Raised on {{ issue.created_at }}
+                📅 Raised on {{ issue.created_at }}
             </p>
         </div>
     </div>
 
+
     <!-- =========================
-         Resolution Section
+         Timeline Section
     ========================== -->
-    {% if resolution %}
-        <div class="resolution-box">
-            <h4>✅ Issue Resolution</h4>
+    <section class="timeline-section">
+        <h3>📍 Issue Timeline</h3>
 
-            <p>
-                <strong>Resolved by:</strong> Representative
-            </p>
+        {% if timeline %}
+            <ul class="timeline">
+                {% for step in timeline %}
+                    <li class="timeline-item">
+                        <div class="timeline-header">
+                            <strong>{{ step.status }}</strong>
+                            <span class="timeline-date">
+                                {{ step.created_at }}
+                            </span>
+                        </div>
 
-            {% if resolution.citizen_confirmed %}
-                <p class="confirmed">✔ Confirmed by citizen</p>
-            {% else %}
-                {% if is_issue_owner %}
-                    <button
-                        class="btn-primary"
-                        onclick="confirmResolution('{{ issue.id }}')"
-                    >
-                        Confirm Resolution
-                    </button>
-                {% else %}
-                    <p>Awaiting citizen confirmation</p>
-                {% endif %}
+                        <p class="timeline-note">
+                            {{ step.note }}
+                        </p>
+
+                        {% if step.estimated_start_at %}
+                            <p class="timeline-extra">
+                                🛠 Estimated Start: {{ step.estimated_start_at }}
+                            </p>
+                        {% endif %}
+
+                        {% if step.estimated_completion_at %}
+                            <p class="timeline-extra">
+                                ⏳ Estimated Completion: {{ step.estimated_completion_at }}
+                            </p>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No status updates yet.</p>
+        {% endif %}
+    </section>
+
+
+    <!-- =========================
+         Resolution Duration
+    ========================== -->
+    {% if issue.status == "Resolved" or issue.status == "Closed" %}
+        {% set resolved_step = None %}
+        {% for step in timeline %}
+            {% if step.status == "Resolved" %}
+                {% set resolved_step = step %}
+            {% endif %}
+        {% endfor %}
+
+        {% if resolved_step %}
+            <div class="resolution-duration">
+                🕒 Resolution completed on {{ resolved_step.created_at }}
+            </div>
+        {% endif %}
+    {% endif %}
+
+
+    <!-- =========================
+         Feedback Section
+    ========================== -->
+    {% if feedback %}
+        <div class="feedback-box">
+            <h4>⭐ Citizen Feedback</h4>
+            <p>Rating: {{ feedback.rating }}/5</p>
+            {% if feedback.review %}
+                <p>{{ feedback.review }}</p>
             {% endif %}
         </div>
     {% endif %}
+
+
+    <!-- =========================
+         Resolution Confirmation
+    ========================== -->
+    {% if issue.status == "Resolved" and is_issue_owner %}
+        <div class="resolution-box">
+            <form method="POST"
+                  action="{{ url_for('citizen.submit_issue_feedback', issue_id=issue.id) }}">
+                <label>Rate the resolution (1–5)</label>
+                <select name="rating" required>
+                    <option value="5">⭐⭐⭐⭐⭐</option>
+                    <option value="4">⭐⭐⭐⭐</option>
+                    <option value="3">⭐⭐⭐</option>
+                    <option value="2">⭐⭐</option>
+                    <option value="1">⭐</option>
+                </select>
+
+                <textarea name="review"
+                          placeholder="Write your feedback (optional)"></textarea>
+
+                <button class="btn-primary">
+                    Submit Feedback & Close Issue
+                </button>
+            </form>
+        </div>
+    {% endif %}
+
 
     <!-- =========================
          Comments Section
     ========================== -->
     <section class="comments-section">
-    <h3>💬 Discussion</h3>
+        <h3>💬 Discussion</h3>
 
-    {% if comments %}
-        {% for comment in comments %}
-            {% set level = 0 %}
-{% set issue_id = issue.id %}
-{% set comment = comment %}
-{% include "citizen/_comment.html" %}
+        {% if comments %}
+            {% for comment in comments %}
+                {% set level = 0 %}
+                {% set issue_id = issue.id %}
+                {% set comment = comment %}
+                {% include "citizen/_comment.html" %}
+            {% endfor %}
+        {% else %}
+            <p>No comments yet. Be the first to comment.</p>
+        {% endif %}
 
-        {% endfor %}
-    {% else %}
-        <p>No comments yet. Be the first to comment.</p>
-    {% endif %}
-
-    <!-- New top-level comment -->
+        {% if issue.status != "Closed" and issue.status != "Rejected" %}
+        <form method="POST"
+              action="{{ url_for('citizen.add_issue_comment', issue_id=issue.id) }}">
+            <textarea name="comment" rows="3" required></textarea>
+            <button class="btn-primary">Add Comment</button>
+        </form>
+        {% endif %}
+    </section>
     <form method="POST" action="{{ url_for('citizen.add_issue_comment', issue_id=issue.id) }}">
         <textarea name="comment" rows="3" required></textarea>
         <button class="btn-primary">Add Comment</button>
     </form>
-</section>
-
 
 </div>
+
 <script src="{{ url_for('static', filename='js/issue.js') }}"></script>
 {% endblock %}
-

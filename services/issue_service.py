@@ -10,6 +10,14 @@ from models.audit import create_audit_log
 from models.ledger import create_ledger_entry
 from utils.helpers import sha256_hash
 from models.issue import get_issue_comments as fetch_comments
+from models.issue import update_issue_status
+from models.issue_timeline import add_issue_status
+from models.issue import (
+    get_user_issue_vote,
+    upsert_issue_vote,
+    remove_issue_vote
+)
+
 
 
 # -----------------------------
@@ -74,7 +82,7 @@ def upvote_downvote_issue(issue_id: str, user_id: str, vote_type: str):
 
 
 def comment_on_issue(issue_id: str, user_id: str, comment: str,parent_comment_id: str = None):
-    add_issue_comment(issue_id, user_id, comment)
+    add_issue_comment(issue_id, user_id, comment,parent_comment_id)
 
     create_audit_log(
         user_id=user_id,
@@ -84,16 +92,20 @@ def comment_on_issue(issue_id: str, user_id: str, comment: str,parent_comment_id
     )
 
 
+from models.issue import update_issue_status
+
 def resolve_issue(issue_id: str, resolved_by: str):
-    """
-    Elected representative marks issue as resolved.
-    """
     issue = get_issue_by_id(issue_id)
     if not issue:
         raise ValueError("Issue not found")
 
+    # 1. Mark resolution
     mark_issue_resolved(issue_id, resolved_by)
 
+    # 2. Update issue status
+    update_issue_status(issue_id, "Resolved")
+
+    # 3. Audit
     create_audit_log(
         user_id=resolved_by,
         action="RESOLVE_ISSUE",
@@ -102,11 +114,12 @@ def resolve_issue(issue_id: str, resolved_by: str):
     )
 
 
+
 def citizen_confirm_resolution(issue_id: str, user_id: str):
-    """
-    Issue creator confirms resolution.
-    """
     confirm_issue_resolution(issue_id)
+
+    # Optional but recommended
+    update_issue_status(issue_id, "Closed")
 
     create_audit_log(
         user_id=user_id,
@@ -131,3 +144,77 @@ def build_comment_tree(comments):
 def get_threaded_comments(issue_id: str):
     comments = fetch_comments(issue_id)
     return build_comment_tree(comments)
+
+def accept_issue(issue_id, rep_id, note, estimated_start):
+    update_issue_status(issue_id, "Accepted")
+
+    add_issue_status(
+        issue_id=issue_id,
+        status="Accepted",
+        changed_by=rep_id,
+        note=note,
+        estimated_start_at=estimated_start
+    )
+
+def mark_in_progress(issue_id, rep_id, note, estimated_completion):
+    update_issue_status(issue_id, "In Progress")
+
+    add_issue_status(
+        issue_id=issue_id,
+        status="In Progress",
+        changed_by=rep_id,
+        note=note,
+        estimated_completion_at=estimated_completion
+    )
+
+def resolve_issue(issue_id, rep_id, note):
+    update_issue_status(issue_id, "Resolved")
+
+    add_issue_status(
+        issue_id=issue_id,
+        status="Resolved",
+        changed_by=rep_id,
+        note=note
+    )
+
+
+def reject_issue(issue_id, rep_id, note):
+    update_issue_status(issue_id, "Rejected")
+
+    add_issue_status(
+        issue_id=issue_id,
+        status="Rejected",
+        changed_by=rep_id,
+        note=note
+    )
+
+def close_issue(issue_id, citizen_id):
+    update_issue_status(issue_id, "Closed")
+
+    add_issue_status(
+        issue_id=issue_id,
+        status="Closed",
+        changed_by=citizen_id,
+        note="Citizen confirmed resolution"
+    )
+
+def toggle_issue_vote(issue_id: str, user_id: str, vote_type: str):
+    """
+    vote_type = up | down
+    """
+
+    existing = get_user_issue_vote(issue_id, user_id)
+
+    if existing:
+        if existing["vote_type"] == vote_type:
+            # Same vote clicked again → remove vote
+            remove_issue_vote(issue_id, user_id)
+            return "REMOVED"
+        else:
+            # Switch vote
+            upsert_issue_vote(issue_id, user_id, vote_type)
+            return "SWITCHED"
+    else:
+        # New vote
+        upsert_issue_vote(issue_id, user_id, vote_type)
+        return "ADDED"

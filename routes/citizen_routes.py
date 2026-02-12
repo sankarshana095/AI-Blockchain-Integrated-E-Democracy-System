@@ -17,6 +17,13 @@ from models.voter import (
     get_voter_by_user_id
 )
 from services.issue_service import get_threaded_comments
+from models.issue_timeline import get_issue_timeline
+from models.issue_feedback import get_feedback
+from models.issue_feedback import submit_feedback as save_feedback
+from services.issue_service import close_issue
+
+
+
 
 
 
@@ -38,7 +45,11 @@ def dashboard():
     my_issues = get_my_issues(user_id)
 
     trending_issues = all_issues[:5]
-    resolved_issues = [i for i in all_issues if i["status"] == "Resolved"][:5]
+    resolved_issues = [
+        i for i in all_issues
+        if i["status"] in ("Resolved", "Closed")
+    ][:5]
+
 
     return render_template(
         "citizen/dashboard.html",
@@ -216,20 +227,21 @@ def profile():
 @login_required
 @role_required("CITIZEN")
 def vote_issue(issue_id):
-    vote = request.json.get("vote").lower()
+    vote = request.json.get("vote")
 
     if vote not in {"up", "down"}:
-        return "Invalid vote", 400
+        return {"error": "Invalid vote"}, 400
 
-    from services.issue_service import upvote_downvote_issue
+    from services.issue_service import toggle_issue_vote
 
-    upvote_downvote_issue(
+    toggle_issue_vote(
         issue_id=issue_id,
-        user_id=session.get("user_id"),
-        vote_type=vote
+        user_id=session["user_id"],
+        vote_type=vote.lower()
     )
 
     return "", 204
+
 
 @bp.route("/issues/<issue_id>/resolve", methods=["POST"])
 @login_required
@@ -251,7 +263,9 @@ def issue_detail(issue_id):
     from models.issue import (
         get_issue_by_id,
         get_issue_comments,
-        get_issue_resolution
+        get_issue_resolution,
+        get_issue_score,
+        get_user_issue_vote
     )
 
     issue = get_issue_by_id(issue_id)
@@ -261,6 +275,18 @@ def issue_detail(issue_id):
 
     comments = get_threaded_comments(issue_id)
     resolution = get_issue_resolution(issue_id)
+    timeline = get_issue_timeline(issue_id)
+    feedback = get_feedback(issue_id)
+    issue = get_issue_by_id(issue_id)
+    issue["score"] = get_issue_score(issue_id) 
+    user_vote = get_user_issue_vote(
+        issue_id,
+        session["user_id"]
+    )
+    user_vote = user_vote if user_vote else None
+    user_vote = user_vote["vote_type"] if user_vote is not None else 0
+
+
 
     is_issue_owner = issue["created_by"] == session.get("user_id")
 
@@ -269,7 +295,10 @@ def issue_detail(issue_id):
         issue=issue,
         comments=comments,
         resolution=resolution,
-        is_issue_owner=is_issue_owner
+        timeline=timeline, 
+        feedback=feedback,
+        is_issue_owner=is_issue_owner,
+        user_vote=user_vote
     )
 
 @bp.route("/issues/<issue_id>/comment", methods=["POST"])
@@ -280,7 +309,7 @@ def add_issue_comment(issue_id):
 
     comment = request.form.get("comment")
     parent_id = request.form.get("parent_comment_id")
-
+    print(parent_id)
     comment_on_issue(
         issue_id=issue_id,
         user_id=session.get("user_id"),
@@ -290,4 +319,26 @@ def add_issue_comment(issue_id):
 
     return redirect(url_for("citizen.issue_detail", issue_id=issue_id))
 
+@bp.route("/issues/<issue_id>/feedback", methods=["POST"])
+@login_required
+@role_required("CITIZEN")
+def submit_issue_feedback(issue_id):
+
+    rating = request.form.get("rating")
+    review = request.form.get("review")
+
+    # Save feedback
+    save_feedback(
+        issue_id=issue_id,
+        citizen_id=session["user_id"],
+        rating=int(rating),
+        review=review
+    )
+
+    # Close issue after feedback
+    close_issue(issue_id, session["user_id"])
+
+    return redirect(
+        url_for("citizen.issue_detail", issue_id=issue_id)
+    )
 

@@ -18,7 +18,9 @@
         {% for issue in issues %}
             <div class="issue-card">
 
-                <!-- Issue Header -->
+                <!-- =========================
+                     Issue Header
+                ========================== -->
                 <div class="issue-header">
                     <a
                         href="{{ url_for('citizen.issue_detail', issue_id=issue.id) }}"
@@ -34,12 +36,8 @@
 
                 <!-- Meta -->
                 <div class="issue-meta">
-                    <span class="category">
-                        {{ issue.category }}
-                    </span>
-                    <span class="date">
-                        Raised on {{ issue.created_at }}
-                    </span>
+                    <span class="category">{{ issue.category }}</span>
+                    <span class="date">Raised on {{ issue.created_at }}</span>
                 </div>
 
                 <!-- Description Preview -->
@@ -48,34 +46,97 @@
                     {% if issue.description|length > 150 %}...{% endif %}
                 </p>
 
-                <!-- Actions -->
+                <!-- =========================
+                     Actions (STATUS-BASED)
+                ========================== -->
                 <div class="issue-actions">
 
-                    <a
-                        href="{{ url_for('citizen.issue_detail', issue_id=issue.id) }}"
-                        class="btn-secondary"
-                    >
-                        💬 View Discussion
-                    </a>
+                    <!-- ===== OPEN ===== -->
+                    {% if issue.status == "Open" %}
 
-                    {% if issue.status != "Resolved" %}
-                        <form
-                            method="POST"
-                            action="{{ url_for('representative.resolve_issue', issue_id=issue.id) }}"
-                            style="display:inline;"
-                        >
-                            <button class="btn-primary">
-                                ✅ Mark as Resolved
-                            </button>
+                        <!-- ACCEPT -->
+                        <form method="POST"
+                              action="{{ url_for('representative.accept', issue_id=issue.id) }}"
+                              class="action-form">
+
+                            <label>Acceptance Note</label>
+                            <textarea name="note" required
+                                      placeholder="Explain why this issue is accepted"></textarea>
+
+                            <label>Estimated Work Start</label>
+                            <input type="datetime-local"
+                                   name="estimated_start"
+                                   required>
+
+                            <button class="btn-primary">Accept Issue</button>
                         </form>
-                    {% else %}
-                        <span class="resolved-indicator">
-                            ✔ Awaiting Citizen Confirmation
-                        </span>
+
+                        <!-- REJECT -->
+                        <form method="POST"
+                              action="{{ url_for('representative.reject', issue_id=issue.id) }}"
+                              class="action-form">
+
+                            <label>Rejection Reason</label>
+                            <textarea name="note" required
+                                      placeholder="Explain why this issue is rejected"></textarea>
+
+                            <button class="btn-danger">Reject Issue</button>
+                        </form>
+
+                    {% endif %}
+
+                    <!-- ===== ACCEPTED ===== -->
+                    {% if issue.status == "Accepted" %}
+
+                        <form method="POST"
+                              action="{{ url_for('representative.progress', issue_id=issue.id) }}"
+                              class="action-form">
+
+                            <label>Progress Note</label>
+                            <textarea name="note" required
+                                      placeholder="Describe work started"></textarea>
+
+                            <label>Estimated Completion</label>
+                            <input type="datetime-local"
+                                   name="estimated_completion"
+                                   required>
+
+                            <button class="btn-primary">Mark In Progress</button>
+                        </form>
+
+                    {% endif %}
+
+                    <!-- ===== IN PROGRESS ===== -->
+                    {% if issue.status == "In Progress" %}
+
+                        <form method="POST"
+                              action="{{ url_for('representative.resolve', issue_id=issue.id) }}"
+                              class="action-form">
+
+                            <label>Resolution Note</label>
+                            <textarea name="note" required
+                                      placeholder="Describe how the issue was resolved"></textarea>
+
+                            <button class="btn-success">Mark Resolved</button>
+                        </form>
+
+                    {% endif %}
+
+                    <!-- ===== RESOLVED ===== -->
+                    {% if issue.status == "Resolved" %}
+                        <div class="resolved-indicator">
+                            ✅ Awaiting citizen confirmation
+                        </div>
+                    {% endif %}
+
+                    <!-- ===== REJECTED ===== -->
+                    {% if issue.status == "Rejected" %}
+                        <div class="rejected-indicator">
+                            ❌ Issue Rejected
+                        </div>
                     {% endif %}
 
                 </div>
-
             </div>
         {% endfor %}
     {% else %}

@@ -80,8 +80,8 @@
                     <a href="{{ url_for('citizen.issue_detail', issue_id=issue.id) }}">
                         {{ issue.title }}
                     </a>
-                    <span class="status status-resolved">
-                        Resolved
+                    <span class="status status-{{ issue.status|lower }}">
+                        {{ issue.status }}
                     </span>
                 </div>
             {% endfor %}

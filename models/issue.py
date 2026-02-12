@@ -154,5 +154,51 @@ def get_issues_by_user(user_id: str):
     return fetch_all(ISSUES_TABLE, {"created_by": user_id})
 
 
+def get_issue_score(issue_id: str):
+    votes = fetch_all(ISSUE_VOTES_TABLE, {"issue_id": issue_id})
 
+    score = 0
+    for v in votes:
+        if v["vote_type"] == "up":
+            score += 1
+        elif v["vote_type"] == "down":
+            score -= 1
+
+    return score
+
+def get_user_issue_vote(issue_id: str, user_id: str):
+    return fetch_one(
+        ISSUE_VOTES_TABLE,
+        {"issue_id": issue_id, "user_id": user_id}
+    )
+
+def remove_issue_vote(issue_id: str, user_id: str):
+    from supabase_db.db import delete_record
+    return delete_record(
+        ISSUE_VOTES_TABLE,
+        {"issue_id": issue_id, "user_id": user_id},
+        use_admin=True
+    )
+    
+def upsert_issue_vote(issue_id: str, user_id: str, vote_type: str):
+    existing = get_user_issue_vote(issue_id, user_id)
+
+    if existing:
+        # Update vote
+        return update_record(
+            ISSUE_VOTES_TABLE,
+            {"id": existing["id"]},
+            {"vote_type": vote_type},
+            use_admin=True
+        )
+    else:
+        # Insert new vote
+        payload = {
+            "id": generate_uuid(),
+            "issue_id": issue_id,
+            "user_id": user_id,
+            "vote_type": vote_type,
+            "created_at": utc_now().isoformat()
+        }
+        return insert_record(ISSUE_VOTES_TABLE, payload, use_admin=True)
 
