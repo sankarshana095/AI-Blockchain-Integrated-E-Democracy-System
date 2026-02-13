@@ -2,91 +2,112 @@
 {% set title = "Citizen Dashboard" %}
 
 {% block content %}
-<div class="dashboard">
-
-    <h2>Citizen Dashboard</h2>
+<div class="citizen-dashboard">
 
     <!-- =========================
-         Action Bar
+         Header
     ========================== -->
-    <div class="action-bar">
-        <a href="{{ url_for('citizen.new_issue') }}" class="btn-primary">
-            Raise Issue
-        </a>
-        <a href="{{ url_for('citizen.issues_feed') }}" class="btn-secondary">
-            View All Issues
-        </a>
-        <a href="{{ url_for('citizen.my_issues') }}" class="btn-secondary">
-            My Issues
-        </a>
+    <div class="dashboard-header">
+        <div>
+            <h2>👋 Welcome back</h2>
+            <p class="subtext">
+                Track issues, raise concerns, and engage with your constituency
+            </p>
+        </div>
+
+        <div class="dashboard-actions">
+            <a href="{{ url_for('citizen.new_issue') }}" class="btn-primary">
+                ➕ Raise Issue
+            </a>
+            <a href="{{ url_for('citizen.issues_feed') }}" class="btn-secondary">
+                🌍 All Issues
+            </a>
+            <a href="{{ url_for('citizen.my_issues') }}" class="btn-secondary">
+                🧑‍⚖️ My Issues
+            </a>
+        </div>
     </div>
 
     <!-- =========================
-         Trending Issues
+         Main Grid
     ========================== -->
-    <section class="dashboard-section">
-        <h3>🔥 Trending Issues</h3>
+    <div class="dashboard-grid">
 
-        {% if trending_issues %}
-            {% for issue in trending_issues %}
-                <div class="issue-row">
-                    <div class="issue-main">
+        <!-- Trending Issues -->
+        <section class="dashboard-card">
+            <h3>🔥 Trending Issues</h3>
+
+            {% if trending_issues %}
+                {% for issue in trending_issues %}
+                    <div class="issue-mini-card">
                         <a href="{{ url_for('citizen.issue_detail', issue_id=issue.id) }}">
-                            <strong>{{ issue.title }}</strong>
+                            {{ issue.title }}
                         </a>
-                        <span class="category">{{ issue.category }}</span>
+
+                        <div class="meta">
+                            <span class="status status-{{ issue.status|lower }}">
+                                {{ issue.status }}
+                            </span>
+                            <span class="category">
+                                {{ issue.category }}
+                            </span>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="empty-text">No trending issues yet.</p>
+            {% endif %}
+        </section>
+
+        <!-- My Issues -->
+        <section class="dashboard-card">
+            <h3>🧑‍⚖️ My Issues</h3>
+
+            {% if my_issues %}
+                {% for issue in my_issues %}
+                    <div class="issue-mini-card">
+                        <a href="{{ url_for('citizen.issue_detail', issue_id=issue.id) }}">
+                            {{ issue.title }}
+                        </a>
+
                         <span class="status status-{{ issue.status|lower }}">
                             {{ issue.status }}
                         </span>
                     </div>
-                </div>
-            {% endfor %}
-        {% else %}
-            <p>No trending issues yet.</p>
-        {% endif %}
-    </section>
+                {% endfor %}
+            {% else %}
+                <p class="empty-text">
+                    You haven’t raised any issues yet.
+                </p>
+            {% endif %}
+        </section>
 
-    <!-- =========================
-         My Recent Issues
-    ========================== -->
-    <section class="dashboard-section">
-        <h3>🧑‍⚖️ My Recent Issues</h3>
-
-        {% if my_issues %}
-            {% for issue in my_issues %}
-                <div class="issue-row">
-                    <a href="{{ url_for('citizen.issue_detail', issue_id=issue.id) }}">
-                        {{ issue.title }}
-                    </a>
-                    <span class="status status-{{ issue.status|lower }}">
-                        {{ issue.status }}
-                    </span>
-                </div>
-            {% endfor %}
-        {% else %}
-            <p>You haven’t raised any issues yet.</p>
-        {% endif %}
-    </section>
+    </div>
 
     <!-- =========================
          Recently Resolved
     ========================== -->
-    <section class="dashboard-section">
+    <section class="dashboard-card wide">
         <h3>✅ Recently Resolved</h3>
 
         {% if resolved_issues %}
-            {% for issue in resolved_issues %}
-                <div class="issue-row">
-                    <a href="{{ url_for('citizen.issue_detail', issue_id=issue.id) }}">
+            <div class="resolved-list">
+                {% for issue in resolved_issues %}
+                    <a
+                        href="{{ url_for('citizen.issue_detail', issue_id=issue.id) }}"
+                        class="resolved-item"
+                    >
                         {{ issue.title }}
+                        <span class="status status-{{ issue.status|lower }}">
+                            {{ issue.status }}
+                        </span>
                     </a>
-                    <span class="status status-{{ issue.status|lower }}">
-                        {{ issue.status }}
-                    </span>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
         {% else %}
-            <p>No issues resolved recently.</p>
+            <p class="empty-text">
+                No issues resolved recently.
+            </p>
         {% endif %}
     </section>
 

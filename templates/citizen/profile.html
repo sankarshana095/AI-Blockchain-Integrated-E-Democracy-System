@@ -5,83 +5,83 @@
 <div class="profile-page">
 
     <!-- =========================
-         Profile Header
+         Hero Header
     ========================== -->
-    <div class="profile-header">
-        <h2>👤 Citizen Profile</h2>
-        <p class="profile-subtext">
-            Your public identity remains anonymous.
+    <div class="profile-hero">
+        <div class="avatar">
+            🕶️
+        </div>
+
+        <h2 class="alias">
+            u/{{ profile.alias.random_username }}
+        </h2>
+
+        <p class="hero-subtext">
+            Anonymous Civic Identity
         </p>
     </div>
 
     <!-- =========================
-         Anonymous Identity
+         Profile Grid
     ========================== -->
-    <div class="profile-card">
-        <h3>🕶️ Anonymous Identity</h3>
+    <div class="profile-grid">
 
-        <p>
-            <strong>Username:</strong>
-            <span class="alias-name">
-                {{ profile.alias.random_username }}
-            </span>
-        </p>
+        <!-- Public Identity -->
+        <div class="profile-card highlight">
+            <h3>🌐 Public Identity</h3>
 
-        <p class="hint">
-            This name is visible to others when you comment or raise issues.
-        </p>
-    </div>
+            <p class="label">Username</p>
+            <p class="value alias-name">
+                u/{{ profile.alias.random_username }}
+            </p>
 
-    <!-- =========================
-         Voting Identity (Private)
-    ========================== -->
-    <div class="profile-card">
-        <h3>🗳️ Voting Identity</h3>
+            <p class="hint">
+                This name appears on issues, comments, and votes.
+            </p>
+        </div>
 
-        <p>
-            <strong>Voter ID:</strong>
-            {{ profile.voter_mapping.voter_id }}
-        </p>
+        <!-- Private Identity -->
+        <div class="profile-card">
+            <h3>🔒 Private Voting Identity</h3>
 
-        <p class="hint">
-            This information is private and never shown publicly.
-        </p>
-    </div>
+            <p class="label">Voter ID</p>
+            <p class="value mono">
+                {{ profile.voter_mapping.voter_id }}
+            </p>
 
-    <!-- =========================
-         Participation Shortcuts
-    ========================== -->
-    <div class="profile-card">
-        <h3>📌 Your Participation</h3>
+            <p class="hint">
+                Visible only to election authorities.
+            </p>
+        </div>
 
-        <ul class="profile-links">
-            <li>
-                <a href="{{ url_for('citizen.my_issues') }}">
-                    🧑‍⚖️ My Raised Issues
+        <!-- Participation -->
+        <div class="profile-card">
+            <h3>📊 Participation</h3>
+
+            <div class="action-links">
+                <a href="{{ url_for('citizen.my_issues') }}" class="action-btn">
+                    🧑‍⚖️ My Issues
                 </a>
-            </li>
-            <li>
-                <a href="{{ url_for('citizen.issues_feed') }}">
-                    💬 Constituency Discussions
+
+                <a href="{{ url_for('citizen.issues_feed') }}" class="action-btn">
+                    💬 Discussions
                 </a>
-            </li>
-            <li>
-                <a href="{{ url_for('citizen.dashboard') }}">
+
+                <a href="{{ url_for('citizen.dashboard') }}" class="action-btn">
                     🏠 Dashboard
                 </a>
-            </li>
-        </ul>
-    </div>
+            </div>
+        </div>
 
-    <!-- =========================
-         Privacy Notice
-    ========================== -->
-    <div class="profile-card privacy-box">
-        <h3>🔐 Privacy & Safety</h3>
-        <p>
-            Your real identity is never exposed in discussions.
-            Only authorized election systems can access your voter records.
-        </p>
+        <!-- Privacy -->
+        <div class="profile-card privacy">
+            <h3>🛡️ Privacy Guarantee</h3>
+            <p>
+                Your real identity is never revealed in public discussions.
+                All civic interactions are anonymized and secured.
+            </p>
+        </div>
+
     </div>
 
 </div>

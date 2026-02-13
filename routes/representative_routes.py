@@ -121,9 +121,8 @@ def performance_score():
 @login_required
 @role_required("ELECTED_REP")
 def resolve_issue(issue_id):
-    from services.issue_service import resolve_issue
-
-    resolve_issue(
+    from services.issue_service import resolve_issue_rep
+    resolve_issue_rep(
         issue_id=issue_id,
         resolved_by=session.get("user_id")
     )

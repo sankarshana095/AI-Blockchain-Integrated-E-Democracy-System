@@ -15,50 +15,83 @@
         {% for issue in issues %}
             <div class="issue-card">
 
-                <!-- Status Indicator -->
-                <div class="issue-status-badge status-{{ issue.status|lower }}">
-                    {{ issue.status }}
-                </div>
+    <!-- Voting Column -->
+    <div class="vote-column">
+        <button
+            class="vote-btn up {% if issue.user_vote == 'up' %}active{% endif %}"
+            onclick="voteIssue('{{ issue.id }}', 'up')"
+        >
+            ▲
+        </button>
 
-                <!-- Issue Title -->
-                <a
-                    href="{{ url_for('citizen.issue_detail', issue_id=issue.id) }}"
-                    class="issue-title"
-                >
-                    {{ issue.title }}
-                </a>
+        <div class="vote-score">
+            {{ issue.score }}
+        </div>
 
-                <!-- Meta Info -->
-                <div class="issue-meta">
-                    <span class="category">
-                        {{ issue.category }}
-                    </span>
+        <button
+            class="vote-btn down {% if issue.user_vote == 'down' %}active{% endif %}"
+            onclick="voteIssue('{{ issue.id }}', 'down')"
+        >
+            ▼
+        </button>
+    </div>
 
-                    <span class="date">
-                        Raised on {{ issue.created_at }}
-                    </span>
-                </div>
+    <div class="issue-content">
 
-                <!-- Description Preview -->
-                <p class="issue-preview">
-                    {{ issue.description[:120] }}
-                    {% if issue.description|length > 120 %}...{% endif %}
-                </p>
+        <!-- Top Meta -->
+        <div class="issue-meta-top">
+            <span class="username">
+                u/{{ issue.username }}
+            </span>
 
-                <!-- Quick Actions -->
-                <div class="issue-actions">
-                    <a href="{{ url_for('citizen.issue_detail', issue_id=issue.id) }}">
-                        💬 View Discussion
-                    </a>
+            •
 
-                    {% if issue.status == "Resolved" %}
-                        <span class="resolved-indicator">
-                            ✅ Awaiting Confirmation?
-                        </span>
-                    {% endif %}
-                </div>
+            <span class="status status-{{ issue.status|lower }}">
+                {{ issue.status }}
+            </span>
 
+            •
+
+            <span class="time">
+                {{ issue.time_ago }}
+            </span>
+        </div>
+
+        <!-- Title -->
+        <a
+            href="{{ url_for('citizen.issue_detail', issue_id=issue.id) }}"
+            class="issue-title"
+        >
+            {{ issue.title }}
+        </a>
+
+        <!-- Image -->
+        {% if issue.first_image %}
+            <div class="issue-image-preview">
+                <img src="{{ issue.first_image }}">
             </div>
+        {% endif %}
+
+        <!-- Description -->
+        <p class="issue-preview">
+            {{ issue.description[:180] }}
+            {% if issue.description|length > 180 %}...{% endif %}
+        </p>
+
+        <!-- Footer -->
+        <div class="issue-footer">
+            💬 {{ issue.comment_count }} comments
+
+            {% if issue.status == "Resolved" %}
+                <span class="resolved-indicator">
+                    • Awaiting your confirmation
+                </span>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+
         {% endfor %}
     {% else %}
         <div class="empty-state">
@@ -70,4 +103,6 @@
     {% endif %}
 
 </div>
+<script src="{{ url_for('static', filename='js/issue.js') }}"></script>
+
 {% endblock %}

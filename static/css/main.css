@@ -743,3 +743,282 @@ button {
     border-radius: 10px;
     margin-top: 12px;
 }
+.issue-image-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.issue-image-gallery img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.issue-meta-top {
+    font-size: 13px;
+    color: #777;
+    margin-bottom: 6px;
+}
+
+.username {
+    font-weight: 600;
+    color: #333;
+}
+
+.issue-image-preview img {
+    width: 100%;
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+.issue-footer {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #555;
+}
+.issue-meta-top {
+    font-size: 13px;
+    color: #777;
+    margin-bottom: 6px;
+}
+
+.username {
+    font-weight: 600;
+    color: #333;
+}
+
+.issue-image-preview img {
+    width: 100%;
+    max-height: 280px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+.issue-footer {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #555;
+}
+.profile-page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 30px 20px;
+}
+
+/* Hero */
+.profile-hero {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.profile-hero .avatar {
+    font-size: 56px;
+    background: #f0f2f5;
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 15px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-hero .alias {
+    font-size: 26px;
+    margin-bottom: 6px;
+}
+
+.hero-subtext {
+    color: #666;
+    font-size: 14px;
+}
+
+/* Grid */
+.profile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+}
+
+/* Cards */
+.profile-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+
+.profile-card.highlight {
+    border-left: 5px solid #4f46e5;
+}
+
+.profile-card.privacy {
+    background: #f8fafc;
+}
+
+/* Text */
+.label {
+    font-size: 12px;
+    color: #888;
+    text-transform: uppercase;
+}
+
+.value {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.alias-name {
+    color: #4f46e5;
+}
+
+.mono {
+    font-family: monospace;
+}
+
+.hint {
+    font-size: 13px;
+    color: #666;
+}
+
+/* Actions */
+.action-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.action-btn {
+    display: block;
+    padding: 10px 14px;
+    background: #f1f5f9;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #333;
+    transition: background 0.2s;
+}
+
+.action-btn:hover {
+    background: #e5e7eb;
+}
+
+.citizen-dashboard {
+    max-width: 1100px;
+    margin: auto;
+    padding: 24px;
+}
+
+/* Header */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.dashboard-header h2 {
+    margin-bottom: 4px;
+}
+
+.subtext {
+    color: #666;
+    font-size: 14px;
+}
+
+.dashboard-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Grid */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+/* Cards */
+.dashboard-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+
+.dashboard-card.wide {
+    grid-column: 1 / -1;
+}
+
+.dashboard-card h3 {
+    margin-bottom: 14px;
+}
+
+/* Issue mini card */
+.issue-mini-card {
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.issue-mini-card:last-child {
+    border-bottom: none;
+}
+
+.issue-mini-card a {
+    font-weight: 600;
+    text-decoration: none;
+    color: #333;
+}
+
+.issue-mini-card .meta {
+    font-size: 12px;
+    color: #666;
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+/* Resolved */
+.resolved-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.resolved-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background: #f9fafb;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #333;
+}
+
+/* Empty */
+.empty-text {
+    color: #777;
+    font-size: 14px;
+}
+
+/* Status */
+.status {
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.status-open { background: #fde68a; }
+.status-accepted { background: #bfdbfe; }
+.status-in\ progress { background: #c7d2fe; }
+.status-resolved { background: #bbf7d0; }
+.status-closed { background: #e5e7eb; }

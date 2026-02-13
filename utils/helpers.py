@@ -4,6 +4,7 @@ from datetime import date, datetime, timezone
 import pytz
 
 
+
 # -----------------------------
 # Time Helpers
 # -----------------------------
@@ -135,3 +136,26 @@ IST = pytz.timezone("Asia/Kolkata")
 
 def today_ist() -> date:
     return datetime.now(IST).date()
+
+def time_ago(timestamp):
+    if not timestamp:
+        return ""
+
+    if isinstance(timestamp, str):
+        timestamp = datetime.fromisoformat(timestamp.replace("Z", ""))
+
+    now = datetime.utcnow()
+    diff = now - timestamp
+
+    seconds = diff.total_seconds()
+
+    if seconds < 60:
+        return "Just now"
+    elif seconds < 3600:
+        return f"{int(seconds // 60)}m ago"
+    elif seconds < 86400:
+        return f"{int(seconds // 3600)}h ago"
+    elif seconds < 604800:
+        return f"{int(seconds // 86400)}d ago"
+    else:
+        return timestamp.strftime("%d %b %Y")

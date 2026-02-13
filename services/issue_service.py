@@ -97,7 +97,7 @@ def comment_on_issue(issue_id: str, user_id: str, comment: str,parent_comment_id
 
 from models.issue import update_issue_status
 
-def resolve_issue(issue_id: str, resolved_by: str):
+def resolve_issue_rep(issue_id: str, resolved_by: str):
     issue = get_issue_by_id(issue_id)
     if not issue:
         raise ValueError("Issue not found")

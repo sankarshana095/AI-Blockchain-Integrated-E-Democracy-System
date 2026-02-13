@@ -26,9 +26,8 @@ from models.user import get_user_by_id
 from models.user import get_display_name_by_user_id
 from models.comment_vote import get_comment_score, get_user_comment_vote
 from models.user import get_user_by_id, get_display_name_by_user_id
-import cloudinary
 import cloudinary.uploader
-import cloudinary.api
+from models.issue_image import add_issue_image
 
 
 
@@ -135,32 +134,39 @@ def vote():
 def new_issue():
     if request.method == "POST":
         try:
-            image_file = request.files.get("image")
-            print(image_file)
-            image_url = None
+            files = request.files.getlist("images")
+            image_urls = []
 
-            if image_file and image_file.filename != "":
-                upload_result = cloudinary.uploader.upload(
-                    image_file,
-                    folder="issues",
-                    resource_type="image",
-                    transformation=[
-                        {"width": 1200, "height": 1200, "crop": "limit"},
-                        {"quality": "auto"},
-                        {"fetch_format": "auto"}
-                    ]
-                )
-                print("CLOUDINARY RESULT:", upload_result)
+            for file in files:
+                if file and file.filename:
+                    if not file.mimetype.startswith("image/"):
+                        continue
 
-                image_url = upload_result["secure_url"]
-            raise_issue(
+                    upload_result = cloudinary.uploader.upload(
+                        file,
+                        folder="issues",
+                        resource_type="image",
+                        transformation=[
+                            {"width": 1200, "height": 1200, "crop": "limit"},
+                            {"quality": "auto"},
+                            {"fetch_format": "auto"}
+                        ]
+                    )
+                    image_urls.append(upload_result["secure_url"])
+            issue = raise_issue(
                 title=request.form.get("title"),
                 description=request.form.get("description"),
                 category=request.form.get("category"),
-                created_by=session.get("user_id"),
-                constituency_id=session.get("constituency_id"),
-                image_url=image_url
+                created_by=session["user_id"],
+                constituency_id=session["constituency_id"],
             )
+
+            issue_id = issue[0]["id"]
+
+            # 🔗 Save images
+            for url in image_urls:
+                add_issue_image(issue_id, url)
+
             flash("Issue raised successfully", "success")
             return redirect(url_for("citizen.dashboard"))
 
@@ -178,8 +184,52 @@ def new_issue():
 @login_required
 @role_required("CITIZEN")
 def issues_feed():
-    issues = get_constituency_issues(session.get("constituency_id"))
-    return render_template("citizen/issues_feed.html", issues=issues)
+    from models.issue import (
+        get_issue_score,
+        get_user_issue_vote,
+        get_issue_comments,
+        get_comment_author_alias
+    )
+    from models.issue_image import get_issue_images
+    from utils.helpers import time_ago
+
+    constituency_id = session.get("constituency_id")
+    raw_issues = get_constituency_issues(constituency_id)
+
+    enriched = []
+
+    for issue in raw_issues:
+        issue_id = issue["id"]
+
+        # 👤 Username
+        issue["username"] = get_comment_author_alias(issue["created_by"])
+
+        # ⭐ Score
+        issue["score"] = get_issue_score(issue_id)
+
+        # 🗳 User Vote
+        user_vote = get_user_issue_vote(issue_id, session["user_id"])
+        issue["user_vote"] = user_vote["vote_type"] if user_vote else None
+
+        # 💬 Comment count (including replies)
+        comments = get_issue_comments(issue_id)
+        issue["comment_count"] = len(comments)  # replies are already in DB as rows
+
+        # 🖼 First image
+        images = get_issue_images(issue_id)
+        issue["first_image"] = images[0]["image_url"] if images else None
+
+        # ⏳ Time ago
+        issue["time_ago"] = time_ago(issue["created_at"])
+
+        enriched.append(issue)
+
+    return render_template(
+        "citizen/issues_feed.html",
+        issues=enriched
+    )
+
+
 
 
 # -----------------------------
@@ -190,15 +240,56 @@ def issues_feed():
 @login_required
 @role_required("CITIZEN")
 def my_issues():
-    issues = get_my_issues(session.get("user_id"))
+    from models.issue import (
+        get_issue_score,
+        get_user_issue_vote,
+        get_issue_comments
+    )
+    from models.issue_image import get_issue_images
+    from utils.helpers import time_ago
 
-    issues = sorted(
-        issues,
+    user_id = session.get("user_id")
+    raw_issues = get_my_issues(user_id)
+
+    # Sort newest first
+    raw_issues = sorted(
+        raw_issues,
         key=lambda i: i["created_at"],
         reverse=True
     )
 
-    return render_template("citizen/my_issues.html", issues=issues)
+    enriched = []
+
+    for issue in raw_issues:
+        issue_id = issue["id"]
+
+        # 👤 You are the creator
+        issue["username"] = "You"
+
+        # ⭐ Score
+        issue["score"] = get_issue_score(issue_id)
+
+        # 🗳 User vote
+        user_vote = get_user_issue_vote(issue_id, user_id)
+        issue["user_vote"] = user_vote["vote_type"] if user_vote else None
+
+        # 💬 Comment count
+        comments = get_issue_comments(issue_id)
+        issue["comment_count"] = len(comments)
+
+        # 🖼 First image
+        images = get_issue_images(issue_id)
+        issue["first_image"] = images[0]["image_url"] if images else None
+
+        # ⏳ Time ago
+        issue["time_ago"] = time_ago(issue["created_at"])
+
+        enriched.append(issue)
+
+    return render_template(
+        "citizen/my_issues.html",
+        issues=enriched
+    )
 
 
 
@@ -252,7 +343,7 @@ def profile():
 
 @bp.route("/issues/<issue_id>/vote", methods=["POST"])
 @login_required
-@role_required("CITIZEN")
+@role_required("CITIZEN","ELECTED_REP", "OPPOSITION_REP")
 def vote_issue(issue_id):
     vote = request.json.get("vote")
 
@@ -295,6 +386,9 @@ def issue_detail(issue_id):
         get_user_issue_vote,
         get_comment_author_alias
     )
+    from models.issue_image import get_issue_images
+
+    images = get_issue_images(issue_id)
 
     issue = get_issue_by_id(issue_id)
     if not issue:
@@ -344,6 +438,7 @@ def issue_detail(issue_id):
         feedback=feedback,
         is_issue_owner=is_issue_owner,
         user_vote=user_vote,
+        images=images
     )
 
 @bp.route("/issues/<issue_id>/comment", methods=["POST"])
