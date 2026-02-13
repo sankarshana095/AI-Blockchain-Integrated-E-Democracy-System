@@ -677,4 +677,37 @@ button {
     font-weight: 600;
     font-size: 15px;
 }
+.op-badge {
+    font-size: 11px;
+    font-weight: 600;
+    background: #eef2ff;
+    color: #4a6cff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+}
+.official-badge {
+    font-size: 11px;
+    font-weight: 600;
+    background: #e8f0fe;
+    color: #009202;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+}
+
+.opposition-badge {
+    font-size: 11px;
+    font-weight: 600;
+    background: #e8f0fe;
+    color: #af0101;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+}
+
+.comment.official {
+    border-left: 4px solid #e81a1a;
+    background: #f8fbff;
+}
 

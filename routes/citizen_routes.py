@@ -22,6 +22,9 @@ from models.issue_feedback import get_feedback
 from models.issue_feedback import submit_feedback as save_feedback
 from services.issue_service import close_issue
 from services.citizen_service import ensure_citizen_alias
+from models.user import get_user_by_id
+from models.user import get_display_name_by_user_id
+
 
 
 
@@ -258,7 +261,7 @@ def confirm_resolution(issue_id):
 
 @bp.route("/issues/<issue_id>")
 @login_required
-@role_required("CITIZEN")
+@role_required("CITIZEN","ELECTED_REP", "OPPOSITION_REP")
 def issue_detail(issue_id):
     from models.issue import (
         get_issue_by_id,
@@ -279,6 +282,7 @@ def issue_detail(issue_id):
     timeline = get_issue_timeline(issue_id)
     feedback = get_feedback(issue_id)
     issue = get_issue_by_id(issue_id)
+    issue["username"] = get_comment_author_alias(issue["created_by"])
     issue["score"] = get_issue_score(issue_id) 
     user_vote = get_user_issue_vote(
         issue_id,
@@ -288,16 +292,20 @@ def issue_detail(issue_id):
     user_vote = user_vote["vote_type"] if user_vote is not None else 0
     is_issue_owner = issue["created_by"] == session.get("user_id")
 
-    def attach_usernames_to_comments(comments):
+    def attach_usernames_to_comments(comments, issue_owner_id):
         for c in comments:
-            c["username"] = get_comment_author_alias(c["user_id"])
+            c["display_name"] = get_display_name_by_user_id(c["user_id"])
+            c["is_op"] = c["user_id"] == issue_owner_id  # ⭐ OP FLAG
+            user = get_user_by_id(c["user_id"])
+            role = user["role"] if user else "CITIZEN"
+            c["role"] = role
+            c["is_official"] = role in ["ELECTED_REP", "OPPOSITION_REP"]
 
         # 🔁 recurse into replies
             if c.get("replies"):
-                attach_usernames_to_comments(c["replies"])
+                attach_usernames_to_comments(c["replies"], issue_owner_id)
 
-    attach_usernames_to_comments(comments)
-
+    attach_usernames_to_comments(comments,issue["created_by"])
     return render_template(
         "citizen/issue_detail.html",
         issue=issue,
@@ -311,7 +319,7 @@ def issue_detail(issue_id):
 
 @bp.route("/issues/<issue_id>/comment", methods=["POST"])
 @login_required
-@role_required("CITIZEN")
+@role_required("CITIZEN", "ELECTED_REP", "OPPOSITION_REP")
 def add_issue_comment(issue_id):
     from services.issue_service import comment_on_issue
     ensure_citizen_alias(session["user_id"])

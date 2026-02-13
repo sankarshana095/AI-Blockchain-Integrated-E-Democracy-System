@@ -8,8 +8,23 @@
             <span id="toggle-icon-{{ comment.id }}">[–]</span>
         </a>
             <span class="comment-username">
-        u/{{ comment.username }}
+        {% if comment.role == "CITIZEN" %}
+    u/{{ comment.display_name }}
+{% else %}
+    {{ comment.display_name }}
+{% endif %}
+
     </span>
+         {% if comment.is_op %}
+        <span class="op-badge">OP</span>
+    {% endif %}
+    {% if comment.is_official %}
+          {% if comment.role == "ELECTED_REP" %}
+    <span class="official-badge">Official Response</span>
+{% else %}
+    <span class="opposition-badge">Opposition Response</span>
+{% endif %}    
+    {% endif %}
     <span class="comment-time">
         {{ comment.created_at }}
     </span>

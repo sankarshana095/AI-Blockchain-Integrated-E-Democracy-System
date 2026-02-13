@@ -30,8 +30,8 @@ supabase = create_client(
 # -----------------------------
 
 USER_DATA = {
-    "email": "virochanggowda@gmail.com",
-    "password": "virochan@123",
+    "email": "testing@gmail.com",
+    "password": "user@123",
     "role": "CITIZEN",
 
     # Hierarchy (set None if not applicable)

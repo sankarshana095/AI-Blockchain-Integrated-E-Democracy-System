@@ -45,7 +45,7 @@
             {% for issue in issues[:5] %}
                 {% if issue.status != "Resolved" %}
                     <div class="issue-row">
-                        <a href="#">
+                        <a href="{{ url_for('citizen.issue_detail', issue_id=issue.id) }}">
                             {{ issue.title }}
                         </a>
                         <span class="status status-{{ issue.status|lower }}">
