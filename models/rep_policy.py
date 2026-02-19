@@ -185,3 +185,20 @@ def get_user_vote(post_id: str, user_id: str):
         {"post_id": post_id, "user_id": user_id}
     )
 
+def get_policy_posts_by_user(user_id: str):
+    """
+    Fetch all policy posts created by a specific user.
+    Sorted newest first.
+    """
+
+    posts = fetch_all(
+        REP_POLICY_POSTS_TABLE,
+        {"created_by_user_id": user_id}
+    ) or []
+
+    # Sort in Python (newest first)
+    return sorted(
+        posts,
+        key=lambda p: p.get("created_at"),
+        reverse=True
+    )

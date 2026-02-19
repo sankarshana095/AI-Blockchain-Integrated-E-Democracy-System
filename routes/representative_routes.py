@@ -4,7 +4,6 @@ from models.representative import get_rep_posts_by_constituency
 from services.representative_service import (
     #post_update, 
     comment_on_rep_post,
-    get_my_posts,
     get_constituency_issues_for_rep,
     get_my_performance_score
 )
@@ -16,6 +15,7 @@ from services.issue_service import (
 )
 from services.rep_policy_comment_service import add_comment,get_threaded_comments
 from models.rep_policy import get_policy_post_by_id
+from services.rep_policy_service import get_policy_posts_by_user_id
 
 bp = Blueprint("representative", __name__, url_prefix="/representative")
 
@@ -93,7 +93,7 @@ def view_policy(post_id):
 @login_required
 @role_required("ELECTED_REP", "OPPOSITION_REP")
 def my_posts():
-    posts = get_my_posts(session.get("user_id"))
+    posts =get_policy_posts_by_user_id(session.get("user_id"))
     return render_template("representative/my_posts.html", posts=posts)
 
 

@@ -1,76 +1,500 @@
 {% extends "base.html" %}
 {% set title = "BLO Voter Verification" %}
 
+{% block extra_css %}
+<style>
+/* ═══════════════════════════════════════════════════════════
+   BLO VOTER VERIFICATION
+═══════════════════════════════════════════════════════════ */
+
+/* ── PAGE HEADER ─────────────────────────────────────────── */
+.blo-header {
+    padding: 4rem 4rem 2rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--ink-2);
+}
+.blo-header .section-tag { margin-bottom: 0.75rem; }
+.blo-header h1 {
+    font-family: var(--font-disp);
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    line-height: 0.95;
+    color: var(--text);
+    margin-bottom: 1rem;
+}
+.blo-header h1 span { color: var(--indigo); }
+
+.blo-info-banner {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    background: var(--indigo-dim);
+    border: 1px solid rgba(79,70,229,0.2);
+    border-left: 3px solid var(--indigo);
+    padding: 0.9rem 1.25rem;
+    max-width: 680px;
+    margin-top: 0.5rem;
+}
+.blo-info-banner .info-icon { font-size: 0.9rem; margin-top: 1px; flex-shrink: 0; }
+.blo-info-banner p {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.04em;
+    color: var(--indigo);
+    line-height: 1.6;
+}
+
+/* ── STATS BAR ───────────────────────────────────────────── */
+.blo-stats {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    background: #fff;
+}
+.blo-stat {
+    flex: 1;
+    padding: 1.5rem 2rem;
+    border-right: 1px solid var(--border);
+    text-align: center;
+}
+.blo-stat:last-child { border-right: none; }
+.blo-stat-num {
+    font-family: var(--font-disp);
+    font-size: 2.2rem;
+    color: var(--indigo);
+    line-height: 1;
+    margin-bottom: 0.25rem;
+}
+.blo-stat-num.green { color: var(--teal); }
+.blo-stat-num.amber { color: var(--warm); }
+.blo-stat-label {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+/* ── MAIN CONTENT ────────────────────────────────────────── */
+.blo-body { padding: 2rem 4rem 4rem; }
+
+/* ── SEARCH + FILTER CONTROLS ────────────────────────────── */
+.table-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+}
+.search-wrap { position: relative; flex: 1; min-width: 220px; }
+.search-icon {
+    position: absolute; left: 0.85rem; top: 50%;
+    transform: translateY(-50%);
+    width: 14px; height: 14px;
+    stroke: var(--muted); pointer-events: none;
+}
+.search-input {
+    width: 100%;
+    font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.06em;
+    padding: 0.65rem 1rem 0.65rem 2.4rem;
+    border: 1px solid var(--border); background: #fff; color: var(--text);
+    outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+}
+.search-input::placeholder { color: var(--muted); }
+.search-input:focus { border-color: var(--indigo); box-shadow: 0 0 0 3px var(--indigo-dim); }
+
+.sort-wrap { display: flex; align-items: center; gap: 0.4rem; }
+.sort-label {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-right: 0.2rem;
+}
+.sort-btn {
+    font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.1em;
+    text-transform: uppercase; padding: 0.45rem 0.9rem;
+    border: 1px solid var(--border); background: #fff; color: var(--muted);
+    cursor: pointer; transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.sort-btn:hover { border-color: var(--indigo); color: var(--indigo); }
+.sort-btn.active { background: var(--indigo); border-color: var(--indigo); color: #fff; }
+
+.result-count {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 0.75rem; min-height: 1.2em;
+}
+
+/* ── EMPTY STATE ─────────────────────────────────────────── */
+.empty-state {
+    text-align: center; padding: 5rem 2rem;
+    border: 1px dashed var(--border); background: var(--ink-2);
+}
+.empty-state svg {
+    width: 48px; height: 48px; stroke: var(--muted); fill: none; stroke-width: 1.2;
+    stroke-linecap: round; stroke-linejoin: round; margin-bottom: 1rem;
+}
+.empty-state p {
+    font-family: var(--font-mono); font-size: 0.72rem;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+}
+
+/* ── TABLE ───────────────────────────────────────────────── */
+.voter-table-wrap { overflow-x: auto; border: 1px solid var(--border); }
+.voter-table { width: 100%; border-collapse: collapse; background: #fff; }
+.voter-table thead { background: var(--ink-2); border-bottom: 1px solid var(--border); }
+.voter-table thead th {
+    font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--muted); padding: 1rem 1.25rem;
+    text-align: left; font-weight: 400; white-space: nowrap;
+}
+.voter-table thead th:first-child { border-left: 3px solid var(--indigo); }
+.voter-table tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+.voter-table tbody tr:last-child { border-bottom: none; }
+.voter-table tbody tr:hover { background: var(--indigo-dim); }
+.voter-table td { padding: 1rem 1.25rem; font-size: 0.85rem; color: var(--text); vertical-align: top; }
+
+#noResultsRow td {
+    text-align: center; padding: 3rem;
+    font-family: var(--font-mono); font-size: 0.68rem;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+}
+
+/* ── VOTER NAME CELL ─────────────────────────────────────── */
+.voter-name-cell { display: flex; align-items: center; gap: 0.75rem; }
+.voter-avatar {
+    width: 40px; height: 40px; border-radius: 50%; object-fit: cover;
+    border: 2px solid var(--border); flex-shrink: 0; transition: border-color 0.2s;
+}
+.voter-table tbody tr:hover .voter-avatar { border-color: var(--indigo); }
+.voter-avatar-placeholder {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--indigo-dim); border: 2px dashed rgba(79,70,229,0.3);
+    display: grid; place-items: center; flex-shrink: 0;
+    font-size: 0.7rem; color: var(--indigo);
+}
+.voter-name-text { font-weight: 500; font-size: 0.88rem; color: var(--text); line-height: 1.3; }
+
+/* ── VOTER ID CHIP ───────────────────────────────────────── */
+.voter-id-chip {
+    font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.06em;
+    background: var(--indigo-dim); color: var(--indigo); padding: 0.2rem 0.6rem;
+    display: inline-block;
+}
+
+/* ── STATUS BADGE ────────────────────────────────────────── */
+.status-badge {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    font-family: var(--font-mono); font-size: 0.6rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 0.3rem 0.7rem; border-radius: 2px;
+}
+.status-badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; }
+.status-badge.verified {
+    background: var(--teal-dim); color: var(--teal); border: 1px solid rgba(13,148,136,0.25);
+}
+.status-badge.verified::before { background: var(--teal); }
+.status-badge.pending {
+    background: var(--warm-dim); color: var(--warm); border: 1px solid rgba(245,158,11,0.25);
+}
+.status-badge.pending::before { background: var(--warm); animation: blink 1.4s ease-in-out infinite; }
+
+/* ── VERIFY FORM ─────────────────────────────────────────── */
+.verify-form { display: flex; flex-direction: column; gap: 0.55rem; min-width: 200px; max-width: 240px; }
+
+/* File input */
+.file-input-wrap { position: relative; overflow: hidden; }
+.file-input-label {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+    border: 1px dashed rgba(30,40,80,0.2); padding: 0.45rem 0.85rem;
+    cursor: pointer; transition: border-color 0.2s, color 0.2s, background 0.2s; width: 100%;
+}
+.file-input-label:hover { border-color: var(--indigo); color: var(--indigo); background: var(--indigo-dim); }
+.file-input-wrap input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+
+/* ── 1:1 CAMERA PREVIEW ──────────────────────────────────── */
+.camera-preview {
+    display: none;           /* shown via JS: video.style.display = 'block' */
+    width: 100%;
+    aspect-ratio: 1 / 1;    /* strict 1:1 box */
+    object-fit: cover;       /* crop video feed to fill the square */
+    border: 2px solid var(--indigo);
+    background: #000;
+    border-radius: 4px;
+}
+
+/* ── 1:1 SNAPSHOT PREVIEW ────────────────────────────────── */
+.camera-snapshot {
+    display: none;           /* shown after capture */
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border: 2px solid var(--teal);
+    border-radius: 4px;
+    transition: border-color 0.3s;
+}
+
+/* Hidden canvas – used for frame capture only */
+.camera-canvas { display: none; }
+
+/* ── ACTION BUTTONS ──────────────────────────────────────── */
+.verify-actions { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+
+.vbtn {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    font-family: var(--font-mono); font-size: 0.58rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 0.45rem 0.7rem; border: none; cursor: pointer;
+    transition: background 0.2s, transform 0.15s; font-weight: 700; white-space: nowrap;
+}
+.vbtn:hover { transform: translateY(-1px); }
+
+.vbtn-camera  { background: var(--indigo-dim); color: var(--indigo); border: 1px solid rgba(79,70,229,0.25); }
+.vbtn-camera:hover  { background: var(--indigo-mid); }
+
+.vbtn-switch  { background: var(--teal-dim); color: var(--teal); border: 1px solid rgba(13,148,136,0.25); display: none; }
+.vbtn-switch:hover  { background: rgba(13,148,136,0.2); }
+
+.vbtn-close   { background: rgba(220,38,38,0.08); color: #dc2626; border: 1px solid rgba(220,38,38,0.2); display: none; }
+.vbtn-close:hover   { background: rgba(220,38,38,0.15); }
+
+.vbtn-capture { background: var(--warm-dim); color: #b45309; border: 1px solid rgba(245,158,11,0.3); display: none; }
+.vbtn-capture:hover { background: rgba(245,158,11,0.2); }
+
+.vbtn-submit  { background: var(--indigo); color: #fff; clip-path: polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%); }
+.vbtn-submit:hover  { background: var(--indigo-dark); }
+
+/* verified checkmark */
+.verified-check {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-family: var(--font-mono); font-size: 0.65rem;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--teal);
+}
+
+/* ── RESPONSIVE ──────────────────────────────────────────── */
+@media (max-width: 900px) {
+    .blo-header     { padding: 3rem 2rem 2rem; }
+    .blo-body       { padding: 1.5rem 2rem 3rem; }
+    .blo-stats      { flex-wrap: wrap; }
+    .blo-stat       { flex: 1 1 calc(50% - 1px); }
+    .table-controls { flex-direction: column; align-items: stretch; }
+    .sort-wrap      { flex-wrap: wrap; }
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="ec-blo">
 
-    <h2>Booth Level Officer – Voter Verification</h2>
-
-    <div class="info-note">
+<!-- ── PAGE HEADER ──────────────────────────────────────── -->
+<div class="blo-header">
+    <div class="section-tag">Election Commission · BLO Portal</div>
+    <h1>Voter <span>Verification</span></h1>
+    <div class="blo-info-banner">
+        <span class="info-icon">ℹ</span>
         <p>
-            BLO is responsible for door-to-door verification,
-            updating voter photograph and confirming voter existence.
+            Booth Level Officers are responsible for door-to-door verification,
+            updating voter photographs, and confirming voter existence within assigned booths.
         </p>
     </div>
+</div>
 
-    <!-- =========================
-         Voters List
-    ========================== -->
-    {% if voters and voters|length > 0 %}
-    <table class="data-table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Voter ID</th>
-                <th>Photo</th>
-                <th>Status</th>
-                <th>Verify</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for voter in voters %}
-            <tr>
-                <td>{{ voter.full_name }}</td>
-                <td>{{ voter.voter_id_number }}</td>
-                <td>
-                    {% if voter.photo_url %}
-                        <img src="{{ voter.photo_url }}" width="50">
-                    {% else %}
-                        No Photo
-                    {% endif %}
-                </td>
-                <td>
-                    {% if voter.is_verified %}
-                        <span class="status active">Verified</span>
-                    {% else %}
-                        <span class="status pending">Pending</span>
-                    {% endif %}
-                </td>
-                <td>
-                    {% if not voter.is_verified %}
-                    <form method="POST"
-                          action="{{ url_for('election_commission.verify_voter', voter_id=voter.id) }}">
-                        <input
-                            type="text"
-                            name="photo_url"
-                            placeholder="Updated Photo URL"
-                            required
-                        >
-                        <button class="btn-small btn-primary">
-                            Verify
-                        </button>
-                    </form>
-                    {% else %}
-                        ✔
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<!-- ── STATS BAR ────────────────────────────────────────── -->
+{% if voters %}
+<div class="blo-stats">
+    <div class="blo-stat">
+        <div class="blo-stat-num">{{ voters | length }}</div>
+        <div class="blo-stat-label">Total Assigned</div>
+    </div>
+    <div class="blo-stat">
+        <div class="blo-stat-num green">{{ voters | selectattr('is_verified') | list | length }}</div>
+        <div class="blo-stat-label">Verified</div>
+    </div>
+    <div class="blo-stat">
+        <div class="blo-stat-num amber">{{ voters | rejectattr('is_verified') | list | length }}</div>
+        <div class="blo-stat-label">Pending</div>
+    </div>
+    <div class="blo-stat">
+        <div class="blo-stat-num">
+            {% set pct = ((voters | selectattr('is_verified') | list | length) / (voters | length) * 100) | int %}
+            {{ pct }}%
+        </div>
+        <div class="blo-stat-label">Completion Rate</div>
+    </div>
+</div>
+{% endif %}
+
+<!-- ── BODY ─────────────────────────────────────────────── -->
+<div class="blo-body">
+
+    {% if voters and voters | length > 0 %}
+
+    <!-- Search & Filter Controls -->
+    <div class="table-controls reveal">
+        <div class="search-wrap">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+            </svg>
+            <input type="text" id="voterSearch" class="search-input"
+                   placeholder="Search by name or voter ID…" oninput="filterTable()">
+        </div>
+        <div class="sort-wrap">
+            <span class="sort-label">Filter:</span>
+            <button class="sort-btn active" onclick="setFilter(this,'all')">All</button>
+            <button class="sort-btn"        onclick="setFilter(this,'pending')">Pending</button>
+            <button class="sort-btn"        onclick="setFilter(this,'verified')">Verified</button>
+        </div>
+    </div>
+
+    <p class="result-count" id="resultCount"></p>
+
+    <div class="voter-table-wrap reveal">
+        <table class="voter-table">
+            <thead>
+                <tr>
+                    <th>Voter</th>
+                    <th>Voter ID</th>
+                    <th>Status</th>
+                    <th>Verification</th>
+                </tr>
+            </thead>
+            <tbody id="voterTbody">
+
+                {% for voter in voters %}
+                <tr data-status="{{ 'verified' if voter.is_verified else 'pending' }}"
+                    data-name="{{ voter.full_name | lower }}"
+                    data-vid="{{ voter.voter_id_number | lower }}">
+
+                    <!-- Voter + avatar -->
+                    <td>
+                        <div class="voter-name-cell">
+                            {% if voter.photo_url %}
+                                <img class="voter-avatar" src="{{ voter.photo_url }}" alt="{{ voter.full_name }}">
+                            {% else %}
+                                <div class="voter-avatar-placeholder">?</div>
+                            {% endif %}
+                            <span class="voter-name-text">{{ voter.full_name }}</span>
+                        </div>
+                    </td>
+
+                    <!-- Voter ID -->
+                    <td><span class="voter-id-chip">{{ voter.voter_id_number }}</span></td>
+
+                    <!-- Status -->
+                    <td>
+                        {% if voter.is_verified %}
+                            <span class="status-badge verified">Verified</span>
+                        {% else %}
+                            <span class="status-badge pending">Pending</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Verify action -->
+                    <td>
+                        {% if not voter.is_verified %}
+                        <form class="verify-form" method="POST"
+                              action="{{ url_for('election_commission.verify_voter', voter_id=voter.id) }}"
+                              enctype="multipart/form-data">
+
+                            <!-- File upload fallback -->
+                            <div class="file-input-wrap">
+                                <label class="file-input-label">📁 Choose Photo</label>
+                                <input type="file" name="photo" accept="image/*">
+                            </div>
+
+                            <!-- 1:1 live camera feed -->
+                            <video class="camera-preview" autoplay playsinline muted></video>
+
+                            <!-- Hidden canvas for frame grab -->
+                            <canvas class="camera-canvas"></canvas>
+
+                            <!-- 1:1 captured snapshot -->
+                            <img class="camera-snapshot" alt="Captured photo">
+
+                            <!-- Buttons -->
+                            <div class="verify-actions">
+                                <button type="button" class="vbtn vbtn-camera main-camera-btn"
+                                        onclick="toggleCamera(this)">📷 Camera</button>
+
+                                <button type="button" class="vbtn vbtn-capture capture-btn"
+                                        onclick="capturePhoto(this)">📸 Capture</button>
+
+                                <button type="button" class="vbtn vbtn-switch switch-camera-btn"
+                                        onclick="switchCamera(this)">🔄 Switch</button>
+
+                                <button type="button" class="vbtn vbtn-close close-camera-btn"
+                                        onclick="closeCamera(this)">✕ Close</button>
+
+                                <button type="submit" class="vbtn vbtn-submit">✓ Verify</button>
+                            </div>
+
+                        </form>
+                        {% else %}
+                            <span class="verified-check">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                     stroke="currentColor" stroke-width="2.5"
+                                     stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                Done
+                            </span>
+                        {% endif %}
+                    </td>
+
+                </tr>
+                {% endfor %}
+
+                <tr id="noResultsRow" style="display:none;">
+                    <td colspan="4">No voters match your search.</td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+
     {% else %}
-        <p>No voters assigned to this booth.</p>
+    <div class="empty-state reveal">
+        <svg viewBox="0 0 24 24">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        <p>No voters assigned to this booth</p>
+    </div>
     {% endif %}
 
 </div>
+
+<script src="{{ url_for('static', filename='js/camera.js') }}"></script>
+
+{% if voters and voters | length > 0 %}
+<script>
+let currentFilter = 'all';
+
+function filterTable() {
+    const query   = document.getElementById('voterSearch').value.trim().toLowerCase();
+    const rows    = document.querySelectorAll('#voterTbody tr[data-name]');
+    const noRow   = document.getElementById('noResultsRow');
+    const countEl = document.getElementById('resultCount');
+    let   visible = 0;
+
+    rows.forEach(row => {
+        const show = (row.dataset.name.includes(query) || row.dataset.vid.includes(query))
+                  && (currentFilter === 'all' || row.dataset.status === currentFilter);
+        row.style.display = show ? '' : 'none';
+        if (show) visible++;
+    });
+
+    noRow.style.display = visible === 0 ? '' : 'none';
+    countEl.textContent = (query || currentFilter !== 'all')
+        ? `Showing ${visible} of ${rows.length} voters` : '';
+}
+
+function setFilter(btn, filter) {
+    document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = filter;
+    filterTable();
+}
+</script>
+{% endif %}
+
 {% endblock %}

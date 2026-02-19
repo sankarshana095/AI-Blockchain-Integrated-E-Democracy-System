@@ -1,5 +1,6 @@
 from supabase_db.db import fetch_one, fetch_all, insert_record, update_record
 from utils.helpers import generate_uuid,generate_voter_id, utc_now
+from supabase_db.client import supabase_public, supabase_admin
 
 
 # -----------------------------
@@ -58,14 +59,16 @@ def get_voters_by_constituency(constituency_id: str):
     return fetch_all(VOTERS_TABLE, {"constituency_id": constituency_id})
 
 
-def update_voter_details(voter_id: str, update_data: dict):
-    update_data["updated_at"] = utc_now().isoformat()
-    return update_record(
-        VOTERS_TABLE,
-        {"id": voter_id},
-        update_data,
-        use_admin=True
+def update_voter_details(voter_id, data,use_admin=True):
+    return (
+        supabase_public
+        .table("voters")
+        .update(data)
+        .eq("id", voter_id)
+        .execute()
     )
+
+
 
 
 def deactivate_voter(voter_id: str):
@@ -113,9 +116,3 @@ def get_voter_by_user_id(user_id: str):
         return None
 
     return fetch_one("voters", {"id": mapping["voter_id"]})
-
-
-
-
-
-

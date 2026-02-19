@@ -1,173 +1,706 @@
 {% extends "base.html" %}
+{% set title = "Presiding Officer Dashboard" %}
 
-{% block title %}Presiding Officer Dashboard{% endblock %}
+{% block extra_css %}
+<style>
+/* ═══════════════════════════════════════════════════════════
+   PRESIDING OFFICER DASHBOARD v2
+═══════════════════════════════════════════════════════════ */
+
+/* ── PAGE HEADER ─────────────────────────────────────────── */
+.po-header {
+    padding: 4rem 4rem 2rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--ink-2);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+.po-header-left .section-tag { margin-bottom: 0.75rem; }
+.po-header-left h1 {
+    font-family: var(--font-disp);
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    line-height: 0.95;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+}
+.po-header-left h1 span { color: var(--indigo); }
+
+.booth-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: var(--teal-dim);
+    color: var(--teal);
+    border: 1px solid rgba(13,148,136,0.25);
+    padding: 0.4rem 1rem;
+}
+.booth-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--teal);
+    animation: blink 1.4s ease-in-out infinite;
+}
+
+.btn-danger {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    font-family: var(--font-mono); font-size: 0.68rem;
+    letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700;
+    background: rgba(220,38,38,0.08); color: #dc2626;
+    border: 1px solid rgba(220,38,38,0.25);
+    padding: 0.65rem 1.2rem; cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+}
+.btn-danger:hover { background: rgba(220,38,38,0.15); transform: translateY(-1px); }
+
+/* ── LAYOUT ──────────────────────────────────────────────── */
+.po-body {
+    padding: 2.5rem 4rem 4rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+/* ── PANEL ───────────────────────────────────────────────── */
+.panel {
+    border: 1px solid var(--border);
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+}
+.panel.span-2 { grid-column: 1 / -1; }
+
+.panel-head {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--ink-2);
+}
+.panel-head-icon {
+    width: 32px; height: 32px;
+    background: var(--indigo-dim);
+    border: 1px solid rgba(79,70,229,0.2);
+    display: grid; place-items: center;
+    flex-shrink: 0;
+    font-size: 0.85rem;
+}
+.panel-head-icon.teal  { background: var(--teal-dim);  border-color: rgba(13,148,136,0.2); }
+.panel-head-icon.amber { background: var(--warm-dim);  border-color: rgba(245,158,11,0.2); }
+.panel-head-icon.red   { background: rgba(220,38,38,0.08); border-color: rgba(220,38,38,0.2); }
+
+.panel-head-title {
+    font-family: var(--font-disp);
+    font-size: 1.4rem;
+    color: var(--text);
+    line-height: 1;
+}
+.panel-head-tag {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 0.2rem 0.5rem;
+}
+.panel-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* ── ACTIVE ELECTION BANNER ──────────────────────────────── */
+.active-election-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--teal-dim);
+    border: 1px solid rgba(13,148,136,0.2);
+    border-left: 3px solid var(--teal);
+    padding: 0.85rem 1.1rem;
+}
+.active-election-banner .ae-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--teal);
+    flex-shrink: 0;
+    animation: blink 1.4s ease-in-out infinite;
+}
+.active-election-banner .ae-label {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--teal);
+    opacity: 0.7;
+}
+.active-election-banner .ae-name {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    color: var(--teal);
+    font-weight: 700;
+}
+
+/* ── FORM FIELDS ─────────────────────────────────────────── */
+.field { display: flex; flex-direction: column; gap: 0.35rem; }
+.field label {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+.field input[type="text"],
+.field select {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid var(--border);
+    background: var(--ink-2);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+    appearance: none;
+}
+.field input[type="text"]:focus,
+.field select:focus {
+    border-color: var(--indigo);
+    box-shadow: 0 0 0 3px var(--indigo-dim);
+    background: #fff;
+}
+.field input::placeholder { color: var(--muted); }
+
+/* select wrapper with chevron */
+.select-wrap { position: relative; }
+.select-wrap select { padding-right: 2.5rem; cursor: pointer; }
+.select-wrap::after {
+    content: '▾';
+    position: absolute;
+    right: 0.9rem; top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.75rem;
+    color: var(--muted);
+    pointer-events: none;
+}
+
+/* voter ID display */
+.voter-id-display {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    padding: 0.65rem 0.9rem;
+    background: var(--indigo-dim);
+    border: 1px solid rgba(79,70,229,0.2);
+    color: var(--indigo);
+    letter-spacing: 0.06em;
+    min-height: 2.5rem;
+    display: flex; align-items: center;
+    transition: background 0.2s, border-color 0.2s;
+}
+.voter-id-display.empty { color: var(--muted); font-style: italic; background: var(--ink-2); border-color: var(--border); }
+.voter-id-display.filled { background: var(--teal-dim); border-color: rgba(13,148,136,0.3); color: var(--teal); }
+
+/* divider */
+.divider { height: 1px; background: var(--border); margin: 0.1rem 0; }
+
+/* ── BUTTONS ─────────────────────────────────────────────── */
+.btn-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+.po-btn {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-family: var(--font-mono); font-size: 0.65rem;
+    letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700;
+    padding: 0.65rem 1.1rem; border: none; cursor: pointer;
+    transition: background 0.2s, transform 0.15s; white-space: nowrap;
+}
+.po-btn:hover { transform: translateY(-1px); }
+
+.po-btn-primary {
+    background: var(--indigo); color: #fff;
+    clip-path: polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+}
+.po-btn-primary:hover { background: var(--indigo-dark); }
+.po-btn-secondary { background: var(--indigo-dim); color: var(--indigo); border: 1px solid rgba(79,70,229,0.25); }
+.po-btn-secondary:hover { background: var(--indigo-mid); }
+.po-btn-teal   { background: var(--teal-dim); color: var(--teal); border: 1px solid rgba(13,148,136,0.25); }
+.po-btn-teal:hover { background: rgba(13,148,136,0.2); }
+.po-btn-amber  { background: var(--warm-dim); color: #b45309; border: 1px solid rgba(245,158,11,0.3); }
+.po-btn-amber:hover { background: rgba(245,158,11,0.18); }
+.po-btn-red    { background: rgba(220,38,38,0.07); color: #dc2626; border: 1px solid rgba(220,38,38,0.2); }
+.po-btn-red:hover { background: rgba(220,38,38,0.14); }
+
+/* ── QR SCANNER ──────────────────────────────────────────── */
+.qr-wrap { display: none; flex-direction: column; gap: 0.75rem; }
+.qr-wrap.active { display: flex; }
+
+.qr-reader-box {
+    border: 2px solid var(--indigo);
+    overflow: hidden;
+    background: #000;
+    position: relative;
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    max-width: 280px;
+    align-self: center;
+}
+.qr-reader-box::before,
+.qr-reader-box::after {
+    content: '';
+    position: absolute;
+    width: 22px; height: 22px;
+    border-color: var(--warm);
+    border-style: solid;
+    z-index: 10;
+}
+.qr-reader-box::before { top: 8px; left: 8px;     border-width: 2px 0 0 2px; }
+.qr-reader-box::after  { bottom: 8px; right: 8px; border-width: 0 2px 2px 0; }
+#qr-reader { width: 100%; }
+
+.qr-hint {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); text-align: center;
+}
+
+/* ── INFO NOTE ───────────────────────────────────────────── */
+.info-note {
+    display: flex; align-items: flex-start; gap: 0.6rem;
+    background: var(--indigo-dim);
+    border-left: 3px solid var(--indigo);
+    padding: 0.8rem 1rem;
+}
+.info-note.warn  { background: var(--warm-dim); border-color: var(--warm); }
+.info-note.warn p { color: #92400e; }
+.info-note .note-icon { flex-shrink: 0; font-size: 0.85rem; margin-top: 1px; }
+.info-note p {
+    font-family: var(--font-mono); font-size: 0.65rem;
+    letter-spacing: 0.04em; color: var(--indigo); line-height: 1.6;
+}
+
+/* terminal path */
+.terminal-path {
+    font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.08em;
+    background: var(--ink-2); border: 1px solid var(--border);
+    border-left: 3px solid var(--teal); padding: 0.7rem 1rem;
+    color: var(--teal); display: flex; align-items: center; gap: 0.5rem;
+}
+.terminal-path::before { content: '$'; color: var(--muted); }
+
+/* ── RESPONSIVE ──────────────────────────────────────────── */
+@media (max-width: 900px) {
+    .po-header { padding: 3rem 2rem 1.5rem; }
+    .po-body   { padding: 1.5rem 2rem 3rem; grid-template-columns: 1fr; }
+    .panel.span-2 { grid-column: auto; }
+}
+
+/* ── OTP BOXES ───────────────────────────────────────────── */
+.otp-boxes {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 1.25rem;
+}
+.otp-box {
+    width: 48px;
+    height: 48px;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--indigo);
+    border: 1px solid var(--border);
+    background: var(--ink-2);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    caret-color: transparent;
+}
+.otp-box:focus {
+    border-color: var(--indigo);
+    box-shadow: 0 0 0 3px var(--indigo-dim);
+    background: #fff;
+}
+.otp-box.filled {
+    background: var(--indigo-dim);
+    border-color: rgba(79,70,229,0.4);
+}
+/* separator dot between box 3 and 4 */
+.otp-boxes .otp-sep {
+    font-family: var(--font-mono);
+    font-size: 1.2rem;
+    color: var(--muted);
+    user-select: none;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+{% endblock %}
 
 {% block content %}
 
-<div class="container">
+<!-- ── PAGE HEADER ──────────────────────────────────────── -->
+<div class="po-header">
+    <div class="po-header-left">
+        <div class="section-tag">Election Commission · PO Portal</div>
+        <h1>Presiding <span>Officer</span></h1>
+        <span class="booth-badge">Booth {{ session.get("booth_id", "—") }}</span>
+    </div>
+    <form method="POST" action="{{ url_for('presiding_officer.release_terminal') }}"
+          onsubmit="return confirm('Release the voting terminal?')">
+        <button type="submit" class="btn-danger">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18.36 6.64A9 9 0 1 1 5.64 6.64"/><line x1="12" y1="2" x2="12" y2="12"/>
+            </svg>
+            Release Terminal
+        </button>
+    </form>
+</div>
 
-    <h2>Presiding Officer Dashboard</h2>
+<!-- ── DASHBOARD GRID ───────────────────────────────────── -->
+<div class="po-body">
 
-    <p class="mt-1">
-        Booth ID: <strong>{{ session.get("booth_id") }}</strong>
-    </p>
-
-    <!-- =========================
-         Flash Messages
-    ========================= -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <div class="flash-container mt-2">
-          {% for category, message in messages %}
-            <div class="flash {{ category }}">
-                {{ message }}
-            </div>
-          {% endfor %}
+    <!-- ══ PANEL 1: Select Election (full width) ═════════ -->
+    <div class="panel span-2 reveal">
+        <div class="panel-head">
+            <div class="panel-head-icon teal">🗓</div>
+            <span class="panel-head-title">Active Election</span>
+            <span class="panel-head-tag">Step 1</span>
         </div>
-      {% endif %}
-    {% endwith %}
+        <div class="panel-body">
+            {% if session.get("active_election_id") %}
+                <div class="active-election-banner">
+                    <div class="ae-dot"></div>
+                    <div>
+                        <div class="ae-label">Currently Active</div>
+                        <div class="ae-name">{{ session.get("active_election_name") }}</div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="info-note">
+                    <span class="note-icon">ℹ</span>
+                    <p>No election is currently locked for this booth. Select one below to begin authorizing voters.</p>
+                </div>
+                <form method="POST">
+                    <div style="display:flex; gap:0.75rem; align-items:flex-end; flex-wrap:wrap;">
+                        <div class="field" style="flex:1; min-width:220px;">
+                            <label>Choose Election</label>
+                            <div class="select-wrap">
+                                <select id="election_id" name="election_id" required>
+                                    <option value="">— Select Election —</option>
+                                    {% for e in elections %}
+                                        <option value="{{ e.id }}">{{ e.election_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="po-btn po-btn-primary" style="margin-bottom:1px;">
+                            🔒 Lock for Booth
+                        </button>
+                    </div>
+                </form>
+            {% endif %}
+        </div>
+    </div>
 
-    <!-- =========================
-     Select Active Election
-========================= -->
-<div class="mt-3">
-    <h3>Select Active Election (Booth)</h3>
+    <!-- ══ PANEL 2: Authorize Voter ══════════════════════ -->
+    <div class="panel reveal" style="grid-row: span 2;">
+        <div class="panel-head">
+            <div class="panel-head-icon">🗳</div>
+            <span class="panel-head-title">Authorize Voter</span>
+            <span class="panel-head-tag">Step 2</span>
+        </div>
+        <div class="panel-body">
+            <form method="POST" action="{{ url_for('presiding_officer.authorize_voter') }}">
 
-    {% if session.get("active_election_id") %}
-        <p class="mt-1">
-            <strong>Active Election:</strong>
-            {{ session.get("active_election_name") }}
-        </p>
-    {% else %}
-        <form method="POST" class="mt-1">
-            <label for="election_id">
-                Choose Election
-            </label>
+                <!-- Voter ID display -->
+                <div class="field">
+                    <label>Voter ID</label>
+                    <div class="voter-id-display empty" id="voterIdDisplay">Not scanned yet</div>
+                    <input type="hidden" id="voter_user_id" name="voter_user_id"
+                           value="{{ request.args.get('voter', '') }}">
+                </div>
 
-            <select
-                id="election_id"
-                name="election_id"
-                required
-                class="mt-1"
-            >
-                <option value="">-- Select Election --</option>
-                {% for e in elections %}
-                    <option value="{{ e.id }}">
-                        {{ e.election_name }}
-                    </option>
-                {% endfor %}
-            </select>
+                <!-- Entry mode buttons -->
+                <div class="btn-row">
+                    <button type="button" class="po-btn po-btn-secondary" onclick="startQRScan()">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                            <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="4" height="4"/>
+                        </svg>
+                        Scan QR
+                    </button>
+                    <button type="button" class="po-btn po-btn-teal" onclick="showManualInput()">
+                        ✎ Manual Entry
+                    </button>
+                </div>
 
-            <div class="mt-2">
-                <button type="submit">
-                    Lock Election for Booth
-                </button>
+                <!-- QR Scanner -->
+                <div class="qr-wrap" id="qrWrap">
+                    <div class="qr-reader-box">
+                        <div id="qr-reader"></div>
+                    </div>
+                    <p class="qr-hint">Keep QR code centred in the frame</p>
+                    <div class="btn-row">
+                        <button type="button" class="po-btn po-btn-secondary"
+                                id="switch-btn" style="display:none;" onclick="switchQRCamera()">
+                            🔄 Switch Camera
+                        </button>
+                        <button type="button" class="po-btn po-btn-red" onclick="stopQRScan()">
+                            ✕ Stop Scan
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Manual input -->
+                <div class="field" id="manualField" style="display:none;">
+                    <label>Voter User ID (manual)</label>
+                    <input type="text" id="voter_user_id_manual"
+                           placeholder="Type voter ID…"
+                           oninput="syncId(this.value)"
+                           value="{{ request.args.get('voter', '') }}">
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- OTP — 6 boxes -->
+                <div class="field">
+                    <label>OTP (sent to voter email)</label>
+                    <div class="otp-boxes">
+                        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+                        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+                        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+                        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+                        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+                        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+                    </div>
+                    <!-- hidden input carries assembled OTP -->
+                    <input type="hidden" id="otp" name="otp">
+                </div>
+
+                <!-- Actions -->
+                <div class="btn-row">
+                    <button type="submit" name="action" value="request_otp"
+                            class="po-btn po-btn-amber">
+                        📨 Request OTP
+                    </button>
+                    <button type="submit" name="action" value="verify_otp"
+                            class="po-btn po-btn-primary">
+                        ✓ Verify &amp; Open Voting
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- ══ PANEL 3: End Session ══════════════════════════ -->
+    <div class="panel reveal">
+        <div class="panel-head">
+            <div class="panel-head-icon red">⏹</div>
+            <span class="panel-head-title">End Session</span>
+            <span class="panel-head-tag">Override</span>
+        </div>
+        <div class="panel-body">
+            <div class="info-note warn">
+                <span class="note-icon">⚠</span>
+                <p>Use only if the voter leaves without completing their vote. The session will be force-terminated.</p>
             </div>
-        </form>
-    {% endif %}
+            <form method="POST" action="{{ url_for('presiding_officer.end_session') }}">
+                <button type="submit" class="po-btn po-btn-red"
+                        onclick="return confirm('Force end the current voter session?')">
+                    ⏹ Force End Session
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ══ PANEL 4: Voting Terminal ══════════════════════ -->
+    <div class="panel reveal">
+        <div class="panel-head">
+            <div class="panel-head-icon teal">🖥</div>
+            <span class="panel-head-title">Voting Terminal</span>
+            <span class="panel-head-tag">Info</span>
+        </div>
+        <div class="panel-body">
+            <div class="info-note">
+                <span class="note-icon">ℹ</span>
+                <p>Ensure the voting terminal is open at the path below. The screen unlocks automatically when a voter is authorized.</p>
+            </div>
+            <div class="terminal-path">/evote/waiting</div>
+        </div>
+    </div>
+
 </div>
 
-        
-    <!-- =========================
-         Authorize Voter (OTP Based)
-    ========================= -->
-    <div class="mt-3">
-        <h3>Authorize Voter</h3>
+<script>
+/* ── Voter ID helpers ────────────────────────────────────── */
+function setVoterId(val) {
+    document.getElementById('voter_user_id').value = val;
+    const d = document.getElementById('voterIdDisplay');
+    if (val) {
+        d.textContent = val;
+        d.className = 'voter-id-display filled';
+    } else {
+        d.textContent = 'Not scanned yet';
+        d.className = 'voter-id-display empty';
+    }
+}
+function syncId(val) { setVoterId(val); }
 
-        <form method="POST"
-              action="{{ url_for('presiding_officer.authorize_voter') }}"
-              class="mt-1">
+// pre-fill from query string
+(function() {
+    const v = document.getElementById('voter_user_id').value;
+    if (v) { setVoterId(v); showManualInput(); }
+})();
 
-            <!-- Voter ID -->
-            <label for="voter_user_id">
-                Voter User ID
-            </label>
+function showManualInput() {
+    stopQRScan();
+    document.getElementById('manualField').style.display = 'flex';
+    document.getElementById('voter_user_id_manual').focus();
+}
 
-            <input
-                type="text"
-                id="voter_user_id"
-                name="voter_user_id"
-                required
-                value="{{ request.args.get('voter', '') }}"
-                placeholder="Enter voter user ID"
-                class="mt-1"
-            >
+/* ── QR Scanner ──────────────────────────────────────────── */
+let qrScanner = null, cameras = [], currentCamIdx = 0;
 
-            <!-- OTP -->
-            <label for="otp" class="mt-2">
-                OTP (sent to voter email)
-            </label>
+function startQRScan() {
+    document.getElementById('qrWrap').classList.add('active');
+    document.getElementById('manualField').style.display = 'none';
 
-            <input
-                type="text"
-                id="otp"
-                name="otp"
-                placeholder="Enter OTP after requesting"
-                class="mt-1"
-            >
+    qrScanner = new Html5Qrcode('qr-reader');
+    Html5Qrcode.getCameras().then(devices => {
+        if (!devices || !devices.length) { alert('No camera found'); return; }
+        cameras = devices;
+        currentCamIdx = 0;
+        devices.forEach((d, i) => {
+            if (d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('rear'))
+                currentCamIdx = i;
+        });
+        startWithCamera(cameras[currentCamIdx].id);
+        document.getElementById('switch-btn').style.display =
+            cameras.length > 1 ? 'inline-flex' : 'none';
+    }).catch(() => alert('Camera permission denied'));
 
-            <!-- Buttons -->
-            <div class="mt-2">
+    setTimeout(() => {
+        if (qrScanner) { alert('QR scan timed out. Enter manually.'); stopQRScan(); showManualInput(); }
+    }, 30000);
+}
 
-                <!-- Request OTP -->
-                <button type="submit" name="action" value="request_otp">
-                    Request OTP
-                </button>
+function startWithCamera(id) {
+    qrScanner.start(id, { fps: 10, qrbox: 200, aspectRatio: 1 }, onQRSuccess, () => {});
+}
 
-                <!-- Verify & Authorize -->
-                <button type="submit" name="action" value="verify_otp" class="mt-1">
-                    Verify OTP & Open Voting
-                </button>
+function switchQRCamera() {
+    if (!cameras || cameras.length < 2) return;
+    currentCamIdx = (currentCamIdx + 1) % cameras.length;
+    qrScanner.stop().then(() => startWithCamera(cameras[currentCamIdx].id));
+}
 
-            </div>
+let qrHandled = false;  // guard: html5-qrcode can fire multiple times
 
-        </form>
-    </div>
+function onQRSuccess(text) {
+    if (!text || qrHandled) return;
+    qrHandled = true;
 
-    <!-- =========================
-         End Active Voter Session
-    ========================= -->
-    <div class="mt-3">
-        <h3>End Current Voter Session</h3>
+    setVoterId(text);
+    stopQRScan();
 
-        <form method="POST" action="{{ url_for('presiding_officer.end_session') }}">
-            <button type="submit">
-                Force End Session
-            </button>
-        </form>
+    // Brief visual feedback
+    const display = document.getElementById('voterIdDisplay');
+    display.textContent = '✓ ' + text + ' — requesting OTP…';
 
-        <p class="mt-1">
-            <small>
-                Use this only if the voter leaves without completing the vote.
-            </small>
-        </p>
-    </div>
+    // Auto-click Request OTP after a short delay so the PO sees the scanned ID
+    setTimeout(() => {
+        document.querySelector('button[value="request_otp"]').click();
+    }, 600);
+}
 
-    <!-- =========================
-         Voting Terminal Control
-    ========================= -->
-    <div class="mt-3">
-        <h3>Voting Terminal</h3>
+function stopQRScan() {
+    if (qrScanner) {
+        qrScanner.stop().then(() => { qrScanner.clear(); qrScanner = null; }).catch(() => {});
+    }
+    document.getElementById('qrWrap').classList.remove('active');
+    document.getElementById('switch-btn').style.display = 'none';
+}
 
-        <p class="mt-1">
-            Ensure the voting terminal is opened at:
-        </p>
+/* ── OTP 6-box logic ─────────────────────────────────────── */
+(function () {
+    const boxes   = Array.from(document.querySelectorAll('.otp-box'));
+    const hidden  = document.getElementById('otp');
 
-        <p>
-            <code>/evote/waiting</code>
-        </p>
+    function assemble() {
+        hidden.value = boxes.map(b => b.value).join('');
+    }
 
-        <p class="mt-1">
-            The voting screen will automatically unlock when a voter is authorized.
-        </p>
-    </div>
+    boxes.forEach((box, i) => {
+        // Only allow digits
+        box.addEventListener('keydown', e => {
+            const allowed = e.key === 'Backspace' || e.key === 'ArrowLeft' ||
+                            e.key === 'ArrowRight' || e.key === 'Tab' ||
+                            /^[0-9]$/.test(e.key);
+            if (!allowed) { e.preventDefault(); return; }
 
-</div>
-<form method="POST" action="{{ url_for('presiding_officer.release_terminal') }}">
-    <button type="submit">
-        Release Voting Terminal
-    </button>
-</form>
+            if (/^[0-9]$/.test(e.key)) {
+                e.preventDefault();
+                box.value = e.key;
+                box.classList.add('filled');
+                assemble();
+                if (i < boxes.length - 1) boxes[i + 1].focus();
+            }
 
+            if (e.key === 'Backspace') {
+                if (box.value) {
+                    box.value = '';
+                    box.classList.remove('filled');
+                    assemble();
+                } else if (i > 0) {
+                    boxes[i - 1].focus();
+                    boxes[i - 1].value = '';
+                    boxes[i - 1].classList.remove('filled');
+                    assemble();
+                }
+            }
+
+            if (e.key === 'ArrowLeft'  && i > 0)              boxes[i - 1].focus();
+            if (e.key === 'ArrowRight' && i < boxes.length - 1) boxes[i + 1].focus();
+        });
+
+        // Handle paste on any box
+        box.addEventListener('paste', e => {
+            e.preventDefault();
+            const digits = (e.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0, 6);
+            digits.split('').forEach((d, j) => {
+                if (boxes[j]) {
+                    boxes[j].value = d;
+                    boxes[j].classList.add('filled');
+                }
+            });
+            assemble();
+            const next = boxes[Math.min(digits.length, boxes.length - 1)];
+            if (next) next.focus();
+        });
+    });
+
+    // Assemble OTP before any form submit
+    document.querySelector('form[action*="authorize_voter"]')
+        .addEventListener('submit', assemble);
+})();
+
+</script>
 
 {% endblock %}

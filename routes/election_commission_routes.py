@@ -20,6 +20,8 @@ from models.constituency import get_constituencies_by_state
 from services.election_finalizer import finalize_election_if_needed
 from models.election import get_state_name_by_state_id,get_election_by_id, get_elections_by_constituency
 from models.booth import get_booths_by_constituency
+from supabase_db.client import supabase_admin, supabase_public
+import uuid
 
 
 
@@ -409,16 +411,41 @@ def publish_final_roll(election_id):
 @login_required
 @role_required("BLO")
 def verify_voter(voter_id):
+
     try:
+        client = supabase_admin if supabase_admin else supabase_public
+
+        file = request.files.get("photo")
+
+        if not file or file.filename == "":
+            flash("Please select a photo", "error")
+            return redirect(url_for("election_commission.dashboard"))
+
+        # Keep extension
+        ext = file.filename.rsplit(".", 1)[-1]
+        filename = f"{voter_id}_{uuid.uuid4()}.{ext}"
+        print(filename)
+        # Upload
+        client.storage.from_("voter-photos").upload(
+            filename,
+            file.read(),
+            {"content-type": file.content_type}
+        )
+
+        # ✅ Your SDK returns string
+        photo_url = client.storage.from_("voter-photos").get_public_url(filename)
+        print(photo_url)
         update_voter_details(voter_id, {
-            "photo_url": request.form.get("photo_url"),
+            "photo_url": photo_url,
             "is_verified": True,
             "verified_at": datetime.utcnow().isoformat(),
             "verified_by": session.get("user_id")
         })
+
         flash("Voter verified successfully", "success")
+
     except Exception as e:
-        flash(str(e), "error")
+        flash(f"Upload failed: {e}", "error")
 
     return redirect(url_for("election_commission.dashboard"))
 

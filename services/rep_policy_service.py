@@ -2,6 +2,7 @@ from models.rep_policy import (
     create_policy_post,
     get_policy_post_by_id,
     get_policy_posts_by_constituency,
+    get_policy_posts_by_user,
     update_representative_statement,
     update_opposition_statement,
     upsert_vote
@@ -158,6 +159,34 @@ def vote_policy_post(user_id, post_id, vote_value):
 
 def get_policy_feed(constituency_id):
     posts = get_policy_posts_by_constituency(constituency_id)
+
+    enriched = []
+
+    for p in posts:
+
+        p["author_name"] = p.get("rep_name") if p.get("created_by_role")=='ELECTED_REP' else p.get("opp_name")
+        p["party_name"] = p.get("rep_party") if p.get("created_by_role")=='ELECTED_REP' else p.get("opp_party")
+
+        # time ago
+        p["time_ago"] = _time_ago(p.get("created_at"))
+
+        # score
+        p["score"] = p["upvotes"] - p["downvotes"]
+
+        # comment count
+        comments = fetch_all("rep_policy_comments", {"post_id": p["id"]}) or []
+        p["comment_count"] = len(comments)
+
+        enriched.append(p)
+
+    return sorted(
+        enriched,
+        key=lambda p: (p["score"], p["created_at"]),
+        reverse=True
+    )
+
+def get_policy_posts_by_user_id(user_id):
+    posts = get_policy_posts_by_user(user_id)
 
     enriched = []
 

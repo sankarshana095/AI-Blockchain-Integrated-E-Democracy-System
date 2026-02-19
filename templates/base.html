@@ -468,6 +468,6 @@
         document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
     </script>
 
-    {% block extra_js %}{% endblock %}
+    {% block extra_js %}<script src="https://unpkg.com/html5-qrcode"></script>{% endblock %}
 </body>
 </html>
