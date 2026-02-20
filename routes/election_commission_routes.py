@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from utils.decorators import login_required, role_required
+from utils.helpers import format_datetime
 from services.election_service import (
     create_state_election,
     approve_state_election
@@ -45,6 +46,11 @@ def dashboard():
 
     if role == "CEO":
         elections = get_elections_by_state(session.get("state_id"))
+
+        return render_template(
+            "election_commission/ceo/dashboard.html",
+            elections=elections
+        )
         return render_template("election_commission/ceo/dashboard.html", elections=elections)
 
     if role == "DEO":
@@ -540,3 +546,20 @@ def api_constituencies_for_election(election_id):
     constituencies = get_constituencies_by_state(election["state_id"])
 
     return constituencies
+
+@bp.route("/notifications")
+@login_required
+def view_notifications():
+
+    from models.notification import get_notifications_for_user
+
+    notifications = get_notifications_for_user(
+        role=session.get("role"),
+        state_id=session.get("state_id")
+    )
+    for notification in notifications:
+        notification["created_at"] = format_datetime(notification["created_at"])
+    return render_template(
+        "election_commission/common/notifications.html",
+        notifications=notifications
+    )

@@ -1,112 +1,708 @@
 {% extends "base.html" %}
-{% set title = "Public Accountability Dashboard" %}
+{% set title = "Accountability Dashboard" %}
+
+{% block extra_css %}
+<style>
+/* ═══════════════════════════════════════════════════════════
+   REPRESENTATIVE ACCOUNTABILITY DASHBOARD
+═══════════════════════════════════════════════════════════ */
+
+/* ── PAGE HEADER ─────────────────────────────────────────── */
+.acc-header {
+    padding: 4rem 4rem 0;
+    background: var(--ink-2);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+}
+.acc-header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+        linear-gradient(rgba(79,70,229,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(79,70,229,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(ellipse 80% 80% at 100% 0%, black 20%, transparent 70%);
+    pointer-events: none;
+}
+.acc-header-inner {
+    position: relative; z-index: 1;
+    display: flex; align-items: flex-end;
+    justify-content: space-between; gap: 2rem; flex-wrap: wrap;
+    padding-bottom: 0;
+}
+.acc-header-left .section-tag { margin-bottom: 0.75rem; }
+.acc-header-left h1 {
+    font-family: var(--font-disp);
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    line-height: 0.93; color: var(--text);
+    margin-bottom: 0;
+}
+.acc-header-left h1 span { color: var(--indigo); }
+
+/* Big score in header */
+.acc-header-score {
+    display: flex; flex-direction: column; align-items: flex-end;
+    padding-bottom: 0.5rem;
+}
+.acc-header-score .score-num {
+    font-family: var(--font-disp);
+    font-size: clamp(4rem, 8vw, 6rem);
+    line-height: 1; color: var(--text);
+}
+.acc-header-score .score-num.good     { color: var(--teal); }
+.acc-header-score .score-num.warning  { color: var(--warm); }
+.acc-header-score .score-num.danger   { color: #dc2626; }
+.acc-header-score .score-denom {
+    font-family: var(--font-mono); font-size: 0.68rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); text-align: right;
+}
+.acc-header-score .score-rating {
+    font-family: var(--font-mono); font-size: 0.72rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--indigo); border: 1px solid rgba(79,70,229,0.2);
+    background: var(--indigo-dim); padding: 0.2rem 0.75rem;
+    margin-top: 0.4rem; align-self: flex-end;
+}
+
+/* Score bar strip below header */
+.acc-score-strip {
+    border-top: 1px solid var(--border);
+    background: #fff;
+    display: flex; align-items: stretch;
+}
+.acc-strip-item {
+    flex: 1; display: flex; flex-direction: column;
+    padding: 0.9rem 1.5rem;
+    border-right: 1px solid var(--border);
+    position: relative; overflow: hidden;
+}
+.acc-strip-item:last-child { border-right: none; }
+.acc-strip-item::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0;
+    height: 3px; background: var(--color, var(--border));
+    width: var(--pct, 0%);
+    transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.acc-strip-label {
+    font-family: var(--font-mono); font-size: 0.58rem;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted);
+    margin-bottom: 0.25rem;
+}
+.acc-strip-weight {
+    font-family: var(--font-mono); font-size: 0.52rem;
+    letter-spacing: 0.1em; color: var(--muted); opacity: 0.6;
+}
+.acc-strip-val {
+    font-family: var(--font-disp); font-size: 1.8rem;
+    line-height: 1; color: var(--text); margin-top: auto;
+}
+
+/* ── ALERTS ──────────────────────────────────────────────── */
+.acc-alerts {
+    padding: 1.5rem 4rem 0;
+    display: flex; flex-direction: column; gap: 0.75rem;
+}
+.acc-alert {
+    display: flex; align-items: flex-start; gap: 1rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid; position: relative;
+    overflow: hidden;
+}
+.acc-alert::before {
+    content: '';
+    position: absolute; top: 0; left: 0; bottom: 0; width: 3px;
+}
+.acc-alert.warn {
+    background: var(--warm-dim); border-color: rgba(245,158,11,0.25);
+}
+.acc-alert.warn::before { background: var(--warm); }
+.acc-alert.pre-danger {
+    background: rgba(234,88,12,0.07); border-color: rgba(234,88,12,0.25);
+}
+.acc-alert.pre-danger::before { background: #ea580c; }
+.acc-alert.danger {
+    background: rgba(220,38,38,0.07); border-color: rgba(220,38,38,0.25);
+}
+.acc-alert.danger::before { background: #dc2626; }
+
+.acc-alert-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+.acc-alert-body { flex: 1; }
+.acc-alert-title {
+    font-family: var(--font-mono); font-size: 0.65rem;
+    letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700;
+    margin-bottom: 0.3rem;
+}
+.acc-alert.warn .acc-alert-title       { color: #b45309; }
+.acc-alert.pre-danger .acc-alert-title { color: #ea580c; }
+.acc-alert.danger .acc-alert-title     { color: #dc2626; }
+.acc-alert-text {
+    font-size: 0.84rem; line-height: 1.6;
+    color: var(--text);
+}
+.acc-alert-text strong { font-weight: 700; }
+
+/* ── BODY GRID ───────────────────────────────────────────── */
+.acc-body {
+    padding: 2rem 4rem 4rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+}
+.acc-body .span-2 { grid-column: 1 / -1; }
+
+/* ── DIMENSION CARDS ─────────────────────────────────────── */
+.dim-card {
+    border: 1px solid var(--border);
+    background: #fff;
+    position: relative; overflow: hidden;
+}
+.dim-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--dim-color, var(--indigo));
+}
+.dim-card-head {
+    display: flex; align-items: center; gap: 0.75rem;
+    padding: 1.1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--ink-2);
+}
+.dim-icon {
+    width: 30px; height: 30px;
+    display: grid; place-items: center;
+    font-size: 0.85rem; flex-shrink: 0;
+    background: #fff; border: 1px solid var(--border);
+}
+.dim-title {
+    font-family: var(--font-disp); font-size: 1.3rem; color: var(--text); line-height: 1;
+}
+.dim-weight {
+    margin-left: auto;
+    font-family: var(--font-mono); font-size: 0.58rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); border: 1px solid var(--border);
+    padding: 0.2rem 0.5rem; background: #fff;
+}
+.dim-total {
+    font-family: var(--font-disp); font-size: 1.1rem;
+    color: var(--dim-color, var(--indigo));
+}
+
+.dim-card-body { padding: 1.25rem 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; }
+
+/* metric row */
+.metric-row { display: flex; flex-direction: column; gap: 0.3rem; }
+.metric-top {
+    display: flex; align-items: center; justify-content: space-between;
+}
+.metric-label {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+}
+.metric-weight {
+    font-family: var(--font-mono); font-size: 0.55rem;
+    letter-spacing: 0.06em; color: var(--muted); opacity: 0.6;
+}
+.metric-val {
+    font-family: var(--font-disp); font-size: 1.5rem;
+    line-height: 1; color: var(--text);
+}
+.metric-val.good    { color: var(--teal); }
+.metric-val.mid     { color: var(--warm); }
+.metric-val.bad     { color: #dc2626; }
+
+/* progress bar */
+.metric-bar {
+    height: 4px; background: var(--border); position: relative;
+}
+.metric-bar-fill {
+    position: absolute; top: 0; left: 0; bottom: 0;
+    background: var(--dim-color, var(--indigo));
+    transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.metric-divider { height: 1px; background: var(--border); margin: 0.1rem 0; }
+
+/* ── 90-DAY CARD ─────────────────────────────────────────── */
+.avg-card {
+    border: 1px solid var(--border);
+    background: #fff;
+    grid-column: 1 / -1;
+    position: relative; overflow: hidden;
+}
+.avg-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--indigo), var(--teal));
+}
+.avg-card-head {
+    display: flex; align-items: center; gap: 0.75rem;
+    padding: 1.1rem 1.5rem; border-bottom: 1px solid var(--border);
+    background: var(--ink-2);
+}
+.avg-card-title {
+    font-family: var(--font-disp); font-size: 1.3rem; color: var(--text); line-height: 1;
+}
+.avg-days-badge {
+    margin-left: auto;
+    font-family: var(--font-mono); font-size: 0.6rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--teal); border: 1px solid rgba(13,148,136,0.2);
+    background: var(--teal-dim); padding: 0.2rem 0.6rem;
+}
+.avg-card-body {
+    padding: 1.5rem;
+    display: grid; grid-template-columns: auto 1fr; gap: 1.5rem; align-items: center;
+}
+.avg-score-big {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 1.25rem 2rem;
+    border: 1px solid var(--border);
+    background: var(--ink-2);
+    border-top: 3px solid var(--indigo);
+}
+.avg-score-num {
+    font-family: var(--font-disp); font-size: 3.5rem; line-height: 1;
+    color: var(--text);
+}
+.avg-score-num.good    { color: var(--teal); }
+.avg-score-num.warning { color: var(--warm); }
+.avg-score-num.danger  { color: #dc2626; }
+.avg-score-label {
+    font-family: var(--font-mono); font-size: 0.6rem;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+    margin-top: 0.25rem;
+}
+.avg-metrics { display: flex; flex-direction: column; gap: 0.75rem; }
+.avg-metric-row { display: flex; flex-direction: column; gap: 0.3rem; }
+.avg-metric-header {
+    display: flex; align-items: center; justify-content: space-between;
+}
+.avg-metric-label {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+    display: flex; align-items: center; gap: 0.5rem;
+}
+.avg-metric-label .dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.avg-metric-val {
+    font-family: var(--font-mono); font-size: 0.78rem;
+    letter-spacing: 0.06em; font-weight: 700; color: var(--text);
+}
+.avg-bar { height: 3px; background: var(--border); }
+.avg-bar-fill { height: 100%; transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1); }
+
+.avg-note {
+    grid-column: 1 / -1;
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.06em; color: var(--muted); line-height: 1.6;
+    padding-top: 0.75rem; border-top: 1px solid var(--border);
+}
+
+/* ── FORMULA HINT ────────────────────────────────────────── */
+.formula-card {
+    grid-column: 1 / -1;
+    border: 1px solid var(--border);
+    background: var(--ink-2);
+    padding: 1rem 1.5rem;
+    display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+}
+.formula-label {
+    font-family: var(--font-mono); font-size: 0.58rem;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted);
+    flex-shrink: 0;
+}
+.formula-expr {
+    font-family: var(--font-mono); font-size: 0.68rem;
+    letter-spacing: 0.04em; color: var(--text); flex: 1;
+    line-height: 1.6;
+}
+.formula-expr span { color: var(--indigo); font-weight: 700; }
+
+/* ── RESPONSIVE ──────────────────────────────────────────── */
+@media (max-width: 900px) {
+    .acc-header  { padding: 3rem 2rem 0; }
+    .acc-alerts  { padding: 1.25rem 2rem 0; }
+    .acc-body    { padding: 1.5rem 2rem 3rem; grid-template-columns: 1fr; }
+    .acc-body .span-2 { grid-column: auto; }
+    .avg-card-body    { grid-template-columns: 1fr; }
+    .acc-score-strip  { flex-wrap: wrap; }
+    .acc-strip-item   { min-width: 50%; border-bottom: 1px solid var(--border); }
+}
+</style>
+{% endblock %}
 
 {% block content %}
 
-<div class="accountability-container">
+<!-- ── PAGE HEADER ──────────────────────────────────────── -->
+<div class="acc-header">
+    <div class="acc-header-inner">
+        <div class="acc-header-left">
+            <div class="section-tag">Representative Portal · Performance</div>
+            <h1>Account<span>ability</span><br>Dashboard</h1>
+        </div>
 
-    <h2>📊 Representative Accountability Dashboard</h2>
+        {% if score %}
+        <div class="acc-header-score">
+            <div class="score-num
+                {% if score.final_score >= 70 %}good
+                {% elif score.final_score >= 45 %}warning
+                {% else %}danger{% endif %}">
+                {{ score.final_score }}
+            </div>
+            <div class="score-denom">out of 100 · today</div>
+            <div class="score-rating">{{ score.rating }}</div>
+        </div>
+        {% endif %}
+    </div>
 
+    <!-- Dimension score strip -->
     {% if score %}
-    <div class="score-display">
+    <div class="acc-score-strip">
+        <div class="acc-strip-item"
+             style="--color:var(--indigo); --pct:{{ score.breakdown.accountability.total }}%;">
+            <div class="acc-strip-label">Accountability</div>
+            <div class="acc-strip-weight">Weight 40%</div>
+            <div class="acc-strip-val">{{ score.breakdown.accountability.total }}</div>
+        </div>
+        <div class="acc-strip-item"
+             style="--color:var(--teal); --pct:{{ score.breakdown.engagement.total }}%;">
+            <div class="acc-strip-label">Engagement</div>
+            <div class="acc-strip-weight">Weight 30%</div>
+            <div class="acc-strip-val">{{ score.breakdown.engagement.total }}</div>
+        </div>
+        <div class="acc-strip-item"
+             style="--color:var(--warm); --pct:{{ score.breakdown.integrity.total }}%;">
+            <div class="acc-strip-label">Integrity</div>
+            <div class="acc-strip-weight">Weight 20%</div>
+            <div class="acc-strip-val">{{ score.breakdown.integrity.total }}</div>
+        </div>
+        <div class="acc-strip-item"
+             style="--color:#9333ea; --pct:{{ score.breakdown.impact.total }}%;">
+            <div class="acc-strip-label">Impact</div>
+            <div class="acc-strip-weight">Weight 10%</div>
+            <div class="acc-strip-val">{{ score.breakdown.impact.total }}</div>
+        </div>
+    </div>
+    {% endif %}
+</div>
 
-        <!-- ================= FINAL SCORE ================= -->
-        <div class="final-score-card">
-            <h2 class="rating">{{ score.rating }}</h2>
-            <div class="score-number">{{ score.final_score }}/100</div>
-            <p class="formula">
-                FINAL = (Accountability × 0.40) + (Engagement × 0.30) 
-                + (Integrity × 0.20) + (Impact × 0.10)
+<!-- ── ALERTS ────────────────────────────────────────────── -->
+{% if score or avg90 %}
+<div class="acc-alerts">
+
+    {% if score and score.final_score < 45 %}
+    <div class="acc-alert warn reveal">
+        <span class="acc-alert-icon">⚠</span>
+        <div class="acc-alert-body">
+            <div class="acc-alert-title">Performance Warning</div>
+            <p class="acc-alert-text">
+                Your current accountability score has dropped below the acceptable threshold of <strong>45</strong>.
+                Improve responsiveness, engagement, and governance quality to avoid escalation.
             </p>
         </div>
+    </div>
+    {% endif %}
 
-        <!-- ================= ACCOUNTABILITY ================= -->
-        <div class="dimension-card">
-            <h3>🟦 Accountability (Weight: 40%)</h3>
-            <p><strong>Total:</strong> {{ score.breakdown.accountability.total }}/100</p>
+    {% if avg90 and avg90.days_used >= 60 and avg90.final_score < 40 %}
+    <div class="acc-alert pre-danger reveal">
+        <span class="acc-alert-icon">🟠</span>
+        <div class="acc-alert-body">
+            <div class="acc-alert-title">Pre-Termination Alert</div>
+            <p class="acc-alert-text">
+                Your sustained performance trend indicates governance risk.
+                If the 90-day average falls below <strong>35</strong>, your term may be automatically ended.
+                Immediate improvement is strongly advised.
+            </p>
+        </div>
+    </div>
+    {% endif %}
 
-            <ul>
-                <li>
-                    Issue Resolution Rate (50%) → 
+    {% if avg90 and avg90.days_used >= 90 and avg90.final_score < 35 %}
+    <div class="acc-alert danger reveal">
+        <span class="acc-alert-icon">⛔</span>
+        <div class="acc-alert-body">
+            <div class="acc-alert-title">Critical Accountability Failure</div>
+            <p class="acc-alert-text">
+                Your 90-day average has fallen below the constitutional threshold of <strong>35</strong>.
+                This may trigger <strong>automatic termination of term</strong> under the public accountability framework.
+            </p>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endif %}
+
+<!-- ── BODY ─────────────────────────────────────────────── -->
+<div class="acc-body">
+
+    {% if score %}
+
+    <!-- ── ACCOUNTABILITY ── -->
+    <div class="dim-card reveal" style="--dim-color: var(--indigo);">
+        <div class="dim-card-head">
+            <div class="dim-icon">🟦</div>
+            <span class="dim-title">Accountability</span>
+            <span class="dim-weight">40% weight</span>
+            <span class="dim-total">{{ score.breakdown.accountability.total }}/100</span>
+        </div>
+        <div class="dim-card-body">
+
+            <div class="metric-row">
+                <div class="metric-top">
+                    <span class="metric-label">Issue Resolution Rate</span>
+                    <span class="metric-weight">50%</span>
+                </div>
+                <div class="metric-val {% if score.breakdown.accountability.resolution_rate >= 70 %}good{% elif score.breakdown.accountability.resolution_rate >= 45 %}mid{% else %}bad{% endif %}">
                     {{ score.breakdown.accountability.resolution_rate }}%
-                </li>
-                <li>
-                    Response Time Score (25%) → 
+                </div>
+                <div class="metric-bar">
+                    <div class="metric-bar-fill" style="width:{{ score.breakdown.accountability.resolution_rate }}%;"></div>
+                </div>
+            </div>
+
+            <div class="metric-divider"></div>
+
+            <div class="metric-row">
+                <div class="metric-top">
+                    <span class="metric-label">Response Time Score</span>
+                    <span class="metric-weight">25%</span>
+                </div>
+                <div class="metric-val {% if score.breakdown.accountability.response_time >= 70 %}good{% elif score.breakdown.accountability.response_time >= 45 %}mid{% else %}bad{% endif %}">
                     {{ score.breakdown.accountability.response_time }}/100
-                </li>
-                <li>
-                    Citizen Satisfaction (25%) → 
+                </div>
+                <div class="metric-bar">
+                    <div class="metric-bar-fill" style="width:{{ score.breakdown.accountability.response_time }}%;"></div>
+                </div>
+            </div>
+
+            <div class="metric-divider"></div>
+
+            <div class="metric-row">
+                <div class="metric-top">
+                    <span class="metric-label">Citizen Satisfaction</span>
+                    <span class="metric-weight">25%</span>
+                </div>
+                <div class="metric-val {% if score.breakdown.accountability.citizen_satisfaction >= 70 %}good{% elif score.breakdown.accountability.citizen_satisfaction >= 45 %}mid{% else %}bad{% endif %}">
                     {{ score.breakdown.accountability.citizen_satisfaction }}%
-                </li>
-            </ul>
+                </div>
+                <div class="metric-bar">
+                    <div class="metric-bar-fill" style="width:{{ score.breakdown.accountability.citizen_satisfaction }}%;"></div>
+                </div>
+            </div>
+
         </div>
+    </div>
 
-        <!-- ================= ENGAGEMENT ================= -->
-        <div class="dimension-card">
-            <h3>🟩 Engagement (Weight: 30%)</h3>
-            <p><strong>Total:</strong> {{ score.breakdown.engagement.total }}/100</p>
+    <!-- ── ENGAGEMENT ── -->
+    <div class="dim-card reveal" style="--dim-color: var(--teal);">
+        <div class="dim-card-head">
+            <div class="dim-icon">🟩</div>
+            <span class="dim-title">Engagement</span>
+            <span class="dim-weight">30% weight</span>
+            <span class="dim-total">{{ score.breakdown.engagement.total }}/100</span>
+        </div>
+        <div class="dim-card-body">
 
-            <ul>
-                <li>
-                    Policy Post Quality (60%) → 
+            <div class="metric-row">
+                <div class="metric-top">
+                    <span class="metric-label">Policy Post Quality</span>
+                    <span class="metric-weight">60%</span>
+                </div>
+                <div class="metric-val {% if score.breakdown.engagement.post_quality >= 70 %}good{% elif score.breakdown.engagement.post_quality >= 45 %}mid{% else %}bad{% endif %}">
                     {{ score.breakdown.engagement.post_quality }}/100
-                </li>
-                <li>
-                    Consistency Score (30%) → 
+                </div>
+                <div class="metric-bar">
+                    <div class="metric-bar-fill" style="width:{{ score.breakdown.engagement.post_quality }}%; background:var(--teal);"></div>
+                </div>
+            </div>
+
+            <div class="metric-divider"></div>
+
+            <div class="metric-row">
+                <div class="metric-top">
+                    <span class="metric-label">Consistency Score</span>
+                    <span class="metric-weight">30%</span>
+                </div>
+                <div class="metric-val {% if score.breakdown.engagement.consistency >= 70 %}good{% elif score.breakdown.engagement.consistency >= 45 %}mid{% else %}bad{% endif %}">
                     {{ score.breakdown.engagement.consistency }}/100
-                </li>
-                <li>
-                    Participation Depth (10%) → 
+                </div>
+                <div class="metric-bar">
+                    <div class="metric-bar-fill" style="width:{{ score.breakdown.engagement.consistency }}%; background:var(--teal);"></div>
+                </div>
+            </div>
+
+            <div class="metric-divider"></div>
+
+            <div class="metric-row">
+                <div class="metric-top">
+                    <span class="metric-label">Participation Depth</span>
+                    <span class="metric-weight">10%</span>
+                </div>
+                <div class="metric-val {% if score.breakdown.engagement.participation_depth >= 70 %}good{% elif score.breakdown.engagement.participation_depth >= 45 %}mid{% else %}bad{% endif %}">
                     {{ score.breakdown.engagement.participation_depth }}/100
-                </li>
-            </ul>
+                </div>
+                <div class="metric-bar">
+                    <div class="metric-bar-fill" style="width:{{ score.breakdown.engagement.participation_depth }}%; background:var(--teal);"></div>
+                </div>
+            </div>
+
         </div>
+    </div>
 
-        <!-- ================= INTEGRITY ================= -->
-        <div class="dimension-card">
-            <h3>🟨 Integrity (Weight: 20%)</h3>
-            <p><strong>Total:</strong> {{ score.breakdown.integrity.total }}/100</p>
+    <!-- ── INTEGRITY ── -->
+    <div class="dim-card reveal" style="--dim-color: var(--warm);">
+        <div class="dim-card-head">
+            <div class="dim-icon">🟨</div>
+            <span class="dim-title">Integrity</span>
+            <span class="dim-weight">20% weight</span>
+            <span class="dim-total">{{ score.breakdown.integrity.total }}/100</span>
+        </div>
+        <div class="dim-card-body">
 
-            <ul>
-                <li>
-                    Discourse Balance Index (Primary Metric) → 
+            <div class="metric-row">
+                <div class="metric-top">
+                    <span class="metric-label">Discourse Balance Index</span>
+                    <span class="metric-weight">Primary</span>
+                </div>
+                <div class="metric-val {% if score.breakdown.integrity.discourse_balance >= 70 %}good{% elif score.breakdown.integrity.discourse_balance >= 45 %}mid{% else %}bad{% endif %}">
                     {{ score.breakdown.integrity.discourse_balance }}/100
-                </li>
-                <li>
-                    Controversy Penalty (Deduction up to -30) → 
+                </div>
+                <div class="metric-bar">
+                    <div class="metric-bar-fill" style="width:{{ score.breakdown.integrity.discourse_balance }}%; background:var(--warm);"></div>
+                </div>
+            </div>
+
+            <div class="metric-divider"></div>
+
+            <div class="metric-row">
+                <div class="metric-top">
+                    <span class="metric-label">Controversy Penalty</span>
+                    <span class="metric-weight">Deduction ≤ −30</span>
+                </div>
+                <div class="metric-val {% if score.breakdown.integrity.controversy_penalty == 0 %}good{% elif score.breakdown.integrity.controversy_penalty > -15 %}mid{% else %}bad{% endif %}">
                     {{ score.breakdown.integrity.controversy_penalty }}
-                </li>
-            </ul>
+                </div>
+                <div class="metric-bar">
+                    <div class="metric-bar-fill" style="width:{{ ([score.breakdown.integrity.controversy_penalty | abs, 30] | min / 30 * 100) | int }}%; background:#dc2626;"></div>
+                </div>
+            </div>
+
         </div>
+    </div>
 
-        <!-- ================= IMPACT ================= -->
-        <div class="dimension-card">
-            <h3>🟪 Impact (Weight: 10%)</h3>
-            <p><strong>Total:</strong> {{ score.breakdown.impact.total }}/100</p>
+    <!-- ── IMPACT ── -->
+    <div class="dim-card reveal" style="--dim-color: #9333ea;">
+        <div class="dim-card-head">
+            <div class="dim-icon">🟪</div>
+            <span class="dim-title">Impact</span>
+            <span class="dim-weight">10% weight</span>
+            <span class="dim-total">{{ score.breakdown.impact.total }}/100</span>
+        </div>
+        <div class="dim-card-body">
 
-            <ul>
-                <li>
-                    Constituency Engagement Index (50%) → 
+            <div class="metric-row">
+                <div class="metric-top">
+                    <span class="metric-label">Constituency Engagement</span>
+                    <span class="metric-weight">50%</span>
+                </div>
+                <div class="metric-val {% if score.breakdown.impact.constituency_engagement >= 70 %}good{% elif score.breakdown.impact.constituency_engagement >= 45 %}mid{% else %}bad{% endif %}">
                     {{ score.breakdown.impact.constituency_engagement }}/100
-                </li>
-                <li>
-                    Issue Scope Impact (50%) → 
-                    {{ score.breakdown.impact.issue_scope_impact }}/100
-                </li>
-            </ul>
-        </div>
+                </div>
+                <div class="metric-bar">
+                    <div class="metric-bar-fill" style="width:{{ score.breakdown.impact.constituency_engagement }}%; background:#9333ea;"></div>
+                </div>
+            </div>
 
+            <div class="metric-divider"></div>
+
+            <div class="metric-row">
+                <div class="metric-top">
+                    <span class="metric-label">Issue Scope Impact</span>
+                    <span class="metric-weight">50%</span>
+                </div>
+                <div class="metric-val {% if score.breakdown.impact.issue_scope_impact >= 70 %}good{% elif score.breakdown.impact.issue_scope_impact >= 45 %}mid{% else %}bad{% endif %}">
+                    {{ score.breakdown.impact.issue_scope_impact }}/100
+                </div>
+                <div class="metric-bar">
+                    <div class="metric-bar-fill" style="width:{{ score.breakdown.impact.issue_scope_impact }}%; background:#9333ea;"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ── FORMULA ── -->
+    <div class="formula-card span-2 reveal">
+        <span class="formula-label">Scoring Formula</span>
+        <span class="formula-expr">
+            Final =
+            (Accountability × <span>0.40</span>) +
+            (Engagement × <span>0.30</span>) +
+            (Integrity × <span>0.20</span>) +
+            (Impact × <span>0.10</span>)
+            &nbsp;·&nbsp; All scores calculated automatically using issue data, engagement analytics, AI discourse evaluation &amp; behavioral metrics.
+        </span>
     </div>
 
     {% else %}
-        <p>No performance data available.</p>
+    <div class="formula-card span-2">
+        <span class="formula-label">Notice</span>
+        <span class="formula-expr">No performance data is available yet. Scores will appear once activity is recorded.</span>
+    </div>
     {% endif %}
 
-    <p class="hint">
-        ℹ️ All scores are calculated automatically using issue resolution data,
-        engagement analytics, AI discourse evaluation, and behavioral metrics.
-        Weightages are publicly visible for transparency.
-    </p>
+    <!-- ── 90-DAY AVERAGE ── -->
+    {% if avg90 %}
+    <div class="avg-card span-2 reveal">
+        <div class="avg-card-head">
+            <div class="dim-icon" style="background:var(--indigo-dim);border-color:rgba(79,70,229,0.2);">📈</div>
+            <span class="avg-card-title">90-Day Performance Average</span>
+            <span class="avg-days-badge">{{ avg90.days_used }} days recorded</span>
+        </div>
+        <div class="avg-card-body">
+            <div class="avg-score-big">
+                <div class="avg-score-num
+                    {% if avg90.final_score >= 70 %}good
+                    {% elif avg90.final_score >= 45 %}warning
+                    {% else %}danger{% endif %}">
+                    {{ avg90.final_score }}
+                </div>
+                <div class="avg-score-label">/ 100 sustained</div>
+            </div>
+            <div class="avg-metrics">
+                {% for label, val, color in [
+                    ('Accountability', avg90.accountability, 'var(--indigo)'),
+                    ('Engagement',     avg90.engagement,     'var(--teal)'),
+                    ('Integrity',      avg90.integrity,      'var(--warm)'),
+                    ('Impact',         avg90.impact,         '#9333ea')
+                ] %}
+                <div class="avg-metric-row">
+                    <div class="avg-metric-header">
+                        <span class="avg-metric-label">
+                            <span class="dot" style="background:{{ color }};"></span>
+                            {{ label }}
+                        </span>
+                        <span class="avg-metric-val">{{ val }}/100</span>
+                    </div>
+                    <div class="avg-bar">
+                        <div class="avg-bar-fill" style="width:{{ val }}%; background:{{ color }};"></div>
+                    </div>
+                </div>
+                {% endfor %}
+                <p class="avg-note">
+                    Based on {{ avg90.days_used }} days of recorded performance.
+                    This reflects sustained governance quality rather than daily fluctuation.
+                    Sustained scores below 35 may trigger automatic term review.
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
 </div>
 

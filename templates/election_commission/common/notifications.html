@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% set title = "Notifications" %}
+
+{% block extra_css %}
+<style>
+/* ═══════════════════════════════════════════════════════════
+   NOTIFICATIONS PAGE
+═══════════════════════════════════════════════════════════ */
+
+/* ── PAGE HEADER ─────────────────────────────────────────── */
+.notif-header {
+    padding: 3.5rem 4rem 2rem;
+    background: var(--ink-2);
+    border-bottom: 1px solid var(--border);
+    position: relative; overflow: hidden;
+}
+.notif-header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+        linear-gradient(rgba(79,70,229,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(79,70,229,0.04) 1px, transparent 1px);
+    background-size: 36px 36px;
+    mask-image: radial-gradient(ellipse 60% 80% at 0% 0%, black 20%, transparent 70%);
+    pointer-events: none;
+}
+.notif-header-inner {
+    position: relative; z-index: 1;
+    display: flex; align-items: flex-end;
+    justify-content: space-between; gap: 1.5rem; flex-wrap: wrap;
+}
+.notif-header h1 {
+    font-family: var(--font-disp);
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 0.95; color: var(--text); margin-bottom: 0;
+}
+.notif-count-badge {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    background: var(--indigo); color: #fff;
+    padding: 0.25rem 0.75rem; align-self: flex-start;
+    margin-top: 0.5rem; display: inline-block;
+}
+
+/* ── BODY ────────────────────────────────────────────────── */
+.notif-body {
+    padding: 2rem 4rem 5rem;
+    max-width: 860px;
+}
+
+/* ── NOTIFICATION LIST ───────────────────────────────────── */
+.notif-list {
+    display: flex; flex-direction: column; gap: 0;
+    border: 1px solid var(--border);
+}
+
+.notif-item {
+    display: flex; gap: 0;
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    transition: background 0.15s;
+}
+.notif-item:last-child { border-bottom: none; }
+.notif-item:hover { background: var(--ink-2); }
+
+/* unread indicator strip */
+.notif-item.unread::before {
+    content: '';
+    position: absolute; top: 0; left: 0; bottom: 0; width: 3px;
+    background: var(--indigo);
+}
+
+/* left — icon column */
+.notif-icon-col {
+    width: 52px; flex-shrink: 0;
+    display: flex; align-items: flex-start; justify-content: center;
+    padding-top: 1.1rem;
+    border-right: 1px solid var(--border);
+    background: var(--ink-2);
+}
+.notif-icon {
+    width: 28px; height: 28px;
+    border: 1px solid var(--border);
+    background: #fff;
+    display: grid; place-items: center;
+    font-size: 0.75rem; flex-shrink: 0;
+}
+
+/* right — content */
+.notif-content {
+    flex: 1; min-width: 0;
+    padding: 1rem 1.25rem 1rem 1rem;
+}
+.notif-meta {
+    display: flex; align-items: center; gap: 0.6rem;
+    flex-wrap: wrap; margin-bottom: 0.35rem;
+}
+.notif-title {
+    font-family: var(--font-mono); font-size: 0.68rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    font-weight: 700; color: var(--text);
+}
+.notif-dot { color: var(--border); font-size: 0.4rem; }
+.notif-time {
+    font-family: var(--font-mono); font-size: 0.58rem;
+    letter-spacing: 0.06em; color: var(--muted); margin-left: auto;
+}
+.notif-message {
+    font-size: 0.88rem; color: var(--text);
+    line-height: 1.7;
+}
+
+/* ── EMPTY STATE ─────────────────────────────────────────── */
+.notif-empty {
+    padding: 4rem 2rem;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 1rem;
+    border: 1px solid var(--border);
+    background: #fff;
+}
+.notif-empty-icon {
+    width: 56px; height: 56px;
+    border: 1px solid var(--border);
+    background: var(--ink-2);
+    display: grid; place-items: center;
+    font-size: 1.5rem;
+}
+.notif-empty-title {
+    font-family: var(--font-disp); font-size: 1.5rem;
+    color: var(--text); line-height: 1;
+}
+.notif-empty-sub {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted);
+}
+
+/* ── RESPONSIVE ──────────────────────────────────────────── */
+@media (max-width: 760px) {
+    .notif-header { padding: 2.5rem 2rem 1.5rem; }
+    .notif-body   { padding: 1.5rem 2rem 3rem; }
+    .notif-icon-col { width: 40px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ── HEADER ────────────────────────────────────────────── -->
+<div class="notif-header">
+    <div class="notif-header-inner">
+        <div>
+            <div class="section-tag">System · Inbox</div>
+            <h1>Notifications</h1>
+        </div>
+        {% if notifications %}
+            <span class="notif-count-badge">{{ notifications | length }} message{{ 's' if notifications | length != 1 }}</span>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ── BODY ──────────────────────────────────────────────── -->
+<div class="notif-body">
+
+    {% if notifications %}
+    <div class="notif-list">
+        {% for n in notifications %}
+        <div class="notif-item reveal {% if not n.is_read %}unread{% endif %}">
+
+            <!-- Icon -->
+            <div class="notif-icon-col">
+                <div class="notif-icon">
+                    {% if 'warn' in n.title | lower or 'alert' in n.title | lower %}⚠
+                    {% elif 'resolv' in n.title | lower or 'complet' in n.title | lower %}✓
+                    {% elif 'terminat' in n.title | lower or 'critical' in n.title | lower %}⛔
+                    {% elif 'update' in n.title | lower or 'status' in n.title | lower %}↻
+                    {% else %}🔔{% endif %}
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="notif-content">
+                <div class="notif-meta">
+                    <span class="notif-title">{{ n.title }}</span>
+                    <span class="notif-dot">●</span>
+                    <span class="notif-time">{{ n.created_at }}</span>
+                </div>
+                <p class="notif-message">{{ n.message }}</p>
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="notif-empty reveal">
+        <div class="notif-empty-icon">🔔</div>
+        <div class="notif-empty-title">All caught up</div>
+        <div class="notif-empty-sub">No notifications yet</div>
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

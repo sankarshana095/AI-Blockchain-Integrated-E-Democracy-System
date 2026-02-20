@@ -37,6 +37,7 @@ def create_representative(
         "candidate_name": candidate_name,
         "party_name": party_name,
         "created_at": utc_now().isoformat(),
+        "status": "ACTIVE"
     }
     initialize_rep_score(user_id)
     return insert_record(REPRESENTATIVES_TABLE, payload, use_admin=True)
@@ -302,3 +303,42 @@ def get_current_representative_by_constituency(constituency_id: str):
             return rep
 
     return None
+
+def get_current_representatives_by_constituency(constituency_id: str):
+    reps = get_representatives_by_constituency(constituency_id)
+
+    if not reps:
+        return None
+
+    # If single dict returned, convert to list
+    if isinstance(reps, dict):
+        reps = [reps]
+
+    today = date.today()
+
+    for rep in reps:
+        start = rep.get("term_start")
+        end = rep.get("term_end")
+
+        if not start or not end:
+            continue
+
+        if isinstance(start, str):
+            start = date.fromisoformat(start)
+        if isinstance(end, str):
+            end = date.fromisoformat(end)
+
+        if start <= today <= end:
+            return rep
+
+    return None
+
+def get_terminated_representatives(today: date):
+    reps = fetch_all(REPRESENTATIVES_TABLE)
+
+    terminated = []
+    for r in reps:
+        if r["status"] == "TERMINATED":
+            terminated.append(r)
+
+    return terminated

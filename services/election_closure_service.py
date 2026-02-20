@@ -56,7 +56,8 @@ def close_election_and_assign_reps(election):
             runner_up = random.choice(runners)
         else:
             runner_up = None
-
+        
+        completed_constituency_terms(constituency_id)
         # -----------------------------
         # INSERT REPRESENTATIVES
         # -----------------------------

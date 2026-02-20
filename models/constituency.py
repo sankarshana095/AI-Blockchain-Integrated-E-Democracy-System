@@ -1,11 +1,5 @@
 from supabase_db.db import fetch_all,fetch_one
 
-
-CONSTITUENCIES_TABLE = "constituencies"
-
-
-from supabase_db.db import fetch_all
-
 CONSTITUENCIES_TABLE = "constituencies"
 DISTRICTS_TABLE = "districts"
 
@@ -53,3 +47,20 @@ def get_all_constituencies():
     Fetch all constituencies
     """
     return fetch_all(CONSTITUENCIES_TABLE)
+
+
+def get_state_id_by_constituency_id(constituency_id: str):
+    rows = fetch_all("constituencies", {"id": constituency_id})
+
+    if not rows:
+        return None
+
+    district_id = rows[0].get("district_id")
+    if not district_id:
+        return None
+
+    district = fetch_one("districts", {"id": district_id})
+    if not district:
+        return None
+
+    return district.get("state_id")
