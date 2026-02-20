@@ -190,3 +190,27 @@ def get_representatives_with_photo(constituency_id: str):
         rep["photo_url"] = photo_url
 
     return reps
+
+
+
+def get_representatives_by_constituency(constituency_id: str):
+    """
+    Get all representatives for a given constituency.
+    """
+    return fetch_all(
+        REPRESENTATIVES_TABLE,
+        {"constituency_id": constituency_id}
+    )
+
+
+def get_elected_representative_by_constituency(constituency_id: str):
+    """
+    Get the ELECTED_REP for a given constituency.
+    """
+    reps = get_representatives_by_constituency(constituency_id)
+
+    for rep in reps:
+        if rep.get("type") == "ELECTED_REP":
+            return rep
+
+    return None

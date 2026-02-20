@@ -208,7 +208,7 @@ def accept_issue(issue_id, rep_id, note, estimated_start):
         status="Accepted",
         changed_by=rep_id,
         note=note,
-        estimated_start_at=estimated_start
+        estimated_start_at=estimated_start,
     )
 
 def mark_in_progress(issue_id, rep_id, note, estimated_completion):

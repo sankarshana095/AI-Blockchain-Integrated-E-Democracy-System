@@ -287,7 +287,8 @@ def add_counter_statement(post_id, user_id, role, content, images=None):
                 post_id=post_id,
                 summary=result["summary"],
                 fact_check=result["fact_check"],
-                confidence_score=result["confidence_score"]
+                confidence_score=result["confidence_score"],
+                integrity_score=result["integrity_score"]
             )
 
         except AIClientError as e:

@@ -18,7 +18,7 @@ from models.rep_policy import get_policy_post_by_id
 from services.rep_policy_service import get_policy_posts_by_user_id
 
 bp = Blueprint("representative", __name__, url_prefix="/representative")
-
+from services.representative_scoring import calculate_representative_score
 
 # -----------------------------
 # Dashboard
@@ -130,14 +130,13 @@ def issue_management():
 @login_required
 @role_required("ELECTED_REP", "OPPOSITION_REP")
 def performance_score():
-    score = get_my_performance_score(session.get("user_id"))
+    score = calculate_representative_score(session.get("user_id"),session.get("constituency_id"))
     return render_template("representative/performance_score.html", score=score)
 
 @bp.route("/issues/<issue_id>/resolve", methods=["POST"])
 @login_required
 @role_required("ELECTED_REP")
 def resolve_issue(issue_id):
-    print(session.get("user_id"))
     _resolve_issue(
         issue_id=issue_id,
         resolved_by=session.get("user_id"),
@@ -161,7 +160,7 @@ def accept(issue_id):
         issue_id=issue_id,
         rep_id=session["user_id"],
         note=note,
-        estimated_start=estimated_start
+        estimated_start=estimated_start,
     )
 
     flash("Issue accepted successfully.", "success")

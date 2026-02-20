@@ -2,329 +2,1130 @@
 {% set title = "Policy Detail" %}
 
 {% macro render_comment(comment, level=0) %}
-<div class="comment" style="margin-left: {{ level * 20 }}px">
-
-    <div class="comment-header">
-        u/<strong>{{ comment.username }}</strong>
-        <span class="comment-time" title="{{ comment.created_at }}">
-            • {{ comment.time_ago }}
-        </span>
-    </div>
-
-    {% if comment.ai_generated %}
-        <div class="ai-comment">
-            🤖 <strong>AI Bot</strong>
-            <p>{{ comment.content }}</p>
+<div class="comment-item" style="margin-left: {{ [level * 1.5, 6] | min }}rem;">
+    <div class="comment-spine"></div>
+    <div class="comment-content">
+        <div class="comment-header">
+            <span class="comment-author">u/{{ comment.username }}</span>
+            {% if comment.ai_generated %}
+                <span class="comment-ai-badge">🤖 AI</span>
+            {% endif %}
+            <span class="comment-time">{{ comment.time_ago }}</span>
         </div>
-    {% else %}
-        <p>{{ comment.content }}</p>
-    {% endif %}
 
-    <form method="POST"
-          action="{{ url_for('rep_policy.comment', post_id=post.id) }}">
-        <input type="hidden" name="parent_comment_id" value="{{ comment.id }}">
-        <textarea name="content" rows="2" placeholder="Reply..." required></textarea>
-        <button class="btn-secondary">Reply</button>
-    </form>
+        {% if comment.ai_generated %}
+            <p class="comment-body ai-body">{{ comment.content }}</p>
+        {% else %}
+            <p class="comment-body">{{ comment.content }}</p>
+        {% endif %}
 
-    {% for reply in comment.replies %}
-        {{ render_comment(reply, level + 1) }}
-    {% endfor %}
+        <form class="reply-form" method="POST"
+              action="{{ url_for('rep_policy.comment', post_id=post.id) }}">
+            <input type="hidden" name="parent_comment_id" value="{{ comment.id }}">
+            <div class="reply-input-wrap">
+                <textarea name="content" rows="2" placeholder="Reply…" required></textarea>
+                <button type="submit" class="reply-btn">↩ Reply</button>
+            </div>
+        </form>
+
+        {% for reply in comment.replies %}
+            {{ render_comment(reply, level + 1) }}
+        {% endfor %}
+    </div>
 </div>
 {% endmacro %}
 
-{% block content %}
-{% set first_role = post.created_by_role %}
+{% block extra_css %}
+<style>
+/* ═══════════════════════════════════════════════════════════
+   POLICY DETAIL
+═══════════════════════════════════════════════════════════ */
+{% set first_role  = post.created_by_role %}
 {% set second_role = "OPPOSITION_REP" if first_role == "ELECTED_REP" else "ELECTED_REP" %}
-<div class="policy-detail">
 
-    <h2>📜 {{ post.title if post.title else "Public Forum Discussion" }}</h2>
+/* ── PAGE HEADER ─────────────────────────────────────────── */
+.pd-header {
+    padding: 4rem 4rem 2.5rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--ink-2);
+    position: relative;
+    overflow: hidden;
+}
+.pd-header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+        linear-gradient(rgba(79,70,229,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(79,70,229,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(ellipse 80% 80% at 0% 0%, black 20%, transparent 70%);
+}
+.pd-header-inner { position: relative; z-index: 1; max-width: 860px; }
+.pd-breadcrumb {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); text-decoration: none;
+    margin-bottom: 1.25rem;
+    transition: color 0.2s;
+}
+.pd-breadcrumb:hover { color: var(--indigo); }
+.pd-breadcrumb::before { content: '←'; }
 
-    <div class="policy-meta">
-        <strong>{{ post.author_name }}</strong>
+.pd-title {
+    font-family: var(--font-disp);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    line-height: 0.95;
+    color: var(--text);
+    margin-bottom: 1rem;
+}
+.pd-meta {
+    display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+}
+.pd-author {
+    font-family: var(--font-mono); font-size: 0.72rem;
+    letter-spacing: 0.06em; color: var(--text); font-weight: 700;
+}
+.party-badge {
+    font-family: var(--font-mono); font-size: 0.6rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    background: var(--indigo-dim); color: var(--indigo);
+    border: 1px solid rgba(79,70,229,0.2);
+    padding: 0.2rem 0.6rem;
+}
+.pd-time {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.06em; color: var(--muted);
+}
 
-        {% if post.party_name %}
-            <span class="party-badge">• {{ post.party_name }}</span>
-        {% endif %}
+/* ── BODY LAYOUT ─────────────────────────────────────────── */
+.pd-body {
+    padding: 2.5rem 4rem 0;
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 2rem;
+    align-items: start;
+    max-width: 1300px;
+}
+.pd-main { display: flex; flex-direction: column; gap: 1.5rem; }
+.pd-sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
 
-        <span class="post-time">• Posted {{ post.created_at }}</span>
-    </div>
+/* Full-width comments section below the grid */
+.pd-comments {
+    padding: 0 4rem 4rem;
+    max-width: 1300px;
+}
 
-    <!-- ======================
-         Representative Section
-    ======================= -->
-<section class="policy-section">
+/* ── STATEMENT CARD ──────────────────────────────────────── */
+.statement-card {
+    border: 1px solid var(--border);
+    background: #fff;
+    position: relative;
+    overflow: hidden;
+}
+.statement-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; bottom: 0;
+    width: 3px;
+}
+.statement-card.rep::before  { background: var(--indigo); }
+.statement-card.opp::before  { background: var(--teal); }
 
-    {% if first_role == "ELECTED_REP" %}
-        <h3>🏛️ Representative Statement</h3>
+.statement-head {
+    display: flex; align-items: center; gap: 0.75rem;
+    padding: 1.1rem 1.5rem 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--ink-2);
+}
+.statement-icon {
+    width: 30px; height: 30px;
+    display: grid; place-items: center;
+    font-size: 0.85rem; flex-shrink: 0;
+    background: var(--indigo-dim); border: 1px solid rgba(79,70,229,0.2);
+}
+.statement-card.opp .statement-icon { background: var(--teal-dim); border-color: rgba(13,148,136,0.2); }
+.statement-role {
+    font-family: var(--font-disp); font-size: 1.3rem; color: var(--text); line-height: 1;
+}
+.statement-tag {
+    margin-left: auto;
+    font-family: var(--font-mono); font-size: 0.58rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--indigo); border: 1px solid rgba(79,70,229,0.2);
+    padding: 0.2rem 0.5rem; background: var(--indigo-dim);
+}
+.statement-card.opp .statement-tag { color: var(--teal); border-color: rgba(13,148,136,0.2); background: var(--teal-dim); }
 
-        {% if post.image_urls %}
-        <div class="policy-images">
-            {% for img in post.image_urls %}
-                <img src="{{ img }}" class="policy-image">
-            {% endfor %}
-        </div>
-        {% endif %}
+.statement-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+.statement-person {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding-bottom: 0.75rem; border-bottom: 1px solid var(--border);
+}
+.statement-person strong {
+    font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.05em; color: var(--text);
+}
+.statement-text { font-size: 0.92rem; color: var(--text); line-height: 1.75; }
+.statement-text em { color: var(--muted); font-size: 0.85rem; }
 
-        {% if post.representative_statement %}
-            <p>{{ post.representative_statement }}</p>
-        {% else %}
-            <p><em>No representative statement yet.</em></p>
-        {% endif %}
+/* policy images */
+.policy-images { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.policy-image {
+    width: 120px; height: 90px;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    cursor: zoom-in;
+    transition: border-color 0.2s, transform 0.2s;
+}
+.policy-image:hover { border-color: var(--indigo); transform: scale(1.03); }
 
-    {% else %}
-        <h3>⚖️ Opposition Statement</h3>
+/* ── COUNTER FORM ────────────────────────────────────────── */
+.counter-form-wrap {
+    display: flex; flex-direction: column; gap: 0.75rem;
+}
+.counter-form-wrap textarea {
+    font-family: var(--font-body); font-size: 0.88rem;
+    padding: 0.85rem 1rem; border: 1px solid var(--border);
+    background: var(--ink-2); color: var(--text);
+    resize: vertical; min-height: 100px; outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+}
+.counter-form-wrap textarea:focus {
+    border-color: var(--indigo); box-shadow: 0 0 0 3px var(--indigo-dim); background: #fff;
+}
+.file-label {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+    margin-bottom: 0.25rem; display: block;
+}
 
-        {% if post.image_urls %}
-        <div class="policy-images">
-            {% for img in post.image_urls %}
-                <img src="{{ img }}" class="policy-image">
-            {% endfor %}
-        </div>
-        {% endif %}
+/* ── VOTE PANEL ──────────────────────────────────────────── */
+.vote-panel {
+    display: flex; align-items: center; gap: 0.75rem;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid var(--border); background: #fff;
+}
+.vote-panel-label {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+    margin-right: auto;
+}
+.vote-btn {
+    width: 40px; height: 40px;
+    display: grid; place-items: center;
+    font-size: 1rem; border: 1px solid var(--border);
+    background: var(--ink-2); cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s; color: var(--muted);
+}
+.vote-btn:hover { border-color: var(--indigo); color: var(--indigo); transform: translateY(-1px); }
+.vote-btn.upvote.active   { background: var(--indigo-dim); border-color: var(--indigo); color: var(--indigo); }
+.vote-btn.downvote.active { background: rgba(220,38,38,0.08); border-color: rgba(220,38,38,0.3); color: #dc2626; }
+.vote-score {
+    font-family: var(--font-disp); font-size: 2rem; color: var(--text);
+    min-width: 3ch; text-align: center; line-height: 1;
+}
 
-        {% if post.opposition_statement %}
-            <p>{{ post.opposition_statement }}</p>
-        {% else %}
-            <p><em>No opposition statement yet.</em></p>
-        {% endif %}
+/* ── AI SUMMARY CARD ─────────────────────────────────────── */
+.ai-card {
+    border: 1px solid var(--border);
+    background: #fff;
+    position: relative; overflow: hidden;
+}
+.ai-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--indigo), var(--teal));
+}
+.ai-card-head {
+    display: flex; align-items: center; gap: 0.75rem;
+    padding: 1.1rem 1.5rem; border-bottom: 1px solid var(--border);
+    background: var(--ink-2);
+}
+.ai-card-title {
+    font-family: var(--font-disp); font-size: 1.3rem; color: var(--text); line-height: 1;
+}
+.ai-badge {
+    font-family: var(--font-mono); font-size: 0.58rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    background: var(--indigo-dim); color: var(--indigo);
+    border: 1px solid rgba(79,70,229,0.2); padding: 0.2rem 0.5rem;
+}
+.ai-card-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; }
 
-    {% endif %}
+.ai-summary-text {
+    font-size: 0.88rem; line-height: 1.75; color: var(--text);
+    padding: 1rem; background: var(--indigo-dim);
+    border-left: 3px solid var(--indigo);
+}
 
-</section>
+/* claims */
+.ai-claims { display: flex; flex-direction: column; gap: 0.5rem; }
+.ai-claims-label {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted);
+    margin-bottom: 0.25rem;
+}
+.claim-item {
+    padding: 0.75rem 1rem; border: 1px solid var(--border); background: var(--ink-2);
+    display: flex; flex-direction: column; gap: 0.25rem;
+}
+.claim-item strong { font-size: 0.85rem; color: var(--text); }
+.claim-item small  { font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
+.claim-tag {
+    align-self: flex-start;
+    font-family: var(--font-mono); font-size: 0.55rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.15rem 0.5rem; margin-top: 0.2rem;
+}
+.claim-tag.verified    { background: var(--teal-dim); color: var(--teal); border: 1px solid rgba(13,148,136,0.2); }
+.claim-tag.unverified  { background: var(--warm-dim); color: #b45309; border: 1px solid rgba(245,158,11,0.2); }
+.claim-tag.misleading  { background: rgba(220,38,38,0.07); color: #dc2626; border: 1px solid rgba(220,38,38,0.2); }
+.claim-tag.uncertain   { background: var(--indigo-dim); color: var(--indigo); border: 1px solid rgba(79,70,229,0.2); }
 
+.ai-neutral { display: flex; flex-direction: column; gap: 0.35rem; }
+.ai-neutral-item {
+    font-size: 0.82rem; color: var(--muted); padding: 0.5rem 0.75rem;
+    border-left: 2px solid var(--border); line-height: 1.5;
+}
 
-    <!-- ======================
-         Counter Statement Form
-    ======================= -->
-        <section class="policy-section">
+.ai-confidence-bar { display: flex; flex-direction: column; gap: 0.4rem; }
+.ai-confidence-label {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+    display: flex; justify-content: space-between;
+}
+.ai-confidence-label span { color: var(--indigo); font-weight: 700; }
+.ai-bar-track {
+    height: 4px; background: var(--border); position: relative;
+}
+.ai-bar-fill {
+    position: absolute; top: 0; left: 0; bottom: 0;
+    background: linear-gradient(90deg, var(--indigo), var(--teal));
+    width: {{ post.ai_confidence_score | default(0) }}%;
+    transition: width 1s ease;
+}
 
-    {% if second_role == "ELECTED_REP" %}
-        <h3>🏛️ Representative Response</h3>
+.ai-disclaimer {
+    font-family: var(--font-mono); font-size: 0.6rem;
+    letter-spacing: 0.05em; color: var(--muted); line-height: 1.6;
+    border-top: 1px solid var(--border); padding-top: 0.75rem; margin-top: 0;
+}
 
-        {% if post.rep_name %}
-        <div class="rep-meta">
-            <strong>{{ post.rep_name }}</strong>
-            {% if post.rep_party %}
-                <span class="party-badge">• {{ post.rep_party }}</span>
-            {% endif %}
-        </div>
-    {% endif %}
+/* ── COMMENTS SECTION ────────────────────────────────────── */
+.comments-section {
+    border: 1px solid var(--border); background: #fff;
+}
+.comments-head {
+    display: flex; align-items: center; gap: 0.75rem;
+    padding: 1.1rem 1.5rem; border-bottom: 1px solid var(--border); background: var(--ink-2);
+}
+.comments-title {
+    font-family: var(--font-disp); font-size: 1.3rem; color: var(--text); line-height: 1;
+}
+.comments-count {
+    font-family: var(--font-mono); font-size: 0.6rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--indigo); border: 1px solid rgba(79,70,229,0.2);
+    background: var(--indigo-dim); padding: 0.2rem 0.5rem;
+}
+.comments-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; }
 
-        {% if post.representative_statement and first_role != "ELECTED_REP" %}
-            {% if post.counter_image_urls %}
-    {% for img in post.counter_image_urls %}
-        <img src="{{ img }}" class="policy-image">
-    {% endfor %}
-{% endif %}
+/* new comment form */
+.new-comment-form textarea {
+    width: 100%; font-family: var(--font-body); font-size: 0.88rem;
+    padding: 0.85rem 1rem; border: 1px solid var(--border);
+    background: var(--ink-2); color: var(--text); resize: vertical;
+    min-height: 80px; outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s; margin-bottom: 0.6rem;
+}
+.new-comment-form textarea:focus {
+    border-color: var(--indigo); box-shadow: 0 0 0 3px var(--indigo-dim); background: #fff;
+}
 
-            <p>{{ post.representative_statement }}</p>
-        {% elif session.role == "ELECTED_REP" %}
-            <div class="empty-state">
-                <p><em>You have not added your official response yet.</em></p>
+/* comment thread */
+.comment-thread { display: flex; flex-direction: column; gap: 0; }
+.comment-item {
+    display: flex; gap: 0; padding: 0.9rem 0;
+    border-top: 1px solid var(--border); position: relative;
+}
+.comment-spine {
+    width: 2px; flex-shrink: 0; margin-right: 1rem;
+    background: var(--border); align-self: stretch;
+    min-height: 100%;
+}
+.comment-content { flex: 1; display: flex; flex-direction: column; gap: 0.5rem; }
+.comment-header {
+    display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;
+}
+.comment-author {
+    font-family: var(--font-mono); font-size: 0.68rem;
+    letter-spacing: 0.05em; color: var(--text); font-weight: 700;
+}
+.comment-ai-badge {
+    font-family: var(--font-mono); font-size: 0.55rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    background: var(--indigo-dim); color: var(--indigo);
+    border: 1px solid rgba(79,70,229,0.2); padding: 0.1rem 0.45rem;
+}
+.comment-time {
+    font-family: var(--font-mono); font-size: 0.6rem;
+    letter-spacing: 0.06em; color: var(--muted); margin-left: auto;
+}
+.comment-body { font-size: 0.88rem; color: var(--text); line-height: 1.7; }
+.comment-body.ai-body {
+    background: var(--indigo-dim); border-left: 2px solid var(--indigo);
+    padding: 0.6rem 0.85rem; font-size: 0.85rem;
+}
 
-                <form method="POST"
-                      action="{{ url_for('rep_policy.counter_statement', post_id=post.id) }}" enctype="multipart/form-data">
-                    <textarea name="content" rows="4" required
-                              placeholder="Present the representative’s response..."></textarea>
-                              <label>Upload Supporting Images (optional)</label>
-<input type="file" name="images" multiple accept="image/*">
-                    <button class="btn-primary">Submit Response</button>
-                </form>
-            </div>
-        {% else %}
-            <p><em>Representative response not submitted yet.</em></p>
-        {% endif %}
+/* reply form */
+.reply-form { margin-top: 0.25rem; }
+.reply-input-wrap { display: flex; gap: 0.5rem; align-items: flex-end; }
+.reply-input-wrap textarea {
+    flex: 1; font-family: var(--font-body); font-size: 0.82rem;
+    padding: 0.55rem 0.75rem; border: 1px solid var(--border);
+    background: var(--ink-2); color: var(--text); resize: none;
+    outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+}
+.reply-input-wrap textarea:focus {
+    border-color: var(--indigo); box-shadow: 0 0 0 3px var(--indigo-dim); background: #fff;
+}
+.reply-btn {
+    font-family: var(--font-mono); font-size: 0.6rem;
+    letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700;
+    padding: 0.55rem 0.85rem; border: none; cursor: pointer;
+    background: var(--indigo-dim); color: var(--indigo);
+    border: 1px solid rgba(79,70,229,0.25); white-space: nowrap;
+    transition: background 0.2s;
+}
+.reply-btn:hover { background: var(--indigo-mid); }
 
-    {% else %}
-        <h3>⚖️ Opposition Response</h3>
+/* empty state */
+.empty-note {
+    font-family: var(--font-mono); font-size: 0.68rem;
+    letter-spacing: 0.06em; color: var(--muted);
+    padding: 1rem; border: 1px dashed var(--border); text-align: center;
+}
 
-        {% if post.opposition_statement and first_role != "OPPOSITION_REP" %}
-        {% if post.counter_image_urls %}
-        {% if post.opp_name %}
-        <div class="opp-meta">
-            <strong>{{ post.opp_name }}</strong>
-            {% if post.opp_party %}
-                <span class="party-badge">• {{ post.opp_party }}</span>
-            {% endif %}
-        </div>
-    {% endif %}
-    {% for img in post.counter_image_urls %}
-        <img src="{{ img }}" class="policy-image">
-    {% endfor %}
-{% endif %}
+/* ── SHARED HELPERS ──────────────────────────────────────── */
+.po-btn {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-family: var(--font-mono); font-size: 0.65rem;
+    letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700;
+    padding: 0.65rem 1.2rem; border: none; cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+}
+.po-btn:hover { transform: translateY(-1px); }
+.po-btn-primary {
+    background: var(--indigo); color: #fff;
+    clip-path: polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+}
+.po-btn-primary:hover { background: var(--indigo-dark); }
+.po-btn-teal { background: var(--teal-dim); color: var(--teal); border: 1px solid rgba(13,148,136,0.25); }
+.po-btn-teal:hover { background: rgba(13,148,136,0.2); }
 
-            <p>{{ post.opposition_statement }}</p>
-        {% elif session.role == "OPPOSITION_REP" %}
-            <div class="empty-state">
-                <p><em>You have not added your official opposition response yet.</em></p>
+/* ── RESPONSIVE ──────────────────────────────────────────── */
+@media (max-width: 1000px) {
+    .pd-body    { grid-template-columns: 1fr; padding: 1.5rem 2rem 0; }
+    .pd-comments { padding: 0 2rem 3rem; }
+    .pd-header  { padding: 3rem 2rem 2rem; }
+}
 
-                <form method="POST"
-                      action="{{ url_for('rep_policy.counter_statement', post_id=post.id) }}" enctype="multipart/form-data">
-                    <textarea name="content" rows="4" required
-                              placeholder="Present the opposition’s response..."></textarea>
-                              <label>Upload Supporting Images (optional)</label>
-<input type="file" name="images" multiple accept="image/*">
-                    <button class="btn-primary">Submit Opposition Response</button>
-                </form>
-            </div>
-        {% else %}
-            <p><em>Opposition response not submitted yet.</em></p>
-        {% endif %}
+/* ── LIGHTBOX ────────────────────────────────────────────── */
+.policy-image { cursor: zoom-in; }
 
-    {% endif %}
+.lightbox-overlay {
+    position: fixed; inset: 0; z-index: 9000;
+    background: rgba(0,0,0,0.92);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+.lightbox-overlay.active {
+    opacity: 1; pointer-events: all;
+}
+.lightbox-inner {
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; height: 100%;
+    padding: 3rem 5rem;
+    box-sizing: border-box;
+}
+.lightbox-img {
+    max-width: 100%; max-height: 85vh;
+    object-fit: contain;
+    border: 1px solid rgba(79,70,229,0.3);
+    box-shadow: 0 0 80px rgba(79,70,229,0.2);
+    transition: opacity 0.2s ease;
+    display: block;
+}
+.lightbox-img.fading { opacity: 0; }
 
-</section>
+/* Close button */
+.lightbox-close {
+    position: fixed; top: 1.5rem; right: 1.5rem;
+    width: 44px; height: 44px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #fff; font-size: 1.1rem;
+    display: grid; place-items: center;
+    cursor: pointer; z-index: 9010;
+    font-family: var(--font-mono);
+    transition: background 0.2s;
+}
+.lightbox-close:hover { background: rgba(255,255,255,0.18); }
 
+/* Prev / Next arrows */
+.lightbox-arrow {
+    position: fixed; top: 50%; transform: translateY(-50%);
+    width: 48px; height: 56px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #fff; font-family: var(--font-mono); font-size: 1.1rem;
+    display: grid; place-items: center;
+    cursor: pointer; z-index: 9010;
+    transition: background 0.2s, transform 0.2s;
+    user-select: none;
+}
+.lightbox-arrow:hover { background: rgba(79,70,229,0.35); }
+.lightbox-arrow.prev { left: 1.25rem; }
+.lightbox-arrow.prev:hover { transform: translateY(-50%) translateX(-2px); }
+.lightbox-arrow.next { right: 1.25rem; }
+.lightbox-arrow.next:hover { transform: translateY(-50%) translateX(2px); }
+.lightbox-arrow[hidden] { display: none; }
 
-    <!-- ======================
-         Voting
-    ======================= -->
-<div class="vote-panel">
+/* Counter — e.g. 2 / 5 */
+.lightbox-counter {
+    position: fixed; bottom: 1.75rem; left: 50%; transform: translateX(-50%);
+    font-family: var(--font-mono); font-size: 0.65rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    z-index: 9010;
+}
 
-    <!-- UPVOTE -->
-    <form method="POST" action="{{ url_for('rep_policy.vote', post_id=post.id) }}">
-        <input type="hidden" name="vote" value="1">
-        <button
-            type="submit"
-            class="vote-btn upvote {% if post.user_vote == 1 %}active{% endif %}"
-            aria-label="Upvote"
-        >
-            {% if post.user_vote == 1 %}
-                ▲
-            {% else %}
-                △
-            {% endif %}
-        </button>
-    </form>
+/* Dot indicators */
+.lightbox-dots {
+    position: fixed; bottom: 1.25rem; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 0.4rem; z-index: 9010;
+}
+.lightbox-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    cursor: pointer; transition: background 0.2s, transform 0.2s;
+}
+.lightbox-dot.active { background: var(--indigo); transform: scale(1.4); }
 
-    <!-- SCORE -->
-    <div class="score">
-        {{ post.upvotes - post.downvotes }}
-    </div>
+/* ═══════════════════════════════════════════════════════════
+   REDDIT-STYLE COMMENT THREADS
+═══════════════════════════════════════════════════════════ */
 
-    <!-- DOWNVOTE -->
-    <form method="POST" action="{{ url_for('rep_policy.vote', post_id=post.id) }}">
-        <input type="hidden" name="vote" value="-1">
-        <button
-            type="submit"
-            class="vote-btn downvote {% if post.user_vote == -1 %}active{% endif %}"
-            aria-label="Downvote"
-        >
-            {% if post.user_vote == -1 %}
-                ▼
-            {% else %}
-                ▽
-            {% endif %}
-        </button>
-    </form>
+/* Each comment is a flex row: gutter | body */
+.comment-card {
+    display: flex;
+    gap: 0;
+    /* indent capped at level 6 via --indent CSS var */
+    padding-left: calc(var(--indent, 0) * 1.4rem);
+    position: relative;
+}
 
-</div>
+/* Clickable left spine line */
+.comment-gutter {
+    width: 20px;
+    flex-shrink: 0;
+    position: relative;
+    cursor: pointer;
+    padding-right: 4px;
+}
+.comment-gutter::before {
+    content: '';
+    position: absolute;
+    top: 36px;
+    bottom: 8px;
+    left: 8px;
+    width: 2px;
+    background: var(--border);
+    border-radius: 1px;
+    transition: background 0.2s;
+}
+.comment-gutter:hover::before { background: var(--indigo); }
 
+/* Right side — everything except the gutter */
+.comment-body-wrap {
+    flex: 1;
+    min-width: 0;        /* prevent overflow of long words */
+    padding: 0.6rem 0 0.5rem 0.5rem;
+    border-top: 1px solid var(--border);
+}
 
+/* First-level comments get no border-top */
+.comment-card[style*="--indent: 0"] > .comment-body-wrap { border-top: none; }
 
+/* ── HEADER ROW ──────────────────────────────────────────── */
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.45rem;
+}
 
-     <div class="ai-summary-box">
+/* Collapse button */
+.collapse-btn {
+    width: 18px; height: 18px;
+    border: 1px solid var(--border);
+    background: var(--ink-2);
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    display: grid; place-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: border-color 0.15s, color 0.15s;
+    line-height: 1;
+    padding: 0;
+}
+.collapse-btn:hover { border-color: var(--indigo); color: var(--indigo); }
 
-    <h4>🤖 AI Summary & Fact Check</h4>
+/* Avatar circle */
+.comment-avatar {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--indigo-dim);
+    border: 1px solid rgba(79,70,229,0.2);
+    display: grid; place-items: center;
+    font-size: 0.6rem; font-weight: 700;
+    color: var(--indigo); flex-shrink: 0;
+    font-family: var(--font-mono);
+}
+.comment-ai .comment-avatar { background: var(--teal-dim); border-color: rgba(13,148,136,0.2); color: var(--teal); }
 
-    {% if post.ai_summary %}
-        <p class="ai-summary-text">
-            {{ post.ai_summary }}
-        </p>
+/* Username */
+.comment-username {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--text);
+}
 
-        {% set fc = post.ai_fact_check %}
+/* Badges */
+.cb {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.1rem 0.45rem;
+    border-radius: 2px;
+    font-weight: 700;
+}
+.op-badge  { background: var(--indigo-dim); color: var(--indigo); border: 1px solid rgba(79,70,229,0.25); }
+.rep-badge { background: var(--indigo-dim); color: var(--indigo); border: 1px solid rgba(79,70,229,0.25); }
+.opp-badge { background: var(--teal-dim);   color: var(--teal);   border: 1px solid rgba(13,148,136,0.25); }
+.ai-badge  { background: var(--warm-dim);   color: #b45309;       border: 1px solid rgba(245,158,11,0.25); }
 
-        <!-- Representative Claims -->
-        {% if fc.representative_claims %}
-        <div class="ai-claims rep-claims">
-            <h5>🏛️ Representative Claims</h5>
-            <ul>
-                {% for item in fc.representative_claims %}
-                    <li>
-                        <strong>{{ item.claim }}</strong><br>
-                        <small>{{ item.note }}</small>
-                        <span class="claim-tag {{ item.type | lower | replace(' ', '-') }}">
-                            {{ item.type }}
-                        </span>
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
+/* ── INLINE VOTE ─────────────────────────────────────────── */
+.comment-vote-inline {
+    display: flex; align-items: center; gap: 0.2rem;
+    margin-left: 0.2rem;
+}
+.cv-btn {
+    width: 20px; height: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted); font-size: 0.6rem;
+    display: grid; place-items: center;
+    cursor: pointer; padding: 0;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.cv-btn.up:hover, .cv-btn.up.active  { color: var(--indigo); border-color: var(--indigo); background: var(--indigo-dim); }
+.cv-btn.dn:hover, .cv-btn.dn.active  { color: #dc2626; border-color: rgba(220,38,38,0.4); background: rgba(220,38,38,0.08); }
+.cv-score {
+    font-family: var(--font-mono); font-size: 0.65rem; font-weight: 700;
+    min-width: 1.6ch; text-align: center; color: var(--muted);
+}
+.cv-score.pos { color: var(--indigo); }
+.cv-score.neg { color: #dc2626; }
 
-        <!-- Opposition Claims -->
-        {% if fc.opposition_claims %}
-        <div class="ai-claims opp-claims">
-            <h5>⚖️ Opposition Claims</h5>
-            <ul>
-                {% for item in fc.opposition_claims %}
-                    <li>
-                        <strong>{{ item.claim }}</strong><br>
-                        <small>{{ item.note }}</small>
-                        <span class="claim-tag {{ item.type | lower | replace(' ', '-') }}">
-                            {{ item.type }}
-                        </span>
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
+/* Time */
+.comment-time {
+    font-family: var(--font-mono); font-size: 0.6rem;
+    letter-spacing: 0.04em; color: var(--muted);
+    margin-left: auto;
+}
 
-        <!-- Neutral Observations -->
-        {% if fc.neutral_observations %}
-        <div class="ai-neutral">
-            <h5>⚖️ Neutral Observations</h5>
-            <ul>
-                {% for obs in fc.neutral_observations %}
-                    <li>{{ obs }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
+/* ── COMMENT TEXT ────────────────────────────────────────── */
+.comment-text {
+    font-size: 0.88rem; color: var(--text);
+    line-height: 1.7; margin-bottom: 0.5rem;
+}
+.comment-official .comment-text {
+    background: var(--indigo-dim);
+    border-left: 2px solid var(--indigo);
+    padding: 0.5rem 0.75rem;
+}
+.comment-ai .comment-text {
+    background: var(--warm-dim);
+    border-left: 2px solid var(--warm);
+    padding: 0.5rem 0.75rem;
+}
 
-        <!-- Confidence -->
-        <div class="ai-confidence">
-            <strong>AI Confidence:</strong>
-            {{ post.ai_confidence_score }}%
-        </div>
+/* ── ACTIONS ─────────────────────────────────────────────── */
+.comment-actions { display: flex; gap: 0.75rem; margin-bottom: 0.35rem; }
+.ca-btn {
+    font-family: var(--font-mono); font-size: 0.6rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); background: none; border: none;
+    cursor: pointer; padding: 0;
+    transition: color 0.15s;
+}
+.ca-btn:hover { color: var(--indigo); }
 
-        <p class="ai-disclaimer">
-            ℹ️ This summary is AI-generated to assist understanding.
-            It does not represent an official judgment.
-        </p>
+/* ── REPLY FORM ──────────────────────────────────────────── */
+.reply-form-inner { margin-bottom: 0.5rem; }
+.reply-input-row { display: flex; gap: 0.5rem; align-items: flex-end; }
+.reply-input-row textarea {
+    flex: 1; font-family: var(--font-body); font-size: 0.84rem;
+    padding: 0.55rem 0.75rem; border: 1px solid var(--border);
+    background: var(--ink-2); color: var(--text); resize: none; outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.reply-input-row textarea:focus {
+    border-color: var(--indigo); box-shadow: 0 0 0 3px var(--indigo-dim); background: #fff;
+}
+.reply-submit-btn {
+    font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.1em;
+    text-transform: uppercase; font-weight: 700; padding: 0.55rem 0.9rem;
+    background: var(--indigo); color: #fff; border: none; cursor: pointer;
+    white-space: nowrap; transition: background 0.2s;
+    clip-path: polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);
+}
+.reply-submit-btn:hover { background: var(--indigo-dark); }
 
-    {% else %}
-        <p><em>AI analysis will appear once both sides respond.</em></p>
-    {% endif %}
+/* ── REPLIES CONTAINER ───────────────────────────────────── */
+.comment-replies { margin-top: 0.25rem; }
 
-</div>
-
-    <a href="{{ url_for('rep_policy.policy_feed') }}">
-        ← Back to Policy Feed
-    </a>
-
-</div>
-<hr>
-
-<h3>💬 Discussion</h3>
-
-<form method="POST" action="{{ url_for('rep_policy.comment', post_id=post.id) }}">
-    <textarea name="content" rows="3" placeholder="Add a comment..." required></textarea>
-    <button class="btn-primary">Comment</button>
-</form>
-
-{% if comments %}
-    <div class="comment-thread">
-        {% for comment in comments %}
-            {% set level = 0 %}
-            {% include "policy/_comment.html" %}
-        {% endfor %}
-    </div>
-{% else %}
-    <p>No comments yet.</p>
-{% endif %}
-
-<script src="{{ url_for('static', filename='js/issue.js') }}"></script>
+/* Collapsed state */
+.comment-body-wrap.collapsed .comment-text,
+.comment-body-wrap.collapsed .comment-actions,
+.comment-body-wrap.collapsed .reply-form-inner,
+.comment-body-wrap.collapsed .comment-replies {
+    display: none;
+}
+.comment-body-wrap.collapsed .comment-header { opacity: 0.6; }
+</style>
 {% endblock %}
 
+{% block content %}
+{% set first_role  = post.created_by_role %}
+{% set second_role = "OPPOSITION_REP" if first_role == "ELECTED_REP" else "ELECTED_REP" %}
+
+<!-- ── PAGE HEADER ──────────────────────────────────────── -->
+<div class="pd-header">
+    <div class="pd-header-inner">
+        <a href="{{ url_for('rep_policy.policy_feed') }}" class="pd-breadcrumb">
+            Policy Feed
+        </a>
+        <h1 class="pd-title">{{ post.title if post.title else "Public Forum Discussion" }}</h1>
+        <div class="pd-meta">
+            <span class="pd-author">{{ post.author_name }}</span>
+            {% if post.party_name %}
+                <span class="party-badge">{{ post.party_name }}</span>
+            {% endif %}
+            <span class="pd-time">Posted {{ post.created_at }}</span>
+        </div>
+    </div>
+</div>
+
+<!-- ── BODY ─────────────────────────────────────────────── -->
+<div class="pd-body">
+
+    <!-- ══ MAIN COLUMN ═══════════════════════════════════ -->
+    <div class="pd-main">
+
+        <!-- Statement 1 -->
+        <div class="statement-card {{ 'rep' if first_role == 'ELECTED_REP' else 'opp' }} reveal">
+            <div class="statement-head">
+                <div class="statement-icon">{{ '🏛' if first_role == 'ELECTED_REP' else '⚖' }}</div>
+                <span class="statement-role">
+                    {{ 'Representative Statement' if first_role == 'ELECTED_REP' else 'Opposition Statement' }}
+                </span>
+                <span class="statement-tag">Primary</span>
+            </div>
+            <div class="statement-body">
+                {% if post.author_name %}
+                <div class="statement-person">
+                    <strong>{{ post.author_name }}</strong>
+                    {% if post.party_name %}<span class="party-badge">{{ post.party_name }}</span>{% endif %}
+                </div>
+                {% endif %}
+
+                {% if post.image_urls %}
+                <div class="policy-images">
+                    {% for img in post.image_urls %}
+                        <img src="{{ img }}" class="policy-image" alt="Supporting image">
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if first_role == 'ELECTED_REP' and post.representative_statement %}
+                    <p class="statement-text">{{ post.representative_statement }}</p>
+                {% elif first_role == 'OPPOSITION_REP' and post.opposition_statement %}
+                    <p class="statement-text">{{ post.opposition_statement }}</p>
+                {% else %}
+                    <p class="statement-text"><em>No statement provided yet.</em></p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Statement 2 — Counter -->
+        <div class="statement-card {{ 'rep' if second_role == 'ELECTED_REP' else 'opp' }} reveal">
+            <div class="statement-head">
+                <div class="statement-icon">{{ '🏛' if second_role == 'ELECTED_REP' else '⚖' }}</div>
+                <span class="statement-role">
+                    {{ 'Representative Response' if second_role == 'ELECTED_REP' else 'Opposition Response' }}
+                </span>
+                <span class="statement-tag">Counter</span>
+            </div>
+            <div class="statement-body">
+
+                {% if second_role == 'ELECTED_REP' %}
+                    {% if post.rep_name %}
+                    <div class="statement-person">
+                        <strong>{{ post.rep_name }}</strong>
+                        {% if post.rep_party %}<span class="party-badge">{{ post.rep_party }}</span>{% endif %}
+                    </div>
+                    {% endif %}
+
+                    {% if post.representative_statement and first_role != 'ELECTED_REP' %}
+                        {% if post.counter_image_urls %}
+                        <div class="policy-images">
+                            {% for img in post.counter_image_urls %}
+                                <img src="{{ img }}" class="policy-image" alt="Supporting image">
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <p class="statement-text">{{ post.representative_statement }}</p>
+
+                    {% elif session.role == 'ELECTED_REP' %}
+                        <form method="POST" enctype="multipart/form-data"
+                              action="{{ url_for('rep_policy.counter_statement', post_id=post.id) }}"
+                              class="counter-form-wrap">
+                            <textarea name="content" rows="4" required
+                                      placeholder="Present the representative's official response…"></textarea>
+                            <span class="file-label">Upload Supporting Images (optional)</span>
+                            <input type="file" name="images" multiple accept="image/*">
+                            <div><button type="submit" class="po-btn po-btn-primary">Submit Response →</button></div>
+                        </form>
+                    {% else %}
+                        <p class="statement-text"><em>Representative response not submitted yet.</em></p>
+                    {% endif %}
+
+                {% else %}
+                    {% if post.opp_name %}
+                    <div class="statement-person">
+                        <strong>{{ post.opp_name }}</strong>
+                        {% if post.opp_party %}<span class="party-badge">{{ post.opp_party }}</span>{% endif %}
+                    </div>
+                    {% endif %}
+
+                    {% if post.opposition_statement and first_role != 'OPPOSITION_REP' %}
+                        {% if post.counter_image_urls %}
+                        <div class="policy-images">
+                            {% for img in post.counter_image_urls %}
+                                <img src="{{ img }}" class="policy-image" alt="Supporting image">
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <p class="statement-text">{{ post.opposition_statement }}</p>
+
+                    {% elif session.role == 'OPPOSITION_REP' %}
+                        <form method="POST" enctype="multipart/form-data"
+                              action="{{ url_for('rep_policy.counter_statement', post_id=post.id) }}"
+                              class="counter-form-wrap">
+                            <textarea name="content" rows="4" required
+                                      placeholder="Present the opposition's official response…"></textarea>
+                            <span class="file-label">Upload Supporting Images (optional)</span>
+                            <input type="file" name="images" multiple accept="image/*">
+                            <div><button type="submit" class="po-btn po-btn-teal">Submit Opposition Response →</button></div>
+                        </form>
+                    {% else %}
+                        <p class="statement-text"><em>Opposition response not submitted yet.</em></p>
+                    {% endif %}
+                {% endif %}
+
+            </div>
+        </div>
+
+        <!-- Comments -->
+    </div>
+
+    <!-- ══ SIDEBAR ════════════════════════════════════════ -->
+    <div class="pd-sidebar">
+
+        <!-- Vote panel -->
+        <div class="vote-panel reveal">
+            <span class="vote-panel-label">Community Vote</span>
+            <form method="POST" action="{{ url_for('rep_policy.vote', post_id=post.id) }}">
+                <input type="hidden" name="vote" value="1">
+                <button type="submit" class="vote-btn upvote {% if post.user_vote == 1 %}active{% endif %}" aria-label="Upvote">
+                    {{ '▲' if post.user_vote == 1 else '△' }}
+                </button>
+            </form>
+            <div class="vote-score">{{ post.upvotes - post.downvotes }}</div>
+            <form method="POST" action="{{ url_for('rep_policy.vote', post_id=post.id) }}">
+                <input type="hidden" name="vote" value="-1">
+                <button type="submit" class="vote-btn downvote {% if post.user_vote == -1 %}active{% endif %}" aria-label="Downvote">
+                    {{ '▼' if post.user_vote == -1 else '▽' }}
+                </button>
+            </form>
+        </div>
+
+        <!-- AI Summary -->
+        <div class="ai-card reveal">
+            <div class="ai-card-head">
+                <div class="statement-icon" style="background:var(--indigo-dim);border:1px solid rgba(79,70,229,.2);">🤖</div>
+                <span class="ai-card-title">AI Analysis</span>
+                <span class="ai-badge">Auto-generated</span>
+            </div>
+            <div class="ai-card-body">
+
+                {% if post.ai_summary %}
+                    <p class="ai-summary-text">{{ post.ai_summary }}</p>
+
+                    {% set fc = post.ai_fact_check %}
+
+                    {% if fc.representative_claims %}
+                    <div class="ai-claims">
+                        <div class="ai-claims-label">🏛 Representative Claims</div>
+                        {% for item in fc.representative_claims %}
+                        <div class="claim-item">
+                            <strong>{{ item.claim }}</strong>
+                            <small>{{ item.note }}</small>
+                            <span class="claim-tag {{ item.type | lower | replace(' ', '-') }}">{{ item.type }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {% if fc.opposition_claims %}
+                    <div class="ai-claims">
+                        <div class="ai-claims-label">⚖ Opposition Claims</div>
+                        {% for item in fc.opposition_claims %}
+                        <div class="claim-item">
+                            <strong>{{ item.claim }}</strong>
+                            <small>{{ item.note }}</small>
+                            <span class="claim-tag {{ item.type | lower | replace(' ', '-') }}">{{ item.type }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {% if fc.neutral_observations %}
+                    <div class="ai-neutral">
+                        <div class="ai-claims-label">⚖ Neutral Observations</div>
+                        {% for obs in fc.neutral_observations %}
+                            <div class="ai-neutral-item">{{ obs }}</div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="ai-confidence-bar">
+                        <div class="ai-confidence-label">
+                            AI Confidence <span>{{ post.ai_confidence_score }}%</span>
+                        </div>
+                        <div class="ai-bar-track">
+                            <div class="ai-bar-fill"></div>
+                        </div>
+                    </div>
+
+                    <p class="ai-disclaimer">
+                        This summary is AI-generated to assist understanding.
+                        It does not represent an official judgment.
+                    </p>
+
+                {% else %}
+                    <p class="empty-note">AI analysis will appear once both sides have responded.</p>
+                {% endif %}
+
+            </div>
+        </div>
+
+    </div><!-- /sidebar -->
+
+</div><!-- /pd-body -->
+
+<!-- ── FULL-WIDTH COMMENTS ──────────────────────────────── -->
+<div class="pd-comments">
+    <div class="comments-section reveal">
+        <div class="comments-head">
+            <div class="statement-icon" style="background:var(--indigo-dim);border:1px solid rgba(79,70,229,.2);">💬</div>
+            <span class="comments-title">Discussion</span>
+            {% if comments %}
+                <span class="comments-count">{{ comments | length }} comment{{ 's' if comments | length != 1 }}</span>
+            {% endif %}
+        </div>
+        <div class="comments-body">
+            <form class="new-comment-form" method="POST"
+                  action="{{ url_for('rep_policy.comment', post_id=post.id) }}">
+                <textarea name="content" rows="3" placeholder="Add a comment…" required></textarea>
+                <button type="submit" class="po-btn po-btn-primary">Post Comment →</button>
+            </form>
+            {% if comments %}
+            <div class="comment-thread">
+                {% for comment in comments %}
+                    {% set level = 0 %}
+                    {% include "policy/_comment.html" %}
+                {% endfor %}
+            </div>
+            {% else %}
+                <p class="empty-note">No comments yet. Be the first to contribute.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/issue.js') }}"></script>
+
+<!-- ── LIGHTBOX ──────────────────────────────────────────── -->
+<div class="lightbox-overlay" id="lightbox" onclick="lbClickOutside(event)">
+    <div class="lightbox-inner">
+        <img class="lightbox-img" id="lightboxImg" src="" alt="">
+    </div>
+</div>
+<button class="lightbox-close" id="lightboxClose" onclick="closeLightbox()">✕</button>
+<button class="lightbox-arrow prev" id="lightboxPrev" onclick="lbMove(-1)">&#8592;</button>
+<button class="lightbox-arrow next" id="lightboxNext" onclick="lbMove(1)">&#8594;</button>
+<div class="lightbox-counter" id="lightboxCounter"></div>
+<div class="lightbox-dots" id="lightboxDots"></div>
+
+<script>
+(function () {
+    /* ── State ─────────────────────────────────────────── */
+    let images  = [];   // array of src strings for current gallery
+    let current = 0;
+    let open    = false;
+
+    /* ── Grab elements ─────────────────────────────────── */
+    const overlay = document.getElementById('lightbox');
+    const img     = document.getElementById('lightboxImg');
+    const prev    = document.getElementById('lightboxPrev');
+    const next    = document.getElementById('lightboxNext');
+    const counter = document.getElementById('lightboxCounter');
+    const dotsEl  = document.getElementById('lightboxDots');
+    const closeEl = document.getElementById('lightboxClose');
+
+    /* ── Attach click to every .policy-image ───────────── */
+    document.querySelectorAll('.policy-images').forEach((group, gIdx) => {
+        const imgs = Array.from(group.querySelectorAll('.policy-image'));
+        imgs.forEach((el, i) => {
+            el.dataset.galleryGroup = gIdx;
+            el.dataset.galleryIdx   = i;
+            el.addEventListener('click', () => openLightbox(
+                imgs.map(x => x.src), i
+            ));
+        });
+    });
+
+    /* ── Open ──────────────────────────────────────────── */
+    function openLightbox(srcs, idx) {
+        images  = srcs;
+        current = idx;
+        open    = true;
+        document.body.style.overflow = 'hidden';
+        buildDots();
+        showImage(current, false);
+        overlay.classList.add('active');
+        closeEl.hidden = false;
+    }
+
+    /* ── Close ─────────────────────────────────────────── */
+    window.closeLightbox = function () {
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+        open = false;
+        setTimeout(() => { img.src = ''; }, 300);
+    };
+
+    /* ── Click outside image ───────────────────────────── */
+    window.lbClickOutside = function (e) {
+        if (e.target === overlay || e.target === overlay.firstElementChild) closeLightbox();
+    };
+
+    /* ── Navigate ──────────────────────────────────────── */
+    window.lbMove = function (dir) {
+        if (!open) return;
+        current = (current + dir + images.length) % images.length;
+        showImage(current, true);
+    };
+
+    /* ── Show image with fade ──────────────────────────── */
+    function showImage(idx, animate) {
+        if (animate) {
+            img.classList.add('fading');
+            setTimeout(() => {
+                img.src = images[idx];
+                img.classList.remove('fading');
+            }, 180);
+        } else {
+            img.src = images[idx];
+        }
+        // arrows
+        prev.hidden = images.length <= 1;
+        next.hidden = images.length <= 1;
+        // counter
+        counter.textContent = images.length > 1 ? (idx + 1) + ' / ' + images.length : '';
+        // dots
+        document.querySelectorAll('.lightbox-dot').forEach((d, i) => {
+            d.classList.toggle('active', i === idx);
+        });
+    }
+
+    /* ── Build dot indicators ──────────────────────────── */
+    function buildDots() {
+        dotsEl.innerHTML = '';
+        if (images.length <= 1) return;
+        images.forEach((_, i) => {
+            const d = document.createElement('button');
+            d.className = 'lightbox-dot' + (i === current ? ' active' : '');
+            d.setAttribute('aria-label', 'Image ' + (i + 1));
+            d.onclick = () => { current = i; showImage(i, true); };
+            dotsEl.appendChild(d);
+        });
+    }
+
+    /* ── Keyboard nav ──────────────────────────────────── */
+    document.addEventListener('keydown', e => {
+        if (!open) return;
+        if (e.key === 'Escape')     closeLightbox();
+        if (e.key === 'ArrowRight') lbMove(1);
+        if (e.key === 'ArrowLeft')  lbMove(-1);
+    });
+
+    /* ── Touch swipe ───────────────────────────────────── */
+    let touchStartX = 0;
+    overlay.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+    overlay.addEventListener('touchend',   e => {
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        if (Math.abs(dx) > 50) lbMove(dx < 0 ? 1 : -1);
+    });
+})();
+
+/* ── Comment thread collapse + reply toggle ──────────────── */
+function toggleThread(id) {
+    const body = document.getElementById('comment-body-' + id);
+    const btn  = document.getElementById('toggle-icon-' + id);
+    if (!body) return;
+    const collapsed = body.classList.toggle('collapsed');
+    btn.textContent = collapsed ? '+' : '−';
+}
+
+function toggleReply(id) {
+    const form = document.getElementById('reply-form-' + id);
+    if (!form) return;
+    const isHidden = form.style.display === 'none' || form.style.display === '';
+    form.style.display = isHidden ? 'block' : 'none';
+    if (isHidden) form.querySelector('textarea').focus();
+}
+
+</script>
+
+{% endblock %}

@@ -1,352 +1,410 @@
-<div class="comment-card" style="margin-left: {{ level * 24 }}px;" id="comment-{{ comment.id }}">
+<div class="comment-card"
+     id="comment-{{ comment.id }}">
 
-    <!-- Thread line for nested comments -->
-    {% if level > 0 %}
-        <div class="comment-thread-line"></div>
-    {% endif %}
+    <!-- Clickable spine line -->
+    <div class="comment-gutter" onclick="toggleThread('{{ comment.id }}')" title="Collapse thread"></div>
 
-    <div class="comment-inner">
+    <!-- Body -->
+    <div class="comment-body-wrap" id="comment-body-{{ comment.id }}">
 
-        <!-- ── Comment Header ───────────────────── -->
+        <!-- ── Header ──────────────────────────────────────── -->
         <div class="comment-header">
-            <button
-                class="thread-toggle"
-                onclick="toggleThread('{{ comment.id }}'); return false;"
-                id="toggle-icon-{{ comment.id }}"
-                title="Collapse thread"
-                aria-label="Toggle thread"
-            >
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="5" y1="12" x2="19" y2="12"/>
-                </svg>
-            </button>
 
-            <div class="comment-author-row">
-                <!-- Username / AI -->
+            <!-- Collapse button -->
+            <button class="collapse-btn"
+                    id="toggle-icon-{{ comment.id }}"
+                    onclick="toggleThread('{{ comment.id }}')"
+                    title="Collapse">−</button>
+
+            <!-- Avatar -->
+            <div class="comment-avatar {% if comment.user_id == '00000000-0000-0000-0000-000000000001' %}avatar-ai{% endif %}">
                 {% if comment.user_id == '00000000-0000-0000-0000-000000000001' %}
-                    <span class="comment-username ai">
-                        <span class="ai-dot"></span>
-                        AI Assistant
-                    </span>
+                    🤖
                 {% else %}
-                    <span class="comment-username">u/{{ comment.display_name }}</span>
+                    {{ comment.display_name[0] | upper }}
                 {% endif %}
-
-                <!-- Badges -->
-                {% if comment.is_op %}
-                    <span class="comment-badge op">OP</span>
-                {% endif %}
-
-                {% if comment.is_official %}
-                    {% if comment.role == "ELECTED_REP" %}
-                        <span class="comment-badge official">
-                            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                            Official Response
-                        </span>
-                    {% else %}
-                        <span class="comment-badge opposition">
-                            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                            Opposition
-                        </span>
-                    {% endif %}
-                {% endif %}
-
-                <span class="comment-time" title="{{ comment.created_at }}">{{ comment.time_ago }}</span>
-            </div>
-        </div>
-
-        <!-- ── Comment Body ──────────────────────── -->
-        <div class="comment-body" id="thread-{{ comment.id }}">
-
-            <p class="comment-text">{{ comment.comment }}</p>
-
-            <!-- ── Vote + Actions row ────────────── -->
-            <div class="comment-footer">
-
-                <!-- Vote -->
-                <div class="comment-vote">
-                    <button
-                        class="cvote-btn up {% if comment.user_vote == 'up' %}active{% endif %}"
-                        onclick="voteComment('{{ comment.id }}', 'up')"
-                        aria-label="Upvote"
-                    >
-                        <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l8 8H4z"/></svg>
-                    </button>
-                    <span class="comment-score {% if comment.score > 0 %}pos{% elif comment.score < 0 %}neg{% endif %}">
-                        {{ comment.score }}
-                    </span>
-                    <button
-                        class="cvote-btn down {% if comment.user_vote == 'down' %}active{% endif %}"
-                        onclick="voteComment('{{ comment.id }}', 'down')"
-                        aria-label="Downvote"
-                    >
-                        <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M12 20l-8-8h16z"/></svg>
-                    </button>
-                </div>
-
-                <span class="comment-footer-sep"></span>
-
-                <!-- Reply action -->
-                <button
-                    class="comment-action-btn"
-                    onclick="toggleReply('{{ comment.id }}'); return false;"
-                >
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/>
-                    </svg>
-                    Reply
-                </button>
-
             </div>
 
-            <!-- ── Reply Form ─────────────────────── -->
-            <div id="reply-form-{{ comment.id }}" class="reply-form" style="display:none;">
-                <form method="POST" action="{{ url_for('citizen.add_issue_comment', issue_id=issue_id) }}">
-                    <input type="hidden" name="parent_comment_id" value="{{ comment.id }}">
-                    <div class="reply-form-inner">
-                        <textarea
-                            name="comment"
-                            rows="2"
-                            placeholder="Write a reply..."
-                            required
-                        ></textarea>
-                        <div class="reply-form-actions">
-                            <button type="submit" class="reply-submit">Post Reply →</button>
-                            <button type="button" class="reply-cancel" onclick="toggleReply('{{ comment.id }}')">Cancel</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-
-            <!-- ── Replies ────────────────────────── -->
-            {% if comment.replies %}
-                <div class="comment-replies" id="replies-{{ comment.id }}">
-                    {% for reply in comment.replies %}
-                        {% set level = level + 1 %}
-                        {% set comment = reply %}
-                        {% include "citizen/_comment.html" %}
-                    {% endfor %}
-                </div>
+            <!-- Username -->
+            {% if comment.user_id == '00000000-0000-0000-0000-000000000001' %}
+                <span class="comment-username username-ai">
+                    <span class="ai-pulse"></span>AI Assistant
+                </span>
+            {% else %}
+                <span class="comment-username">u/{{ comment.display_name }}</span>
             {% endif %}
 
-        </div>
-    </div>
+            <!-- Badges -->
+            {% if comment.is_op %}
+                <span class="cbadge badge-op">OP</span>
+            {% endif %}
+            {% if comment.is_official %}
+                {% if comment.role == "ELECTED_REP" %}
+                    <span class="cbadge badge-rep">
+                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                        Official
+                    </span>
+                {% else %}
+                    <span class="cbadge badge-opp">
+                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                        Opposition
+                    </span>
+                {% endif %}
+            {% endif %}
 
+            <!-- Inline votes -->
+            <div class="comment-vote-inline">
+                <button class="cv-btn up {% if comment.user_vote == 'up' %}active{% endif %}"
+                        onclick="voteComment('{{ comment.id }}', 'up')"
+                        aria-label="Upvote">
+                    <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l8 8H4z"/></svg>
+                </button>
+                <span class="cv-score {% if comment.score > 0 %}pos{% elif comment.score < 0 %}neg{% endif %}"
+                      id="comment-score-{{ comment.id }}">{{ comment.score }}</span>
+                <button class="cv-btn dn {% if comment.user_vote == 'down' %}active{% endif %}"
+                        onclick="voteComment('{{ comment.id }}', 'down')"
+                        aria-label="Downvote">
+                    <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M12 20l-8-8h16z"/></svg>
+                </button>
+            </div>
+
+            <!-- Time -->
+            <span class="comment-time" title="{{ comment.created_at }}">{{ comment.time_ago }}</span>
+
+        </div><!-- /comment-header -->
+
+        <!-- ── Text ────────────────────────────────────────── -->
+        <p class="comment-text
+            {% if comment.user_id == '00000000-0000-0000-0000-000000000001' %}text-ai{% endif %}
+            {% if comment.is_official and comment.role == 'ELECTED_REP' %}text-official{% endif %}
+            {% if comment.is_official and comment.role != 'ELECTED_REP' %}text-opposition{% endif %}">
+            {{ comment.comment }}
+        </p>
+
+        <!-- ── Actions ─────────────────────────────────────── -->
+        <div class="comment-actions">
+            <button class="ca-btn" onclick="toggleReply('{{ comment.id }}')">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 17 4 12 9 7"/>
+                    <path d="M20 18v-2a4 4 0 0 0-4-4H4"/>
+                </svg>
+                Reply
+            </button>
+            {% if comment.replies %}
+                <span class="ca-count">
+                    {{ comment.replies | length }} repl{{ 'y' if comment.replies | length == 1 else 'ies' }}
+                </span>
+            {% endif %}
+        </div>
+
+        <!-- ── Reply Form ───────────────────────────────────── -->
+        <div id="reply-form-{{ comment.id }}" class="reply-form-wrap" style="display:none;">
+            <form method="POST"
+                  action="{{ url_for('citizen.add_issue_comment', issue_id=issue_id) }}">
+                <input type="hidden" name="parent_comment_id" value="{{ comment.id }}">
+                <textarea name="comment" rows="2"
+                          class="reply-textarea"
+                          placeholder="Write a reply…" required></textarea>
+                <div class="reply-form-footer">
+                    <button type="submit" class="reply-submit-btn">Post Reply →</button>
+                    <button type="button" class="reply-cancel-btn"
+                            onclick="toggleReply('{{ comment.id }}')">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- ── Nested replies ──────────────────────────────── -->
+        {% if comment.replies %}
+        <div class="comment-replies" id="replies-{{ comment.id }}">
+            {% for reply in comment.replies %}
+                {% set level = level + 1 %}
+                {% set comment = reply %}
+                {% include "citizen/_comment.html" %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+    </div><!-- /comment-body-wrap -->
 </div>
 
-{% if loop.first and loop.last %}{% endif %}
 
+{% if loop.first %}
 <style>
 /* ═══════════════════════════════════════════════════════════
-   COMMENT COMPONENT — injected once, scoped to .comment-card
+   CITIZEN _COMMENT — REDDIT STYLE
+   (rendered once via loop.first guard)
 ═══════════════════════════════════════════════════════════ */
 
+/* ── CARD ─────────────────────────────────────────────────── */
 .comment-card {
+    display: flex;
+    gap: 0;
     position: relative;
-    padding: 1rem 0 0 0;
 }
 
-/* Nested thread indent line */
-.comment-thread-line {
+/* ── SPINE ────────────────────────────────────────────────── */
+.comment-gutter {
+    width: 20px;
+    flex-shrink: 0;
+    position: relative;
+    cursor: pointer;
+    padding-right: 4px;
+}
+.comment-gutter::before {
+    content: '';
     position: absolute;
-    left: -13px; top: 0; bottom: 0;
-    width: 1px;
+    top: 38px; bottom: 8px; left: 8px;
+    width: 2px;
     background: var(--border);
+    border-radius: 1px;
     transition: background 0.2s;
 }
-.comment-card:hover > .comment-thread-line {
-    background: rgba(79,70,229,0.25);
+.comment-gutter:hover::before { background: var(--indigo); }
+
+/* ── BODY WRAP ────────────────────────────────────────────── */
+.comment-body-wrap {
+    flex: 1;
+    min-width: 0;
+    padding: 0.65rem 0 0.5rem 0.5rem;
+    border-top: 1px solid var(--border);
+}
+/* No top border for root-level (indent 0) */
+/* Root-level cards (direct children of the thread container) get no top border */
+.comment-thread > .comment-card > .comment-body-wrap,
+.comments-list  > .comment-card > .comment-body-wrap {
+    border-top: none;
 }
 
-.comment-inner {
-    background: var(--ink);
-    border: 1px solid var(--border);
-    transition: border-color 0.2s;
-}
-.comment-card:hover > .comment-inner { border-color: rgba(79,70,229,0.18); }
-
-/* ── Header ─────────────────────────────────────────────── */
+/* ── HEADER ───────────────────────────────────────────────── */
 .comment-header {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    padding: 0.65rem 1rem;
-    border-bottom: 1px solid var(--border);
-    background: var(--ink-2);
+    gap: 0.45rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.45rem;
 }
 
-.thread-toggle {
+/* Collapse button */
+.collapse-btn {
     width: 18px; height: 18px;
-    display: grid; place-items: center;
-    background: none;
     border: 1px solid var(--border);
+    background: var(--ink-2);
     color: var(--muted);
-    cursor: pointer;
-    flex-shrink: 0;
-    transition: border-color 0.2s, color 0.2s, background 0.2s;
-    padding: 0;
+    font-family: var(--font-mono);
+    font-size: 0.75rem; line-height: 1;
+    display: grid; place-items: center;
+    cursor: pointer; flex-shrink: 0; padding: 0;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
-.thread-toggle:hover {
+.collapse-btn:hover {
     border-color: var(--indigo);
     color: var(--indigo);
     background: var(--indigo-dim);
 }
-.thread-toggle.collapsed svg {
-    transform: rotate(-90deg);
+
+/* Avatar */
+.comment-avatar {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--indigo-dim);
+    border: 1px solid rgba(79,70,229,0.2);
+    display: grid; place-items: center;
+    font-size: 0.6rem; font-weight: 700;
+    color: var(--indigo); flex-shrink: 0;
+    font-family: var(--font-mono);
+}
+.avatar-ai {
+    background: var(--teal-dim);
+    border-color: rgba(13,148,136,0.2);
+    color: var(--teal);
+    font-size: 0.75rem;
 }
 
-.comment-author-row {
-    display: flex; align-items: center; gap: 0.5rem;
-    flex-wrap: wrap; flex: 1;
-}
-
+/* Username */
 .comment-username {
     font-family: var(--font-mono);
-    font-size: 0.65rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--indigo);
-    font-weight: 700;
+    font-size: 0.68rem; letter-spacing: 0.06em;
+    font-weight: 700; color: var(--text);
 }
-.comment-username.ai {
+.username-ai {
     color: var(--teal);
-    display: flex; align-items: center; gap: 0.4rem;
+    display: inline-flex; align-items: center; gap: 0.35rem;
 }
-.ai-dot {
+.ai-pulse {
     width: 6px; height: 6px; border-radius: 50%;
-    background: var(--teal);
+    background: var(--teal); flex-shrink: 0;
     animation: blink 1.4s ease-in-out infinite;
 }
 
 /* Badges */
-.comment-badge {
-    display: inline-flex; align-items: center; gap: 0.3rem;
-    font-family: var(--font-mono);
-    font-size: 0.55rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 0.15rem 0.5rem;
-    border-radius: 2px;
-    white-space: nowrap;
+.cbadge {
+    display: inline-flex; align-items: center; gap: 0.25rem;
+    font-family: var(--font-mono); font-size: 0.55rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.12rem 0.45rem; border-radius: 2px;
+    font-weight: 700; white-space: nowrap;
 }
-.comment-badge.op {
-    color: var(--indigo); background: var(--indigo-dim);
-    border: 1px solid rgba(79,70,229,0.25);
-}
-.comment-badge.official {
-    color: var(--teal); background: var(--teal-dim);
-    border: 1px solid rgba(13,148,136,0.25);
-}
-.comment-badge.opposition {
-    color: var(--warm); background: var(--warm-dim);
-    border: 1px solid rgba(245,158,11,0.25);
-}
+.badge-op  { color: var(--indigo); background: var(--indigo-dim); border: 1px solid rgba(79,70,229,0.25); }
+.badge-rep { color: var(--teal);   background: var(--teal-dim);   border: 1px solid rgba(13,148,136,0.25); }
+.badge-opp { color: #b45309;       background: var(--warm-dim);   border: 1px solid rgba(245,158,11,0.25); }
 
-.comment-time {
-    font-family: var(--font-mono);
-    font-size: 0.58rem;
+/* Inline vote */
+.comment-vote-inline {
+    display: flex; align-items: center; gap: 0.2rem;
+    margin-left: 0.1rem;
+}
+.cv-btn {
+    width: 20px; height: 20px;
+    border: 1px solid var(--border);
+    background: transparent; color: var(--muted);
+    display: grid; place-items: center;
+    cursor: pointer; padding: 0;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.cv-btn.up:hover,
+.cv-btn.up.active  { color: var(--indigo); border-color: var(--indigo); background: var(--indigo-dim); }
+.cv-btn.dn:hover,
+.cv-btn.dn.active  { color: #dc2626; border-color: rgba(220,38,38,0.4); background: rgba(220,38,38,0.08); }
+
+.cv-score {
+    font-family: var(--font-mono); font-size: 0.65rem;
+    font-weight: 700; min-width: 1.6ch; text-align: center;
     color: var(--muted);
-    letter-spacing: 0.06em;
+}
+.cv-score.pos { color: var(--indigo); }
+.cv-score.neg { color: #dc2626; }
+
+/* Time */
+.comment-time {
+    font-family: var(--font-mono); font-size: 0.6rem;
+    letter-spacing: 0.04em; color: var(--muted);
     margin-left: auto;
 }
 
-/* ── Body ───────────────────────────────────────────────── */
-.comment-body { }
-
+/* ── COMMENT TEXT ─────────────────────────────────────────── */
 .comment-text {
-    font-size: 0.9rem;
-    color: var(--text);
-    line-height: 1.75;
-    padding: 1rem 1.25rem 0.75rem;
+    font-size: 0.88rem; color: var(--text);
+    line-height: 1.75; margin-bottom: 0.4rem;
+    padding-right: 0.5rem;
+}
+.text-ai {
+    background: var(--teal-dim);
+    border-left: 2px solid var(--teal);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+}
+.text-official {
+    background: var(--indigo-dim);
+    border-left: 2px solid var(--indigo);
+    padding: 0.5rem 0.75rem;
+}
+.text-opposition {
+    background: var(--warm-dim);
+    border-left: 2px solid var(--warm);
+    padding: 0.5rem 0.75rem;
 }
 
-/* ── Footer: vote + actions ─────────────────────────────── */
-.comment-footer {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.5rem 1.25rem 0.65rem;
-    border-top: 1px solid var(--border);
+/* ── ACTIONS ──────────────────────────────────────────────── */
+.comment-actions {
+    display: flex; align-items: center; gap: 0.75rem;
+    margin-bottom: 0.3rem;
 }
-
-.comment-vote {
-    display: flex; align-items: center; gap: 0.4rem;
-}
-.cvote-btn {
-    width: 22px; height: 22px;
-    display: grid; place-items: center;
-    background: none; border: 1px solid var(--border);
-    color: var(--muted); cursor: pointer; padding: 0;
-    transition: border-color 0.2s, color 0.2s, background 0.2s;
-}
-.cvote-btn:hover { border-color: var(--indigo); color: var(--indigo); background: var(--indigo-dim); }
-.cvote-btn.up.active  { border-color: var(--indigo); color: #fff; background: var(--indigo); }
-.cvote-btn.down.active { border-color: #dc2626; color: #fff; background: #dc2626; }
-
-.comment-score {
-    font-family: var(--font-mono); font-size: 0.7rem;
-    color: var(--text); min-width: 1.5rem; text-align: center;
-    font-weight: 700; letter-spacing: 0.05em;
-}
-.comment-score.pos { color: var(--indigo); }
-.comment-score.neg { color: #dc2626; }
-
-.comment-footer-sep {
-    width: 1px; height: 14px;
-    background: var(--border); flex-shrink: 0;
-}
-
-.comment-action-btn {
-    display: inline-flex; align-items: center; gap: 0.35rem;
+.ca-btn {
+    display: inline-flex; align-items: center; gap: 0.3rem;
     font-family: var(--font-mono); font-size: 0.6rem;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--muted);
-    background: none; border: none; cursor: pointer; padding: 0;
-    transition: color 0.2s;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); background: none; border: none;
+    cursor: pointer; padding: 0;
+    transition: color 0.15s;
 }
-.comment-action-btn:hover { color: var(--indigo); }
+.ca-btn:hover { color: var(--indigo); }
+.ca-count {
+    font-family: var(--font-mono); font-size: 0.58rem;
+    letter-spacing: 0.06em; color: var(--muted);
+}
 
-/* ── Reply Form ─────────────────────────────────────────── */
-.reply-form {
-    border-top: 1px solid var(--border);
-    background: var(--ink-2);
-    padding: 1rem 1.25rem;
-}
-.reply-form-inner { display: flex; flex-direction: column; gap: 0.6rem; }
-.reply-form textarea {
-    background: var(--ink); border: 1px solid var(--border);
-    color: var(--text); font-family: var(--font-body); font-size: 0.85rem;
-    padding: 0.65rem 0.85rem; outline: none; resize: none; width: 100%;
-    border-radius: 0; line-height: 1.6;
+/* ── REPLY FORM ───────────────────────────────────────────── */
+.reply-form-wrap { margin-bottom: 0.5rem; }
+.reply-textarea {
+    width: 100%; font-family: var(--font-body); font-size: 0.84rem;
+    padding: 0.55rem 0.75rem; border: 1px solid var(--border);
+    background: var(--ink-2); color: var(--text);
+    resize: none; outline: none; display: block;
+    margin-bottom: 0.4rem;
     transition: border-color 0.2s, box-shadow 0.2s;
 }
-.reply-form textarea:focus {
+.reply-textarea:focus {
     border-color: var(--indigo);
-    box-shadow: 0 0 0 2px var(--indigo-dim);
+    box-shadow: 0 0 0 3px var(--indigo-dim);
+    background: #fff;
 }
-.reply-form textarea::placeholder { color: rgba(107,114,128,0.45); font-size: 0.82rem; }
-.reply-form-actions { display: flex; align-items: center; gap: 0.6rem; }
-.reply-submit {
-    font-family: var(--font-mono); font-size: 0.65rem;
+.reply-textarea::placeholder { color: rgba(107,114,128,0.4); }
+
+.reply-form-footer { display: flex; align-items: center; gap: 0.5rem; }
+.reply-submit-btn {
+    font-family: var(--font-mono); font-size: 0.62rem;
     letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700;
     background: var(--indigo); color: #fff; border: none;
-    padding: 0.5rem 1.1rem; cursor: pointer;
-    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+    padding: 0.5rem 1rem; cursor: pointer;
+    clip-path: polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);
     transition: background 0.2s;
 }
-.reply-submit:hover { background: var(--indigo-dark); }
-.reply-cancel {
-    font-family: var(--font-mono); font-size: 0.65rem;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--muted); background: none; border: none; cursor: pointer;
-    padding: 0; transition: color 0.2s;
+.reply-submit-btn:hover { background: var(--indigo-dark); }
+.reply-cancel-btn {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); background: none; border: none;
+    cursor: pointer; padding: 0;
+    transition: color 0.2s;
 }
-.reply-cancel:hover { color: var(--text); }
+.reply-cancel-btn:hover { color: var(--text); }
 
-/* ── Replies ────────────────────────────────────────────── */
+/* ── NESTED REPLIES ───────────────────────────────────────── */
+/* Indentation lives HERE only — a small fixed left padding on the
+   replies container. Content width is never harmed because this is
+   inside the already-full-width body wrap. */
 .comment-replies {
-    padding: 0.5rem 0 0 1.25rem;
-    border-left: 1px solid var(--border);
-    margin: 0.5rem 1.25rem 0.75rem;
+    margin-top: 0.25rem;
+    padding-left: 1rem;       /* exactly one indent step per level */
+    border-left: 2px solid var(--border);
+    margin-left: 0.25rem;
 }
+
+/* ── COLLAPSED STATE ──────────────────────────────────────── */
+.comment-body-wrap.collapsed .comment-text,
+.comment-body-wrap.collapsed .comment-actions,
+.comment-body-wrap.collapsed .reply-form-wrap,
+.comment-body-wrap.collapsed .comment-replies { display: none; }
+.comment-body-wrap.collapsed .comment-header   { opacity: 0.55; }
 </style>
+
+<script>
+if (!window._citizenCommentJs) {
+    window._citizenCommentJs = true;
+
+    window.toggleThread = function(id) {
+        const body = document.getElementById('comment-body-' + id);
+        const btn  = document.getElementById('toggle-icon-' + id);
+        if (!body) return;
+        const collapsed = body.classList.toggle('collapsed');
+        btn.textContent = collapsed ? '+' : '−';
+    };
+
+    window.toggleReply = function(id) {
+        const wrap = document.getElementById('reply-form-' + id);
+        if (!wrap) return;
+        const show = wrap.style.display === 'none' || wrap.style.display === '';
+        wrap.style.display = show ? 'block' : 'none';
+        if (show) wrap.querySelector('textarea').focus();
+    };
+}
+</script>
+{% endif %}

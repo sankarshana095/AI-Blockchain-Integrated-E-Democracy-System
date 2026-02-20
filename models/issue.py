@@ -120,8 +120,6 @@ def get_issue_comments(issue_id: str):
         {"issue_id": issue_id}
     )
 
-
-
 # -----------------------------
 # Issue Resolution
 # -----------------------------
@@ -210,4 +208,127 @@ def get_comment_author_alias(user_id: str):
     return alias["random_username"] if alias else "Anonymous"
 
 
+def get_issues_for_elected_rep_term(constituency_id: str):
+    """
+    Get issues created during the elected representative's term
+    along with the rep's user_id.
+    """
 
+    from models.representative import get_representatives_by_constituency
+    from datetime import datetime
+
+    reps = get_representatives_by_constituency(constituency_id)
+
+    elected_rep = next(
+        (r for r in reps if r.get("type") == "ELECTED_REP"),
+        None
+    )
+
+    if not elected_rep:
+        return []
+
+    rep_user_id = elected_rep.get("user_id")
+
+    term_start = elected_rep.get("term_start")
+    term_end = elected_rep.get("term_end")
+
+    if not term_start:
+        return []
+
+    term_start_date = datetime.fromisoformat(str(term_start))
+    term_end_date = (
+        datetime.fromisoformat(str(term_end))
+        if term_end
+        else None
+    )
+
+    issues = fetch_all(ISSUES_TABLE, {"constituency_id": constituency_id})
+
+    filtered_issues = []
+
+    for issue in issues:
+        created_at = issue.get("created_at")
+        if not created_at:
+            continue
+
+        created_date = datetime.fromisoformat(
+            created_at.replace("Z", "+00:00")
+        )
+
+        if created_date >= term_start_date:
+            if term_end_date:
+                if created_date <= term_end_date:
+                    issue_copy = issue.copy()
+                    issue_copy["rep_user_id"] = rep_user_id
+                    filtered_issues.append(issue_copy)
+            else:
+                issue_copy = issue.copy()
+                issue_copy["rep_user_id"] = rep_user_id
+                filtered_issues.append(issue_copy)
+
+    return filtered_issues
+
+
+def get_issues_with_acceptance_time(constituency_id: str):
+    """
+    Returns issues during elected rep term
+    along with:
+      - rep_user_id
+      - accepted_at (timestamp when status first changed to 'Accepted')
+    """
+
+    from models.issue_timeline import get_issue_timeline
+    from datetime import datetime
+
+    issues = get_issues_for_elected_rep_term(constituency_id)
+
+    enriched_issues = []
+
+    for issue in issues:
+        issue_id = issue.get("id")
+        timeline = get_issue_timeline(issue_id)
+
+        accepted_at = None
+
+        if timeline:
+            # Find first Accepted entry
+            accepted_entries = [
+                t for t in timeline
+                if t.get("status") == "Accepted"
+            ]
+
+            if accepted_entries:
+                # Get earliest Accepted timestamp
+                accepted_entries.sort(
+                    key=lambda x: x.get("created_at")
+                )
+                accepted_at = accepted_entries[0].get("created_at")
+
+        issue_copy = issue.copy()
+        issue_copy["accepted_at"] = accepted_at
+
+        enriched_issues.append(issue_copy)
+
+    return enriched_issues
+
+
+def get_issue_comments_by_constituency(constituency_id):
+    from flask import session
+    from utils.helpers import format_datetime, _time_ago
+    # -----------------------------------
+    # Get all issues in this constituency
+    # -----------------------------------
+    issues = fetch_all("issues", {"constituency_id": constituency_id}) or []
+    issue_ids = [i["id"] for i in issues]
+
+    if not issue_ids:
+        return []
+
+    # -----------------------------------
+    # Get all comments for those issues
+    # -----------------------------------
+    comments = []
+    for issue_id in issue_ids:
+        issue_comments = fetch_all("issue_comments", {"issue_id": issue_id}) or []
+        comments.extend(issue_comments)
+    return comments

@@ -7,101 +7,58 @@
    ISSUE DETAIL PAGE
 ═══════════════════════════════════════════════════════════ */
 
-.issue-detail-page {
-    min-height: calc(100vh - var(--nav-h));
+/* ── PAGE HEADER ─────────────────────────────────────────── */
+.issue-page-header {
+    padding: 4rem 4rem 0;
     background: var(--ink-2);
-    display: grid;
-    grid-template-columns: 1fr 300px;
-    gap: 2rem;
-    padding: 3rem 4rem 5rem;
-    align-items: start;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+}
+.issue-page-header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+        linear-gradient(rgba(79,70,229,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(79,70,229,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(ellipse 70% 90% at 0% 0%, black 20%, transparent 70%);
+    pointer-events: none;
+}
+.issue-page-header-inner {
+    position: relative; z-index: 1;
+    max-width: 1300px; margin: 0 auto;
 }
 
-/* ── MAIN COLUMN ──────────────────────────────────────────── */
-.issue-main {}
-
-/* Back link */
+/* back link */
 .back-link {
     display: inline-flex; align-items: center; gap: 0.5rem;
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted);
-    text-decoration: none;
-    margin-bottom: 1.75rem;
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); text-decoration: none;
+    margin-bottom: 1.5rem;
     transition: color 0.2s;
 }
 .back-link:hover { color: var(--indigo); }
 .back-link svg { transition: transform 0.2s; }
 .back-link:hover svg { transform: translateX(-3px); }
 
-/* ── ISSUE HEADER CARD ────────────────────────────────────── */
-.issue-header-card {
-    background: var(--ink);
-    border: 1px solid var(--border);
-    margin-bottom: 1.25rem;
-    position: relative;
-    overflow: hidden;
-}
-.issue-header-card::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, var(--indigo), var(--teal));
-}
-
-.issue-header-inner {
-    display: flex;
-    gap: 0;
-}
-
-/* Vote strip */
-.vote-strip {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 2rem 1.25rem;
-    border-right: 1px solid var(--border);
-    background: var(--ink-2);
-    flex-shrink: 0;
-    width: 72px;
-}
-.vote-btn {
-    width: 32px; height: 32px;
-    display: grid; place-items: center;
-    background: none; border: 1px solid var(--border);
-    cursor: pointer; color: var(--muted);
-    transition: border-color 0.2s, color 0.2s, background 0.2s;
-    padding: 0;
-}
-.vote-btn:hover { border-color: var(--indigo); color: var(--indigo); background: var(--indigo-dim); }
-.vote-btn.upvote.active  { border-color: var(--indigo); color: #fff; background: var(--indigo); }
-.vote-btn.downvote.active { border-color: #dc2626;    color: #fff; background: #dc2626; }
-.vote-score {
-    font-family: var(--font-disp);
-    font-size: 1.6rem; line-height: 1;
-    color: var(--text); text-align: center;
-}
-.vote-score.positive { color: var(--indigo); }
-.vote-score.negative { color: #dc2626; }
-
-/* Issue body */
-.issue-body { padding: 2rem 2.25rem; flex: 1; min-width: 0; }
-
-.issue-meta-row {
-    display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;
-    margin-bottom: 1rem;
+/* meta row above title */
+.issue-page-meta {
+    display: flex; align-items: center; gap: 0.6rem;
+    flex-wrap: wrap; margin-bottom: 0.85rem;
 }
 .issue-username {
-    font-family: var(--font-mono); font-size: 0.65rem;
-    letter-spacing: 0.1em; text-transform: uppercase; color: var(--indigo);
+    font-family: var(--font-mono); font-size: 0.68rem;
+    letter-spacing: 0.08em; color: var(--indigo); font-weight: 700;
 }
-.meta-sep { color: var(--border); }
+.meta-dot { color: var(--border); font-size: 0.5rem; }
 .issue-timestamp {
     font-family: var(--font-mono); font-size: 0.62rem;
     color: var(--muted); letter-spacing: 0.06em;
 }
+
+/* status + category pills */
 .status-pill {
     font-family: var(--font-mono); font-size: 0.58rem;
     letter-spacing: 0.1em; text-transform: uppercase;
@@ -115,114 +72,148 @@
 .category-tag {
     font-family: var(--font-mono); font-size: 0.58rem;
     letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--muted); background: var(--ink-2);
+    color: var(--muted); background: var(--ink);
     border: 1px solid var(--border); padding: 0.2rem 0.6rem;
 }
 
-.issue-title {
+/* big title */
+.issue-page-title {
     font-family: var(--font-disp);
-    font-size: clamp(1.8rem, 3vw, 2.8rem);
-    line-height: 1;
-    color: var(--text);
-    margin-bottom: 1.25rem;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    line-height: 0.95; color: var(--text);
+    margin-bottom: 0;
+    padding-bottom: 2rem;
 }
+
+/* vote bar — horizontal strip below title */
+.issue-vote-bar {
+    display: flex; align-items: center; gap: 0;
+    border-top: 1px solid var(--border);
+    background: #fff;
+}
+.vote-bar-score {
+    font-family: var(--font-disp); font-size: 1.8rem; line-height: 1;
+    color: var(--text); padding: 0.75rem 1.25rem;
+    border-right: 1px solid var(--border);
+    min-width: 80px; text-align: center;
+}
+.vote-bar-score.positive { color: var(--indigo); }
+.vote-bar-score.negative { color: #dc2626; }
+.vote-bar-btn {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-family: var(--font-mono); font-size: 0.65rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.75rem 1.25rem; border: none; border-right: 1px solid var(--border);
+    background: transparent; color: var(--muted);
+    cursor: pointer; transition: background 0.2s, color 0.2s;
+}
+.vote-bar-btn:hover        { background: var(--indigo-dim); color: var(--indigo); }
+.vote-bar-btn.active.up    { background: var(--indigo); color: #fff; }
+.vote-bar-btn.active.down  { background: #dc2626;       color: #fff; }
+.vote-bar-label {
+    font-family: var(--font-mono); font-size: 0.6rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); padding: 0.75rem 1.25rem;
+    margin-left: auto;
+}
+
+/* ── BODY LAYOUT ─────────────────────────────────────────── */
+.issue-detail-page {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 2rem;
+    padding: 2.5rem 4rem 5rem;
+    align-items: start;
+    max-width: 1300px;
+    margin: 0 auto;
+}
+.issue-main { display: flex; flex-direction: column; gap: 1.25rem; }
+
+/* ── DESCRIPTION CARD ────────────────────────────────────── */
+.desc-card {
+    border: 1px solid var(--border);
+    background: #fff;
+    overflow: hidden;
+}
+.desc-card-body { padding: 1.75rem 2rem; }
 
 /* Image gallery */
 .image-gallery {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 0.5rem;
     margin-bottom: 1.5rem;
 }
 .gallery-img-wrap {
-    overflow: hidden;
-    border: 1px solid var(--border);
-    aspect-ratio: 16/10;
-    cursor: pointer;
+    overflow: hidden; border: 1px solid var(--border);
+    aspect-ratio: 16/10; cursor: zoom-in;
 }
 .gallery-img-wrap img {
-    width: 100%; height: 100%;
-    object-fit: cover; display: block;
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    transition: transform 0.3s, filter 0.2s;
     filter: brightness(0.96);
-    transition: filter 0.2s, transform 0.3s;
 }
-.gallery-img-wrap:hover img { filter: brightness(1); transform: scale(1.03); }
+.gallery-img-wrap:hover img { transform: scale(1.04); filter: brightness(1); }
 
-/* Description */
 .issue-description {
-    font-size: 0.95rem;
-    color: var(--text);
-    line-height: 1.85;
-    border-left: 2px solid var(--border);
+    font-size: 0.95rem; color: var(--text); line-height: 1.85;
+    border-left: 2px solid var(--indigo);
     padding-left: 1.25rem;
-    margin-bottom: 1.5rem;
 }
 
-/* Resolution duration banner */
+/* ── RESOLUTION BANNER ───────────────────────────────────── */
 .resolution-banner {
     display: flex; align-items: center; gap: 0.75rem;
-    background: var(--teal-dim);
-    border: 1px solid rgba(13,148,136,0.25);
-    padding: 0.85rem 1.25rem;
-    margin-bottom: 1.25rem;
+    background: var(--teal-dim); border: 1px solid rgba(13,148,136,0.25);
+    border-left: 3px solid var(--teal);
+    padding: 0.9rem 1.25rem;
 }
 .resolution-banner svg { color: var(--teal); flex-shrink: 0; }
 .resolution-banner span {
-    font-family: var(--font-mono); font-size: 0.7rem;
+    font-family: var(--font-mono); font-size: 0.68rem;
     letter-spacing: 0.08em; color: var(--teal);
 }
 
-/* ── SECTION CARDS ────────────────────────────────────────── */
+/* ── SECTION CARDS ───────────────────────────────────────── */
 .section-card {
-    background: var(--ink);
-    border: 1px solid var(--border);
-    margin-bottom: 1.25rem;
+    background: #fff; border: 1px solid var(--border);
 }
 .section-card-header {
-    padding: 1rem 1.75rem;
+    padding: 1rem 1.5rem;
     border-bottom: 1px solid var(--border);
+    background: var(--ink-2);
     display: flex; align-items: center; justify-content: space-between;
 }
 .section-card-title {
-    font-family: var(--font-mono); font-size: 0.65rem;
-    letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--indigo);
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--indigo);
     display: flex; align-items: center; gap: 0.5rem;
 }
 .section-card-title::before { content: ''; width: 14px; height: 1px; background: var(--indigo); }
+.section-count {
+    font-family: var(--font-mono); font-size: 0.6rem;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+}
 .section-card-body { padding: 1.75rem; }
 
-/* ── TIMELINE ─────────────────────────────────────────────── */
+/* ── TIMELINE ────────────────────────────────────────────── */
 .timeline { list-style: none; position: relative; }
 .timeline::before {
     content: '';
     position: absolute; left: 11px; top: 8px; bottom: 8px;
     width: 1px; background: var(--border);
 }
-.timeline-item {
-    display: flex; gap: 1.5rem;
-    padding-bottom: 2rem;
-    position: relative;
-}
+.timeline-item { display: flex; gap: 1.5rem; padding-bottom: 2rem; position: relative; }
 .timeline-item:last-child { padding-bottom: 0; }
 
 .timeline-dot {
     width: 24px; height: 24px; flex-shrink: 0;
-    border: 1px solid var(--border);
-    background: var(--ink);
+    border: 1px solid var(--border); background: #fff;
     display: grid; place-items: center;
-    position: relative; z-index: 1;
-    margin-top: 1px;
-    transition: border-color 0.2s, background 0.2s;
+    position: relative; z-index: 1; margin-top: 1px;
 }
-.timeline-dot.active {
-    border-color: var(--indigo);
-    background: var(--indigo);
-}
-.timeline-dot.resolved {
-    border-color: var(--teal);
-    background: var(--teal);
-}
+.timeline-dot.active  { border-color: var(--indigo); background: var(--indigo); }
+.timeline-dot.resolved{ border-color: var(--teal);   background: var(--teal); }
 .timeline-dot svg { color: #fff; }
 
 .timeline-content { flex: 1; min-width: 0; }
@@ -232,61 +223,42 @@
 }
 .timeline-status {
     font-family: var(--font-mono); font-size: 0.65rem;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    font-weight: 700; color: var(--text);
+    letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; color: var(--text);
 }
 .timeline-date {
     font-family: var(--font-mono); font-size: 0.6rem;
     color: var(--muted); letter-spacing: 0.06em;
 }
-.timeline-note {
-    font-size: 0.88rem; color: var(--muted); line-height: 1.7;
-    margin-bottom: 0.4rem;
-}
+.timeline-note { font-size: 0.88rem; color: var(--muted); line-height: 1.7; margin-bottom: 0.4rem; }
 .timeline-extra {
     display: flex; align-items: center; gap: 0.5rem;
     font-family: var(--font-mono); font-size: 0.62rem;
     color: var(--muted); letter-spacing: 0.06em; margin-top: 0.3rem;
 }
-.timeline-extra svg { flex-shrink: 0; }
 
-/* ── FEEDBACK ─────────────────────────────────────────────── */
-.feedback-display { display: flex; flex-direction: column; gap: 0.75rem; }
-.star-row { display: flex; gap: 0.25rem; }
-.star {
-    font-size: 1.1rem;
-    color: var(--border);
-    transition: color 0.1s;
-}
+/* ── FEEDBACK ────────────────────────────────────────────── */
+.star-row { display: flex; gap: 0.25rem; align-items: center; }
+.star { font-size: 1.1rem; color: var(--border); }
 .star.filled { color: var(--warm); }
 .feedback-review {
-    font-size: 0.9rem; color: var(--text); line-height: 1.75;
-    font-style: italic;
-    border-left: 2px solid var(--warm-dim);
-    padding-left: 1rem;
+    font-size: 0.9rem; color: var(--text); line-height: 1.75; font-style: italic;
+    border-left: 2px solid var(--warm-dim); padding-left: 1rem; margin-top: 0.75rem;
 }
 
 /* Feedback form */
 .feedback-form { display: flex; flex-direction: column; gap: 1.25rem; }
-.rating-select-wrap {
-    display: flex; gap: 0.5rem; flex-wrap: wrap;
-}
+.rating-select-wrap { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 .rating-opt { display: none; }
 .rating-label {
     display: flex; align-items: center; gap: 0.4rem;
     font-family: var(--font-mono); font-size: 0.68rem;
     letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--muted);
-    border: 1px solid var(--border);
-    background: var(--ink-2);
-    padding: 0.5rem 0.85rem;
-    cursor: pointer;
-    transition: border-color 0.2s, color 0.2s, background 0.2s;
+    color: var(--muted); border: 1px solid var(--border);
+    background: var(--ink-2); padding: 0.5rem 0.85rem;
+    cursor: pointer; transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
 .rating-opt:checked + .rating-label {
-    border-color: var(--warm);
-    color: var(--warm);
-    background: var(--warm-dim);
+    border-color: var(--warm); color: var(--warm); background: var(--warm-dim);
 }
 .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
 .form-group label {
@@ -296,183 +268,283 @@
 .form-group textarea {
     background: var(--ink-2); border: 1px solid var(--border);
     color: var(--text); font-family: var(--font-body); font-size: 0.88rem;
-    padding: 0.85rem 1rem; outline: none; resize: none; width: 100%;
-    border-radius: 0; line-height: 1.65;
+    padding: 0.85rem 1rem; outline: none; resize: none; width: 100%; line-height: 1.65;
     transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
 }
 .form-group textarea:focus {
-    border-color: var(--indigo); background: #fff;
-    box-shadow: 0 0 0 3px var(--indigo-dim);
+    border-color: var(--indigo); background: #fff; box-shadow: 0 0 0 3px var(--indigo-dim);
 }
 .form-group textarea::placeholder { color: rgba(107,114,128,0.45); }
 
-/* ── COMMENTS ─────────────────────────────────────────────── */
-.comments-list { display: flex; flex-direction: column; gap: 0; }
-
-/* Comment add form */
-.comment-compose {
-    display: flex; flex-direction: column; gap: 0.75rem;
-}
+/* ── COMMENTS ────────────────────────────────────────────── */
+.comment-compose { display: flex; flex-direction: column; gap: 0.75rem; }
 .comment-compose textarea {
     background: var(--ink-2); border: 1px solid var(--border);
     color: var(--text); font-family: var(--font-body); font-size: 0.88rem;
-    padding: 0.85rem 1rem; outline: none; resize: none; width: 100%;
-    border-radius: 0; line-height: 1.65;
+    padding: 0.85rem 1rem; outline: none; resize: none; width: 100%; line-height: 1.65;
     transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
 }
 .comment-compose textarea:focus {
-    border-color: var(--indigo); background: #fff;
-    box-shadow: 0 0 0 3px var(--indigo-dim);
+    border-color: var(--indigo); background: #fff; box-shadow: 0 0 0 3px var(--indigo-dim);
 }
 .comment-compose-footer {
-    display: flex; align-items: center; justify-content: flex-end;
-    gap: 0.75rem;
+    display: flex; align-items: center; justify-content: flex-end; gap: 0.75rem;
 }
 .comment-hint {
-    font-family: var(--font-mono); font-size: 0.6rem;
-    color: var(--muted); letter-spacing: 0.06em; flex: 1;
+    font-family: var(--font-mono); font-size: 0.6rem; color: var(--muted);
+    letter-spacing: 0.06em; flex: 1;
+}
+.empty-note-mono {
+    font-family: var(--font-mono); font-size: 0.68rem;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
 }
 
-/* ── SIDEBAR ──────────────────────────────────────────────── */
+/* ── SIDEBAR ─────────────────────────────────────────────── */
 .issue-sidebar {
-    position: sticky;
-    top: calc(var(--nav-h) + 2rem);
+    position: sticky; top: calc(var(--nav-h) + 2rem);
     display: flex; flex-direction: column; gap: 1.25rem;
 }
-.sidebar-card {
-    background: var(--ink); border: 1px solid var(--border); overflow: hidden;
-}
+.sidebar-card { background: #fff; border: 1px solid var(--border); overflow: hidden; }
 .sidebar-card-header {
-    padding: 0.85rem 1.25rem;
-    border-bottom: 1px solid var(--border);
-    background: var(--ink-2);
+    padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--border); background: var(--ink-2);
 }
 .sidebar-card-title {
     font-family: var(--font-mono); font-size: 0.62rem;
-    letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--indigo);
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--indigo);
     display: flex; align-items: center; gap: 0.5rem;
 }
 .sidebar-card-title::before { content: ''; width: 12px; height: 1px; background: var(--indigo); }
 .sidebar-card-body { padding: 1.25rem; }
 
 .meta-list { display: flex; flex-direction: column; gap: 0.85rem; }
-.meta-item {
-    display: flex; flex-direction: column; gap: 0.2rem;
-}
+.meta-item { display: flex; flex-direction: column; gap: 0.2rem; }
 .meta-key {
     font-family: var(--font-mono); font-size: 0.58rem;
     letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted);
 }
-.meta-val {
-    font-size: 0.88rem; color: var(--text); font-weight: 500;
-    line-height: 1.4;
+.meta-val { font-size: 0.88rem; color: var(--text); font-weight: 500; line-height: 1.4; }
+.meta-divider { height: 1px; background: var(--border); margin: 0.25rem 0; }
+
+/* progress steps in sidebar */
+.progress-steps { display: flex; flex-direction: column; gap: 0.5rem; }
+.progress-step { display: flex; align-items: center; gap: 0.75rem; }
+.progress-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.progress-step-label {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
 }
 
-/* ── RESPONSIVE ───────────────────────────────────────────── */
+/* share card */
+.share-card {
+    background: var(--indigo-dark);
+    border: 1px solid rgba(79,70,229,0.3);
+    padding: 1.5rem;
+}
+.share-eyebrow {
+    font-family: var(--font-mono); font-size: 0.6rem;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--warm-light); margin-bottom: 0.5rem;
+}
+.share-text {
+    font-size: 0.8rem; color: rgba(255,255,255,0.45);
+    line-height: 1.6; margin-bottom: 1rem;
+}
+.share-btn {
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; font-family: var(--font-mono); font-size: 0.68rem;
+    letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700;
+    padding: 0.7rem 1rem; background: rgba(255,255,255,0.1);
+    color: #fff; border: 1px solid rgba(255,255,255,0.2);
+    cursor: pointer; transition: background 0.2s;
+}
+.share-btn:hover { background: rgba(255,255,255,0.18); }
+
+/* ── RESPONSIVE ──────────────────────────────────────────── */
 @media (max-width: 1024px) {
     .issue-detail-page { grid-template-columns: 1fr; padding: 2rem 2rem 4rem; }
     .issue-sidebar { position: static; }
+    .issue-page-header { padding: 3rem 2rem 0; }
 }
 @media (max-width: 640px) {
     .issue-detail-page { padding: 1.5rem 1rem 3rem; }
-    .vote-strip { padding: 1rem; width: 56px; }
-    .issue-body { padding: 1.25rem; }
+    .issue-page-header { padding: 2rem 1rem 0; }
+    .image-gallery { grid-template-columns: repeat(2, 1fr); }
     .section-card-body { padding: 1.25rem; }
 }
+
+/* ── LIGHTBOX ────────────────────────────────────────────── */
+.gallery-img-wrap { cursor: zoom-in; }
+
+.lightbox-overlay {
+    position: fixed; inset: 0; z-index: 9000;
+    background: rgba(0,0,0,0.92);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+.lightbox-overlay.active { opacity: 1; pointer-events: all; }
+
+.lightbox-inner {
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; height: 100%;
+    padding: 3rem 5rem;
+    box-sizing: border-box;
+}
+.lightbox-img {
+    max-width: 100%; max-height: 85vh;
+    object-fit: contain;
+    border: 1px solid rgba(79,70,229,0.3);
+    box-shadow: 0 0 80px rgba(79,70,229,0.2);
+    transition: opacity 0.2s ease;
+    display: block;
+}
+.lightbox-img.fading { opacity: 0; }
+
+.lightbox-close {
+    position: fixed; top: 1.5rem; right: 1.5rem;
+    width: 44px; height: 44px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #fff; font-size: 1.1rem;
+    display: grid; place-items: center;
+    cursor: pointer; z-index: 9010;
+    font-family: var(--font-mono);
+    transition: background 0.2s;
+}
+.lightbox-close:hover { background: rgba(255,255,255,0.18); }
+
+.lightbox-arrow {
+    position: fixed; top: 50%; transform: translateY(-50%);
+    width: 48px; height: 56px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #fff; font-family: var(--font-mono); font-size: 1.1rem;
+    display: grid; place-items: center;
+    cursor: pointer; z-index: 9010;
+    transition: background 0.2s, transform 0.2s;
+    user-select: none;
+}
+.lightbox-arrow:hover { background: rgba(79,70,229,0.35); }
+.lightbox-arrow.prev { left: 1.25rem; }
+.lightbox-arrow.prev:hover { transform: translateY(-50%) translateX(-2px); }
+.lightbox-arrow.next { right: 1.25rem; }
+.lightbox-arrow.next:hover { transform: translateY(-50%) translateX(2px); }
+.lightbox-arrow[hidden] { display: none; }
+
+.lightbox-counter {
+    position: fixed; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+    font-family: var(--font-mono); font-size: 0.65rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(255,255,255,0.5); z-index: 9010;
+}
+.lightbox-dots {
+    position: fixed; bottom: 1.25rem; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 0.4rem; z-index: 9010;
+}
+.lightbox-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    border: none; cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+.lightbox-dot.active { background: var(--indigo); transform: scale(1.4); }
 </style>
 {% endblock %}
 
-
 {% block content %}
-<div class="issue-detail-page">
 
-    <!-- ══════════════════════════════════════
-         MAIN COLUMN
-    ══════════════════════════════════════ -->
-    <div class="issue-main">
+<!-- ── PAGE HEADER ──────────────────────────────────────── -->
+<div class="issue-page-header">
+    <div class="issue-page-header-inner">
 
         <a href="{{ url_for('citizen.issues_feed') }}" class="back-link">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5M12 5l-7 7 7 7"/>
+            </svg>
             Back to Issues
         </a>
 
-        <!-- ── Issue Header Card ──────────────── -->
-        <div class="issue-header-card">
-            <div class="issue-header-inner">
+        <div class="issue-page-meta">
+            <span class="issue-username">u/{{ issue.username }}</span>
+            <span class="meta-dot">●</span>
+            <span class="status-pill {{ issue.status | lower | replace(' ','_') }}">{{ issue.status }}</span>
+            <span class="meta-dot">●</span>
+            <span class="category-tag">{{ issue.category }}</span>
+            <span class="meta-dot">●</span>
+            <span class="issue-timestamp">{{ issue.created_at }}</span>
+        </div>
 
-                <!-- Vote strip -->
-                <div class="vote-strip">
-                    <button
-                        class="vote-btn upvote {% if user_vote == 'up' %}active{% endif %}"
-                        onclick="voteIssue('{{ issue.id }}', 'up')"
-                        aria-label="Upvote"
-                    >
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l8 8H4z"/></svg>
-                    </button>
-                    <span class="vote-score {% if issue.score > 0 %}positive{% elif issue.score < 0 %}negative{% endif %}" id="issue-score">
-                        {{ issue.score }}
-                    </span>
-                    <button
-                        class="vote-btn downvote {% if user_vote == 'down' %}active{% endif %}"
-                        onclick="voteIssue('{{ issue.id }}', 'down')"
-                        aria-label="Downvote"
-                    >
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 20l-8-8h16z"/></svg>
-                    </button>
-                </div>
+        <h1 class="issue-page-title">{{ issue.title }}</h1>
 
-                <!-- Issue body -->
-                <div class="issue-body">
-                    <div class="issue-meta-row">
-                        <span class="issue-username">u/{{ issue.username }}</span>
-                        <span class="meta-sep">·</span>
-                        <span class="status-pill {{ issue.status|lower|replace(' ', '_') }}">{{ issue.status }}</span>
-                        <span class="meta-sep">·</span>
-                        <span class="category-tag">{{ issue.category }}</span>
-                        <span class="meta-sep">·</span>
-                        <span class="issue-timestamp">{{ issue.created_at }}</span>
+        <!-- Vote bar -->
+        <div class="issue-vote-bar">
+            <button class="vote-bar-btn up {% if user_vote == 'up' %}active{% endif %}"
+                    onclick="voteIssue('{{ issue.id }}', 'up')" aria-label="Upvote">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l8 8H4z"/></svg>
+                Upvote
+            </button>
+            <span class="vote-bar-score {% if issue.score > 0 %}positive{% elif issue.score < 0 %}negative{% endif %}"
+                  id="issue-score">{{ issue.score }}</span>
+            <button class="vote-bar-btn down {% if user_vote == 'down' %}active{% endif %}"
+                    onclick="voteIssue('{{ issue.id }}', 'down')" aria-label="Downvote">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 20l-8-8h16z"/></svg>
+                Downvote
+            </button>
+            <span class="vote-bar-label">{{ comments | length if comments else 0 }} comment{{ 's' if (comments | length if comments else 0) != 1 }}</span>
+        </div>
+
+    </div>
+</div>
+
+<!-- ── BODY ─────────────────────────────────────────────── -->
+<div class="issue-detail-page">
+
+    <!-- ══ MAIN COLUMN ══════════════════════════════════ -->
+    <div class="issue-main">
+
+        <!-- Description -->
+        <div class="desc-card reveal">
+            <div class="desc-card-body">
+                {% if images %}
+                    <div class="image-gallery">
+                        {% for img in images %}
+                            <div class="gallery-img-wrap">
+                                <img src="{{ img.image_url }}" alt="Issue image" loading="lazy">
+                            </div>
+                        {% endfor %}
                     </div>
-
-                    <h1 class="issue-title">{{ issue.title }}</h1>
-
-                    {% if images %}
-                        <div class="image-gallery">
-                            {% for img in images %}
-                                <div class="gallery-img-wrap">
-                                    <img src="{{ img.image_url }}" alt="Issue image" loading="lazy">
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-
-                    <p class="issue-description">{{ issue.description }}</p>
-                </div>
-
+                {% endif %}
+                <p class="issue-description">{{ issue.description }}</p>
             </div>
         </div>
 
         <!-- Resolution banner -->
-        {% if issue.status == "Resolved" or issue.status == "Closed" %}
+        {% if issue.status in ["Resolved", "Closed"] %}
             {% for step in timeline %}
                 {% if step.status == "Resolved" %}
-                    <div class="resolution-banner">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                    <div class="resolution-banner reveal">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                            <polyline points="22 4 12 14.01 9 11.01"/>
                         </svg>
-                        <span>Resolution completed on {{ step.created_at }}</span>
+                        <span>Resolution completed · {{ step.created_at }}</span>
                     </div>
                 {% endif %}
             {% endfor %}
         {% endif %}
 
-        <!-- ── Timeline ───────────────────────── -->
-        <div class="section-card">
+        <!-- Timeline -->
+        <div class="section-card reveal">
             <div class="section-card-header">
                 <span class="section-card-title">Issue Timeline</span>
                 {% if timeline %}
-                    <span style="font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);">
-                        {{ timeline|length }} update{{ 's' if timeline|length != 1 }}
+                    <span class="section-count">
+                        {{ timeline | length }} update{{ 's' if timeline | length != 1 }}
                     </span>
                 {% endif %}
             </div>
@@ -480,151 +552,165 @@
                 {% if timeline %}
                     <ul class="timeline">
                         {% for step in timeline %}
-                            <li class="timeline-item">
-                                <div class="timeline-dot {% if loop.last %}active{% endif %} {% if step.status == 'Resolved' %}resolved{% endif %}">
-                                    {% if step.status == 'Resolved' %}
-                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                                    {% elif loop.last %}
-                                        <svg width="8" height="8" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="12" r="6"/></svg>
-                                    {% else %}
-                                        <svg width="8" height="8" viewBox="0 0 24 24" fill="var(--border)"><circle cx="12" cy="12" r="6"/></svg>
-                                    {% endif %}
+                        <li class="timeline-item">
+                            <div class="timeline-dot
+                                {% if step.status == 'Resolved' %}resolved
+                                {% elif loop.last %}active{% endif %}">
+                                {% if step.status == 'Resolved' %}
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none"
+                                         stroke="currentColor" stroke-width="2.5"
+                                         stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="20 6 9 17 4 12"/>
+                                    </svg>
+                                {% elif loop.last %}
+                                    <svg width="8" height="8" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="12" r="6"/></svg>
+                                {% else %}
+                                    <svg width="8" height="8" viewBox="0 0 24 24" fill="var(--border)"><circle cx="12" cy="12" r="6"/></svg>
+                                {% endif %}
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-header">
+                                    <span class="timeline-status">{{ step.status }}</span>
+                                    <span class="timeline-date">{{ step.created_at }}</span>
                                 </div>
-                                <div class="timeline-content">
-                                    <div class="timeline-header">
-                                        <span class="timeline-status">{{ step.status }}</span>
-                                        <span class="timeline-date">{{ step.created_at }}</span>
+                                {% if step.note %}
+                                    <p class="timeline-note">{{ step.note }}</p>
+                                {% endif %}
+                                {% if step.estimated_start_at %}
+                                    <div class="timeline-extra">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                                             stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                                            <circle cx="12" cy="12" r="10"/>
+                                            <polyline points="12 6 12 12 16 14"/>
+                                        </svg>
+                                        Estimated Start: {{ step.estimated_start_at }}
                                     </div>
-                                    {% if step.note %}
-                                        <p class="timeline-note">{{ step.note }}</p>
-                                    {% endif %}
-                                    {% if step.estimated_start_at %}
-                                        <div class="timeline-extra">
-                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                            Estimated Start: {{ step.estimated_start_at }}
-                                        </div>
-                                    {% endif %}
-                                    {% if step.estimated_completion_at %}
-                                        <div class="timeline-extra">
-                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                            Estimated Completion: {{ step.estimated_completion_at }}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </li>
+                                {% endif %}
+                                {% if step.estimated_completion_at %}
+                                    <div class="timeline-extra">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                                             stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                                            <circle cx="12" cy="12" r="10"/>
+                                            <polyline points="12 6 12 12 16 14"/>
+                                        </svg>
+                                        Estimated Completion: {{ step.estimated_completion_at }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </li>
                         {% endfor %}
                     </ul>
                 {% else %}
-                    <p style="font-family:var(--font-mono);font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);">No status updates yet.</p>
+                    <p class="empty-note-mono">No status updates yet.</p>
                 {% endif %}
             </div>
         </div>
 
-        <!-- ── Citizen Feedback (display) ─────── -->
+        <!-- Citizen Feedback (display) -->
         {% if feedback %}
-            <div class="section-card">
-                <div class="section-card-header">
-                    <span class="section-card-title">Citizen Feedback</span>
-                </div>
-                <div class="section-card-body">
-                    <div class="feedback-display">
-                        <div class="star-row">
-                            {% for i in range(1, 6) %}
-                                <span class="star {% if i <= feedback.rating %}filled{% endif %}">★</span>
-                            {% endfor %}
-                            <span style="font-family:var(--font-mono);font-size:0.65rem;color:var(--muted);margin-left:0.5rem;">{{ feedback.rating }}/5</span>
-                        </div>
-                        {% if feedback.review %}
-                            <p class="feedback-review">"{{ feedback.review }}"</p>
-                        {% endif %}
-                    </div>
-                </div>
+        <div class="section-card reveal">
+            <div class="section-card-header">
+                <span class="section-card-title">Citizen Feedback</span>
             </div>
+            <div class="section-card-body">
+                <div class="star-row">
+                    {% for i in range(1, 6) %}
+                        <span class="star {% if i <= feedback.rating %}filled{% endif %}">★</span>
+                    {% endfor %}
+                    <span style="font-family:var(--font-mono);font-size:0.65rem;color:var(--muted);margin-left:0.5rem;">
+                        {{ feedback.rating }}/5
+                    </span>
+                </div>
+                {% if feedback.review %}
+                    <p class="feedback-review">"{{ feedback.review }}"</p>
+                {% endif %}
+            </div>
+        </div>
         {% endif %}
 
-        <!-- ── Feedback Form (if owner + resolved) ── -->
+        <!-- Feedback Form (owner + resolved, no feedback yet) -->
         {% if issue.status == "Resolved" and is_issue_owner and not feedback %}
-            <div class="section-card">
-                <div class="section-card-header">
-                    <span class="section-card-title">Rate the Resolution</span>
-                </div>
-                <div class="section-card-body">
-                    <form method="POST"
-                          action="{{ url_for('citizen.submit_issue_feedback', issue_id=issue.id) }}"
-                          class="feedback-form">
-                        <div class="form-group">
-                            <label>Your Rating</label>
-                            <div class="rating-select-wrap">
-                                {% for val, label in [('5','★★★★★'), ('4','★★★★'), ('3','★★★'), ('2','★★'), ('1','★')] %}
-                                    <input type="radio" name="rating" id="r{{ val }}" value="{{ val }}" class="rating-opt" {% if val == '5' %}checked{% endif %}>
-                                    <label for="r{{ val }}" class="rating-label">{{ label }}</label>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="review">Your Feedback <span style="color:var(--muted);font-weight:400;">(Optional)</span></label>
-                            <textarea id="review" name="review" rows="4" placeholder="Share your experience with how this issue was handled..."></textarea>
-                        </div>
-                        <button type="submit" class="btn-primary">
-                            Submit Feedback & Close Issue →
-                        </button>
-                    </form>
-                </div>
+        <div class="section-card reveal">
+            <div class="section-card-header">
+                <span class="section-card-title">Rate the Resolution</span>
             </div>
+            <div class="section-card-body">
+                <form method="POST"
+                      action="{{ url_for('citizen.submit_issue_feedback', issue_id=issue.id) }}"
+                      class="feedback-form">
+                    <div class="form-group">
+                        <label>Your Rating</label>
+                        <div class="rating-select-wrap">
+                            {% for val, label in [('5','★★★★★'),('4','★★★★'),('3','★★★'),('2','★★'),('1','★')] %}
+                                <input type="radio" name="rating" id="r{{ val }}" value="{{ val }}"
+                                       class="rating-opt" {% if val == '5' %}checked{% endif %}>
+                                <label for="r{{ val }}" class="rating-label">{{ label }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="review">
+                            Your Feedback
+                            <span style="color:var(--muted);font-weight:400;">(Optional)</span>
+                        </label>
+                        <textarea id="review" name="review" rows="4"
+                                  placeholder="Share your experience with how this issue was handled…"></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary">
+                        Submit Feedback &amp; Close Issue →
+                    </button>
+                </form>
+            </div>
+        </div>
         {% endif %}
 
-        <!-- ── Comments ───────────────────────── -->
-        <div class="section-card">
+        <!-- Comments -->
+        <div class="section-card reveal">
             <div class="section-card-header">
                 <span class="section-card-title">Discussion</span>
                 {% if comments %}
-                    <span style="font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);">
-                        {{ comments|length }} comment{{ 's' if comments|length != 1 }}
+                    <span class="section-count">
+                        {{ comments | length }} comment{{ 's' if comments | length != 1 }}
                     </span>
                 {% endif %}
             </div>
             <div class="section-card-body">
-
-                <!-- Existing comments -->
                 {% if comments %}
                     <div class="comments-list" style="margin-bottom:2rem;">
-                        {% for comment in comments recursive  %}
+                        {% for comment in comments recursive %}
                             {% set level = 0 %}
                             {% set issue_id = issue.id %}
                             {% set comment = comment %}
-    {% include "citizen/_comment.html" %}
-
+                            {% include "citizen/_comment.html" %}
                         {% endfor %}
                     </div>
                 {% else %}
-                    <p style="font-family:var(--font-mono);font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:1.75rem;">
+                    <p class="empty-note-mono" style="margin-bottom:1.75rem;">
                         No comments yet — be the first to weigh in.
                     </p>
                 {% endif %}
 
-                <!-- Add comment -->
                 <form method="POST"
                       action="{{ url_for('citizen.add_issue_comment', issue_id=issue.id) }}"
                       class="comment-compose">
-                    <textarea name="comment" rows="4" placeholder="Share your thoughts or additional context about this issue..." required></textarea>
+                    <textarea name="comment" rows="4"
+                              placeholder="Share your thoughts or additional context about this issue…"
+                              required></textarea>
                     <div class="comment-compose-footer">
                         <span class="comment-hint">Your comment is public to other citizens.</span>
                         <button type="submit" class="btn-primary">Post Comment →</button>
                     </div>
                 </form>
-
             </div>
         </div>
 
     </div>
 
-    <!-- ══════════════════════════════════════
-         SIDEBAR
-    ══════════════════════════════════════ -->
+    <!-- ══ SIDEBAR ═══════════════════════════════════════ -->
     <div class="issue-sidebar">
 
-        <!-- Issue metadata -->
-        <div class="sidebar-card">
+        <!-- Issue Details -->
+        <div class="sidebar-card reveal">
             <div class="sidebar-card-header">
                 <span class="sidebar-card-title">Issue Details</span>
             </div>
@@ -633,46 +719,63 @@
                     <div class="meta-item">
                         <span class="meta-key">Status</span>
                         <span class="meta-val">
-                            <span class="status-pill {{ issue.status|lower|replace(' ', '_') }}">{{ issue.status }}</span>
+                            <span class="status-pill {{ issue.status | lower | replace(' ','_') }}">
+                                {{ issue.status }}
+                            </span>
                         </span>
                     </div>
+                    <div class="meta-divider"></div>
                     <div class="meta-item">
                         <span class="meta-key">Category</span>
                         <span class="meta-val">{{ issue.category }}</span>
                     </div>
+                    <div class="meta-divider"></div>
                     <div class="meta-item">
                         <span class="meta-key">Raised by</span>
-                        <span class="meta-val" style="font-family:var(--font-mono);font-size:0.78rem;color:var(--indigo);">u/{{ issue.username }}</span>
+                        <span class="meta-val" style="font-family:var(--font-mono);font-size:0.78rem;color:var(--indigo);">
+                            u/{{ issue.username }}
+                        </span>
                     </div>
+                    <div class="meta-divider"></div>
                     <div class="meta-item">
                         <span class="meta-key">Date Raised</span>
                         <span class="meta-val">{{ issue.created_at }}</span>
                     </div>
+                    <div class="meta-divider"></div>
                     <div class="meta-item">
                         <span class="meta-key">Vote Score</span>
-                        <span class="meta-val" style="font-family:var(--font-disp);font-size:1.4rem;line-height:1;color:var(--indigo);">{{ issue.score }}</span>
+                        <span class="meta-val" style="font-family:var(--font-disp);font-size:1.6rem;line-height:1;color:var(--indigo);">
+                            {{ issue.score }}
+                        </span>
                     </div>
+                    <div class="meta-divider"></div>
                     <div class="meta-item">
                         <span class="meta-key">Comments</span>
-                        <span class="meta-val">{{ comments|length if comments else 0 }}</span>
+                        <span class="meta-val">{{ comments | length if comments else 0 }}</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Timeline progress -->
+        <!-- Progress -->
         {% if timeline %}
-        <div class="sidebar-card">
+        <div class="sidebar-card reveal">
             <div class="sidebar-card-header">
                 <span class="sidebar-card-title">Progress</span>
             </div>
             <div class="sidebar-card-body">
-                <div style="display:flex;flex-direction:column;gap:0.5rem;">
+                <div class="progress-steps">
                     {% for step in timeline %}
-                        <div style="display:flex;align-items:center;gap:0.75rem;">
-                            <div style="width:8px;height:8px;border-radius:50%;background:{% if step.status=='Resolved' %}var(--teal){% elif loop.last %}var(--indigo){% else %}var(--border){% endif %};flex-shrink:0;"></div>
-                            <span style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;color:{% if loop.last %}var(--text){% else %}var(--muted){% endif %};">{{ step.status }}</span>
-                        </div>
+                    <div class="progress-step">
+                        <div class="progress-dot" style="background:
+                            {% if step.status == 'Resolved' %}var(--teal)
+                            {% elif loop.last %}var(--indigo)
+                            {% else %}var(--border){% endif %};"></div>
+                        <span class="progress-step-label" style="color:
+                            {% if loop.last %}var(--text){% else %}var(--muted){% endif %};">
+                            {{ step.status }}
+                        </span>
+                    </div>
                     {% endfor %}
                 </div>
             </div>
@@ -680,14 +783,11 @@
         {% endif %}
 
         <!-- Share -->
-        <div class="sidebar-card" style="background:var(--indigo-dark);border-color:rgba(79,70,229,0.3);padding:1.5rem;">
-            <div style="font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--warm-light);margin-bottom:0.5rem;">Share</div>
-            <p style="font-size:0.8rem;color:rgba(255,255,255,0.45);line-height:1.6;margin-bottom:1rem;">Help others find this issue and add their support.</p>
-            <button
-                onclick="navigator.clipboard.writeText(window.location.href).then(() => this.textContent = 'Copied! ✓')"
-                class="btn-primary"
-                style="width:100%;justify-content:center;clip-path:none;font-size:0.7rem;"
-            >
+        <div class="share-card reveal">
+            <div class="share-eyebrow">Share Issue</div>
+            <p class="share-text">Help others find this issue and add their support.</p>
+            <button class="share-btn"
+                    onclick="navigator.clipboard.writeText(window.location.href).then(() => this.textContent = '✓ Copied!')">
                 Copy Link →
             </button>
         </div>
@@ -695,9 +795,98 @@
     </div>
 
 </div>
-{% endblock %}
 
+<!-- ── LIGHTBOX (reuses detail.html's lightbox for gallery images) ── -->
+<div class="lightbox-overlay" id="lightbox" onclick="lbClickOutside(event)">
+    <div class="lightbox-inner">
+        <img class="lightbox-img" id="lightboxImg" src="" alt="">
+    </div>
+</div>
+<button class="lightbox-close" id="lightboxClose" onclick="closeLightbox()">✕</button>
+<button class="lightbox-arrow prev" id="lightboxPrev" onclick="lbMove(-1)">&#8592;</button>
+<button class="lightbox-arrow next" id="lightboxNext" onclick="lbMove(1)">&#8594;</button>
+<div class="lightbox-counter" id="lightboxCounter"></div>
+<div class="lightbox-dots"    id="lightboxDots"></div>
+
+{% endblock %}
 
 {% block extra_js %}
 <script src="{{ url_for('static', filename='js/issue.js') }}"></script>
+<script>
+/* ── Lightbox ────────────────────────────────────────────── */
+(function () {
+    let images = [], current = 0, open = false;
+    const overlay = document.getElementById('lightbox');
+    const img     = document.getElementById('lightboxImg');
+    const prev    = document.getElementById('lightboxPrev');
+    const next    = document.getElementById('lightboxNext');
+    const counter = document.getElementById('lightboxCounter');
+    const dotsEl  = document.getElementById('lightboxDots');
+    const closeEl = document.getElementById('lightboxClose');
+
+    document.querySelectorAll('.image-gallery').forEach((group, gIdx) => {
+        const imgs = Array.from(group.querySelectorAll('.gallery-img-wrap img'));
+        imgs.forEach((el, i) => {
+            el.parentElement.addEventListener('click', () =>
+                openLightbox(imgs.map(x => x.src), i));
+        });
+    });
+
+    function openLightbox(srcs, idx) {
+        images = srcs; current = idx; open = true;
+        document.body.style.overflow = 'hidden';
+        buildDots(); showImage(current, false);
+        overlay.classList.add('active');
+        closeEl.hidden = false;
+    }
+    window.closeLightbox = function () {
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+        open = false;
+        setTimeout(() => { img.src = ''; }, 300);
+    };
+    window.lbClickOutside = function (e) {
+        if (e.target === overlay || e.target === overlay.firstElementChild) closeLightbox();
+    };
+    window.lbMove = function (dir) {
+        if (!open) return;
+        current = (current + dir + images.length) % images.length;
+        showImage(current, true);
+    };
+    function showImage(idx, animate) {
+        if (animate) {
+            img.classList.add('fading');
+            setTimeout(() => { img.src = images[idx]; img.classList.remove('fading'); }, 180);
+        } else { img.src = images[idx]; }
+        prev.hidden = images.length <= 1;
+        next.hidden = images.length <= 1;
+        counter.textContent = images.length > 1 ? (idx+1) + ' / ' + images.length : '';
+        document.querySelectorAll('.lightbox-dot').forEach((d,i) =>
+            d.classList.toggle('active', i === idx));
+    }
+    function buildDots() {
+        dotsEl.innerHTML = '';
+        if (images.length <= 1) return;
+        images.forEach((_, i) => {
+            const d = document.createElement('button');
+            d.className = 'lightbox-dot' + (i === current ? ' active' : '');
+            d.setAttribute('aria-label', 'Image ' + (i+1));
+            d.onclick = () => { current = i; showImage(i, true); };
+            dotsEl.appendChild(d);
+        });
+    }
+    document.addEventListener('keydown', e => {
+        if (!open) return;
+        if (e.key === 'Escape')     closeLightbox();
+        if (e.key === 'ArrowRight') lbMove(1);
+        if (e.key === 'ArrowLeft')  lbMove(-1);
+    });
+    let tx = 0;
+    overlay.addEventListener('touchstart', e => { tx = e.touches[0].clientX; });
+    overlay.addEventListener('touchend',   e => {
+        const dx = e.changedTouches[0].clientX - tx;
+        if (Math.abs(dx) > 50) lbMove(dx < 0 ? 1 : -1);
+    });
+})();
+</script>
 {% endblock %}

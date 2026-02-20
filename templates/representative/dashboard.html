@@ -389,14 +389,25 @@
         </div>
 
         <div class="topbar-actions">
-            <a href="{{ url_for('representative.my_posts') }}" class="btn-action">My Posts</a>
-            <a href="{{ url_for('accountability.view_rep_accountability',rep_user_id=session.get('user_id')) }}" class="btn-action">Performance Score</a>
-            {% if role == "ELECTED_REP" %}
-                <a href="{{ url_for('representative.issue_management') }}" class="btn-action primary">
-                    All Issues
-                </a>
-            {% endif %}
-        </div>
+
+    <a href="{{ url_for('representative.my_posts') }}" class="btn-action">
+        My Posts
+    </a>
+
+    <a href="{{ url_for('accountability.view_rep_accountability',rep_user_id=session.get('user_id')) }}" class="btn-action">
+        Performance Score
+    </a>
+
+    <!--{% if role == "ELECTED_REP" %}
+        <a href="{{ url_for('representative.issue_management') }}" class="btn-action">
+            All Issues
+        </a>
+    {% endif %}-->
+            <a href="{{ url_for('rep_policy.create_policy') }}" class="btn-action primary">
+        + Create Post
+    </a>
+</div>
+
     </div>
 
     <!-- ── Stats Strip ─────────────────────────────────────── -->
@@ -602,12 +613,12 @@
                             Performance Score
                             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                         </a>
-                        {% if role == "ELECTED_REP" %}
+                        <!--{% if role == "ELECTED_REP" %}
                         <a href="{{ url_for('representative.issue_management') }}" class="quick-link">
                             Full Issue List
                             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                         </a>
-                        {% endif %}
+                        {% endif %}-->
                         <a href="{{ url_for('rep_policy.policy_feed') }}" class="quick-link">
                             Policy Feed
                             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>

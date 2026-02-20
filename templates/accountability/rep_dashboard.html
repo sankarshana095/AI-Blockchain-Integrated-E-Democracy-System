@@ -2,32 +2,52 @@
 {% set title = "Public Accountability Dashboard" %}
 
 {% block content %}
-<h2>📊 Representative Accountability</h2>
 
-<ul>
-    <li>
-        <strong>Issue Resolution Rate:</strong>
-        {{ snapshot.resolution_rate }}
-    </li>
+<div class="accountability-container">
 
-    <li>
-        <strong>Engagement Score:</strong>
-        {{ snapshot.engagement_score }}
-    </li>
+    <h2>📊 Representative Accountability</h2>
 
-    <li>
-        <strong>Discourse Balance Index (AI):</strong>
-        {{ snapshot.balance_index or "Not available" }}
-    </li>
+    {% if score %}
+    <div class="score-display">
 
-    <li>
-        <strong>Internal Performance Score:</strong>
-        {{ snapshot.system_score.overall_score if snapshot.system_score else "N/A" }}
-    </li>
-</ul>
+        <h2 class="rating">{{ score.rating }}</h2>
+        <div class="score-number">{{ score.final_score }}/100</div>
 
-<p class="hint">
-    ℹ️ These indicators are generated automatically from platform activity.
-    AI indicators are advisory and do not determine outcomes.
-</p>
+        <div class="dimensions">
+
+            <div class="dimension">
+                <h3>Accountability</h3>
+                <p>{{ score.breakdown.accountability.total }}/100</p>
+            </div>
+
+            <div class="dimension">
+                <h3>Engagement</h3>
+                <p>{{ score.breakdown.engagement.total }}/100</p>
+            </div>
+
+            <div class="dimension">
+                <h3>Integrity</h3>
+                <p>{{ score.breakdown.integrity.total }}/100</p>
+            </div>
+
+            <div class="dimension">
+                <h3>Impact</h3>
+                <p>{{ score.breakdown.impact.total }}/100</p>
+            </div>
+
+        </div>
+
+    </div>
+
+    {% else %}
+        <p>No performance data available.</p>
+    {% endif %}
+
+    <p class="hint">
+        ℹ️ These scores are generated automatically using platform analytics,
+        behavioral signals, and AI evaluation models.
+    </p>
+
+</div>
+
 {% endblock %}
