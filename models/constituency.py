@@ -1,4 +1,5 @@
-from supabase_db.db import fetch_all
+from supabase_db.db import fetch_all,fetch_one
+
 
 CONSTITUENCIES_TABLE = "constituencies"
 
@@ -42,8 +43,13 @@ def get_constituency_by_id(constituency_id: str):
     """
     Fetch single constituency
     """
-    from supabase_db.db import fetch_one
     return fetch_one(
         CONSTITUENCIES_TABLE,
         {"id": constituency_id}
     )
+
+def get_all_constituencies():
+    """
+    Fetch all constituencies
+    """
+    return fetch_all(CONSTITUENCIES_TABLE)

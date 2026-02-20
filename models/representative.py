@@ -11,6 +11,7 @@ REPRESENTATIVES_TABLE = "representatives"
 REP_POSTS_TABLE = "rep_posts"
 REP_COMMENTS_TABLE = "rep_comments"
 REP_SCORES_TABLE = "rep_scores"
+REP_DAILY_SCORE_TABLE = "representative_daily_scores"
 
 
 def create_representative(
@@ -211,6 +212,93 @@ def get_elected_representative_by_constituency(constituency_id: str):
 
     for rep in reps:
         if rep.get("type") == "ELECTED_REP":
+            return rep
+
+    return None
+
+def insert_daily_rep_score(
+    rep_user_id: str,
+    election_id: str,
+    constituency_id: str,
+    final_score: float,
+    rating: str,
+    accountability_score: float,
+    engagement_score: float,
+    integrity_score: float,
+    impact_score: float,
+    score_date: date
+):
+    payload = {
+        "id": generate_uuid(),
+        "rep_user_id": rep_user_id,
+        "election_id": election_id,
+        "constituency_id": constituency_id,
+        "final_score": final_score,
+        "rating": rating,
+        "accountability_score": accountability_score,
+        "engagement_score": engagement_score,
+        "integrity_score": integrity_score,
+        "impact_score": impact_score,
+        "score_date": score_date.isoformat(),
+        "created_at": utc_now().isoformat()
+    }
+
+    return insert_record(REP_DAILY_SCORE_TABLE, payload, use_admin=True)
+
+def get_daily_rep_score(
+    rep_user_id: str,
+    election_id: str,
+    score_date: date
+):
+    return fetch_one(
+        REP_DAILY_SCORE_TABLE,
+        {
+            "rep_user_id": rep_user_id,
+            "election_id": election_id,
+            "score_date": score_date.isoformat()
+        }
+    )
+
+def get_rep_score_history(
+    rep_user_id: str,
+    election_id: str
+):
+    return fetch_all(
+        REP_DAILY_SCORE_TABLE,
+        {
+            "rep_user_id": rep_user_id,
+            "election_id": election_id
+        }
+    )
+
+from datetime import date
+
+
+def get_current_representative_by_constituency(constituency_id: str):
+    reps = get_elected_representative_by_constituency(constituency_id)
+
+    if not reps:
+        return None
+
+    # If single dict returned, convert to list
+    if isinstance(reps, dict):
+        reps = [reps]
+
+    today = date.today()
+
+    for rep in reps:
+        start = rep.get("term_start")
+        end = rep.get("term_end")
+
+        if not start or not end:
+            continue
+
+        if isinstance(start, str):
+            start = date.fromisoformat(start)
+        if isinstance(end, str):
+            end = date.fromisoformat(end)
+
+        if start <= today <= end:
             return rep
 
     return None

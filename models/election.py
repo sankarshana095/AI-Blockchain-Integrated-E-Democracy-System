@@ -278,4 +278,3 @@ def get_elections_by_constituency(constituency_id: str):
             elections.append(e)
 
     return elections
-

@@ -18,6 +18,7 @@ from routes.results_routes import bp as results_bp
 from routes.public_results_routes import bp as public_results_bp
 from routes.rep_policy_routes import bp as rep_policy_bp
 from routes.accountability_routes import bp as accountability_bp
+from routes.internal_jobs import bp as internal_jobs_bp
 
 
 
@@ -68,6 +69,7 @@ def create_app():
     app.register_blueprint(public_results_bp)
     app.register_blueprint(rep_policy_bp)
     app.register_blueprint(accountability_bp)
+    app.register_blueprint(internal_jobs_bp)
 
 
 

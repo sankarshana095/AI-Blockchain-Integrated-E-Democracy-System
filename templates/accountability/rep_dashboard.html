@@ -5,36 +5,95 @@
 
 <div class="accountability-container">
 
-    <h2>📊 Representative Accountability</h2>
+    <h2>📊 Representative Accountability Dashboard</h2>
 
     {% if score %}
     <div class="score-display">
 
-        <h2 class="rating">{{ score.rating }}</h2>
-        <div class="score-number">{{ score.final_score }}/100</div>
+        <!-- ================= FINAL SCORE ================= -->
+        <div class="final-score-card">
+            <h2 class="rating">{{ score.rating }}</h2>
+            <div class="score-number">{{ score.final_score }}/100</div>
+            <p class="formula">
+                FINAL = (Accountability × 0.40) + (Engagement × 0.30) 
+                + (Integrity × 0.20) + (Impact × 0.10)
+            </p>
+        </div>
 
-        <div class="dimensions">
+        <!-- ================= ACCOUNTABILITY ================= -->
+        <div class="dimension-card">
+            <h3>🟦 Accountability (Weight: 40%)</h3>
+            <p><strong>Total:</strong> {{ score.breakdown.accountability.total }}/100</p>
 
-            <div class="dimension">
-                <h3>Accountability</h3>
-                <p>{{ score.breakdown.accountability.total }}/100</p>
-            </div>
+            <ul>
+                <li>
+                    Issue Resolution Rate (50%) → 
+                    {{ score.breakdown.accountability.resolution_rate }}%
+                </li>
+                <li>
+                    Response Time Score (25%) → 
+                    {{ score.breakdown.accountability.response_time }}/100
+                </li>
+                <li>
+                    Citizen Satisfaction (25%) → 
+                    {{ score.breakdown.accountability.citizen_satisfaction }}%
+                </li>
+            </ul>
+        </div>
 
-            <div class="dimension">
-                <h3>Engagement</h3>
-                <p>{{ score.breakdown.engagement.total }}/100</p>
-            </div>
+        <!-- ================= ENGAGEMENT ================= -->
+        <div class="dimension-card">
+            <h3>🟩 Engagement (Weight: 30%)</h3>
+            <p><strong>Total:</strong> {{ score.breakdown.engagement.total }}/100</p>
 
-            <div class="dimension">
-                <h3>Integrity</h3>
-                <p>{{ score.breakdown.integrity.total }}/100</p>
-            </div>
+            <ul>
+                <li>
+                    Policy Post Quality (60%) → 
+                    {{ score.breakdown.engagement.post_quality }}/100
+                </li>
+                <li>
+                    Consistency Score (30%) → 
+                    {{ score.breakdown.engagement.consistency }}/100
+                </li>
+                <li>
+                    Participation Depth (10%) → 
+                    {{ score.breakdown.engagement.participation_depth }}/100
+                </li>
+            </ul>
+        </div>
 
-            <div class="dimension">
-                <h3>Impact</h3>
-                <p>{{ score.breakdown.impact.total }}/100</p>
-            </div>
+        <!-- ================= INTEGRITY ================= -->
+        <div class="dimension-card">
+            <h3>🟨 Integrity (Weight: 20%)</h3>
+            <p><strong>Total:</strong> {{ score.breakdown.integrity.total }}/100</p>
 
+            <ul>
+                <li>
+                    Discourse Balance Index (Primary Metric) → 
+                    {{ score.breakdown.integrity.discourse_balance }}/100
+                </li>
+                <li>
+                    Controversy Penalty (Deduction up to -30) → 
+                    {{ score.breakdown.integrity.controversy_penalty }}
+                </li>
+            </ul>
+        </div>
+
+        <!-- ================= IMPACT ================= -->
+        <div class="dimension-card">
+            <h3>🟪 Impact (Weight: 10%)</h3>
+            <p><strong>Total:</strong> {{ score.breakdown.impact.total }}/100</p>
+
+            <ul>
+                <li>
+                    Constituency Engagement Index (50%) → 
+                    {{ score.breakdown.impact.constituency_engagement }}/100
+                </li>
+                <li>
+                    Issue Scope Impact (50%) → 
+                    {{ score.breakdown.impact.issue_scope_impact }}/100
+                </li>
+            </ul>
         </div>
 
     </div>
@@ -44,8 +103,9 @@
     {% endif %}
 
     <p class="hint">
-        ℹ️ These scores are generated automatically using platform analytics,
-        behavioral signals, and AI evaluation models.
+        ℹ️ All scores are calculated automatically using issue resolution data,
+        engagement analytics, AI discourse evaluation, and behavioral metrics.
+        Weightages are publicly visible for transparency.
     </p>
 
 </div>
