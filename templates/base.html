@@ -285,6 +285,19 @@
     /* .stat-card:hover uses #fafafe; data-table tbody tr:hover uses #f8f8fd */
     [data-theme="dark"] .stat-card { background: var(--card-bg); }
     [data-theme="dark"] .stat-card:hover { background: var(--card-hover-bg) !important; }
+     [data-theme="dark"] .stat-card:hover            { background: var(--card-hover-bg) !important; }
+    [data-theme="dark"] .data-table tbody tr:hover  { background: var(--indigo-dim) !important; }
+
+    /* representatives.html — rep card hover */
+    [data-theme="dark"] .rep-card:hover             { background: var(--card-hover-bg) !important; box-shadow: 0 8px 40px rgba(0,0,0,0.3); }
+    [data-theme="dark"] .stat-card:hover            { background: var(--card-hover-bg) !important; }
+    [data-theme="dark"] .data-table tbody tr:hover  { background: var(--indigo-dim) !important; }
+
+    /* representatives.html — rep card hover */
+    [data-theme="dark"] .rep-card:hover             { background: var(--card-hover-bg) !important; box-shadow: 0 8px 40px rgba(0,0,0,0.3); }
+
+
+
     [data-theme="dark"] .stat-cell { background: var(--card-bg); }
     [data-theme="dark"] .stat-cell:hover { background: var(--card-hover-bg) !important; }
     [data-theme="dark"] .data-table tbody tr:hover { background: var(--indigo-dim) !important; }
@@ -306,6 +319,105 @@
 
     /* ── rep_dashboard sidebar perf card ── */
     [data-theme="dark"] .perf-card { background: var(--indigo-dark); }
+
+    /* ── rep_accountability.html ── */
+    [data-theme="dark"] .acc-score-strip           { background: var(--card-bg); }
+    [data-theme="dark"] .acc-strip-item            { background: var(--card-bg); border-color: var(--border); }
+    [data-theme="dark"] .dim-card                  { background: var(--card-bg); }
+    [data-theme="dark"] .dim-card-head             { background: var(--ink-2); }
+    [data-theme="dark"] .dim-icon                  { background: var(--ink-3); border-color: var(--border); }
+    [data-theme="dark"] .dim-weight                { background: var(--ink-3); }
+    [data-theme="dark"] .avg-card                  { background: var(--card-bg); }
+    [data-theme="dark"] .avg-card-head             { background: var(--ink-2); }
+    [data-theme="dark"] .avg-score-big             { background: var(--ink-2); border-color: var(--border); }
+    [data-theme="dark"] .formula-card              { background: var(--ink-2); }
+    [data-theme="dark"] .acc-alert.warn            { background: var(--warm-dim); }
+    [data-theme="dark"] .acc-alert.pre-danger      { background: rgba(234,88,12,0.12); }
+    [data-theme="dark"] .acc-alert.danger          { background: rgba(220,38,38,0.12); }
+    [data-theme="dark"] .acc-body                  { background: var(--ink-2); }
+    [data-theme="dark"] .flow-num                  { background: var(--ink-2); border-color: var(--border); }
+    [data-theme="dark"] .flow-num.active           { background: var(--indigo); border-color: var(--indigo); }
+
+    /* ── my_issues.html ── */
+    [data-theme="dark"] .my-stat                   { background: var(--card-bg); }
+    [data-theme="dark"] .my-stat:hover             { background: var(--card-hover-bg) !important; }
+    [data-theme="dark"] .issue-card                { background: var(--card-bg); }
+    [data-theme="dark"] .issue-card:hover          { background: var(--card-hover-bg) !important; }
+    [data-theme="dark"] .vote-column               { background: var(--ink-2); border-color: var(--border); }
+
+    /* ── audit_logs.html ── */
+    [data-theme="dark"] .audit-stat                { background: var(--card-bg); }
+    [data-theme="dark"] .audit-stat:hover          { background: var(--card-hover-bg) !important; }
+    [data-theme="dark"] .audit-table tbody tr:hover { background: var(--indigo-dim) !important; }
+
+    /* ── manage_ceo.html ── */
+    [data-theme="dark"] .ceo-stat                  { background: var(--card-bg); }
+    [data-theme="dark"] .ceo-stat:hover            { background: var(--card-hover-bg) !important; }
+    [data-theme="dark"] .data-table tbody tr:hover { background: var(--indigo-dim) !important; }
+    [data-theme="dark"] .state-tag                 { background: var(--ink-2); border-color: var(--border); color: var(--text); }
+    [data-theme="dark"] .filter-tabs               { border-color: var(--border); }
+    [data-theme="dark"] .filter-tab                { background: var(--ink-2); color: var(--muted); border-color: var(--border); }
+    [data-theme="dark"] .filter-tab:hover          { background: var(--indigo-dim); color: var(--indigo); }
+    [data-theme="dark"] .filter-tab.active         { background: var(--indigo); color: #fff; }
+
+    /* ── notifications.html ── */
+    [data-theme="dark"] .notif-item                { background: var(--card-bg); }
+    [data-theme="dark"] .notif-item:hover          { background: var(--card-hover-bg); }
+    [data-theme="dark"] .notif-icon-col            { background: var(--ink-2); border-color: var(--border); }
+    [data-theme="dark"] .notif-icon                { background: var(--ink-3); border-color: var(--border); }
+    [data-theme="dark"] .notif-empty               { background: var(--card-bg); }
+    [data-theme="dark"] .notif-empty-title         { color: var(--text); }
+
+    /* ── create_election.html ── */
+    [data-theme="dark"] .form-main                 { background: var(--card-bg); }
+    [data-theme="dark"] .form-section              { background: var(--card-bg); }
+    [data-theme="dark"] .form-actions-bar          { background: var(--ink-2); }
+    /* .sidebar-card already covered above; just add the head */
+    [data-theme="dark"] .sidebar-card-head         { background: var(--ink-2); }
+    [data-theme="dark"] .checkbox-item             { background: var(--card-bg); color: var(--text); }
+    [data-theme="dark"] .checkbox-item:hover       { background: var(--indigo-dim); color: var(--indigo); }
+    [data-theme="dark"] .checkbox-item input[type="checkbox"] {
+        background: var(--ink-3);
+        border-color: var(--border);
+    }
+    [data-theme="dark"] .checkbox-item input[type="checkbox"]:checked {
+        background: var(--indigo);
+        border-color: var(--indigo);
+    }
+    [data-theme="dark"] .constituency-grid         { background: var(--border); border-color: var(--border); }
+    [data-theme="dark"] .constituency-search       { background: var(--ink-2); color: var(--text); border-color: var(--border); }
+    [data-theme="dark"] .constituency-search:focus { border-color: var(--indigo); }
+    [data-theme="dark"] .status-pill.amber-pill,
+    [data-theme="dark"] .page-title-sub            { color: var(--muted); }
+
+    /* ── blo_voter_verification.html ── */
+    [data-theme="dark"] .voter-table               { background: var(--card-bg); }
+    [data-theme="dark"] .voter-table thead         { background: var(--ink-2); }
+    [data-theme="dark"] .voter-table-wrap          { border-color: var(--border); }
+    [data-theme="dark"] .voter-table tbody tr:hover { background: var(--indigo-dim) !important; }
+    [data-theme="dark"] .blo-stat                  { background: var(--card-bg); border-color: var(--border); }
+    [data-theme="dark"] .voter-avatar-placeholder  { background: var(--indigo-dim); }
+    [data-theme="dark"] .search-input              { background: var(--ink-2); border-color: var(--border); color: var(--text); }
+    [data-theme="dark"] .search-input:focus        { background: var(--input-focus-bg) !important; }
+    [data-theme="dark"] .sort-btn                  { background: var(--ink-2); border-color: var(--border); color: var(--muted); }
+    [data-theme="dark"] .sort-btn:hover            { background: var(--indigo-dim); border-color: var(--indigo); color: var(--indigo); }
+    [data-theme="dark"] .sort-btn.active           { background: var(--indigo); border-color: var(--indigo); color: #fff; }
+    [data-theme="dark"] .file-input-label          { border-color: var(--border); color: var(--muted); }
+    [data-theme="dark"] .file-input-label:hover    { background: var(--indigo-dim); border-color: var(--indigo); color: var(--indigo); }
+    [data-theme="dark"] .blo-info-banner           { background: var(--indigo-dim); border-color: rgba(129,140,248,0.25); }
+
+    /* ── election_insights.html ── */
+    [data-theme="dark"] .hero-selector             { background: var(--ink-2); border-color: var(--border); }
+    [data-theme="dark"] .hero-selector-label       { background: var(--ink-3); color: var(--muted); border-color: var(--border); }
+    [data-theme="dark"] .hero-selector-wrap select {
+    background: var(--ink-2) !important;
+    color: var(--text);
+}
+[data-theme="dark"] .hero-selector-wrap { color-scheme: dark; }
+    /* .stat-card is a new class name in insights — different from rep_dashboard .stat-cell */
+    [data-theme="dark"] .stat-card                 { background: var(--card-bg); }
+    [data-theme="dark"] .stat-card:hover           { background: var(--card-hover-bg) !important; }
+
 
     /* ── Selects and native inputs across all pages ── */
     /* ── policy_detail.html — textarea focus overrides ── */
@@ -510,6 +622,101 @@
 
         /* rep_dashboard perf card */
         [data-theme="system"] .perf-card { background: var(--indigo-dark); }
+        /* ── rep_accountability.html ── */
+        [data-theme="system"] .acc-score-strip           { background: var(--card-bg); }
+        [data-theme="system"] .acc-strip-item            { background: var(--card-bg); border-color: var(--border); }
+        [data-theme="system"] .dim-card                  { background: var(--card-bg); }
+        [data-theme="system"] .dim-card-head             { background: var(--ink-2); }
+        [data-theme="system"] .dim-icon                  { background: var(--ink-3); border-color: var(--border); }
+        [data-theme="system"] .dim-weight                { background: var(--ink-3); }
+        [data-theme="system"] .avg-card                  { background: var(--card-bg); }
+        [data-theme="system"] .avg-card-head             { background: var(--ink-2); }
+        [data-theme="system"] .avg-score-big             { background: var(--ink-2); border-color: var(--border); }
+        [data-theme="system"] .formula-card              { background: var(--ink-2); }
+        [data-theme="system"] .acc-alert.warn            { background: var(--warm-dim); }
+        [data-theme="system"] .acc-alert.pre-danger      { background: rgba(234,88,12,0.12); }
+        [data-theme="system"] .acc-alert.danger          { background: rgba(220,38,38,0.12); }
+        [data-theme="system"] .acc-body                  { background: var(--ink-2); }
+        [data-theme="system"] .flow-num                  { background: var(--ink-2); border-color: var(--border); }
+        [data-theme="system"] .flow-num.active           { background: var(--indigo); border-color: var(--indigo); }
+
+        /* ── my_issues.html ── */
+        [data-theme="system"] .my-stat                   { background: var(--card-bg); }
+        [data-theme="system"] .my-stat:hover             { background: var(--card-hover-bg) !important; }
+        [data-theme="system"] .issue-card                { background: var(--card-bg); }
+        [data-theme="system"] .issue-card:hover          { background: var(--card-hover-bg) !important; }
+        [data-theme="system"] .vote-column               { background: var(--ink-2); border-color: var(--border); }
+
+        /* ── audit_logs.html ── */
+        [data-theme="system"] .audit-stat                { background: var(--card-bg); }
+        [data-theme="system"] .audit-stat:hover          { background: var(--card-hover-bg) !important; }
+        [data-theme="system"] .audit-table tbody tr:hover { background: var(--indigo-dim) !important; }
+
+        /* ── manage_ceo.html ── */
+        [data-theme="system"] .ceo-stat                  { background: var(--card-bg); }
+        [data-theme="system"] .ceo-stat:hover            { background: var(--card-hover-bg) !important; }
+        [data-theme="system"] .data-table tbody tr:hover { background: var(--indigo-dim) !important; }
+        [data-theme="system"] .state-tag                 { background: var(--ink-2); border-color: var(--border); color: var(--text); }
+        [data-theme="system"] .filter-tabs               { border-color: var(--border); }
+        [data-theme="system"] .filter-tab                { background: var(--ink-2); color: var(--muted); border-color: var(--border); }
+        [data-theme="system"] .filter-tab:hover          { background: var(--indigo-dim); color: var(--indigo); }
+        [data-theme="system"] .filter-tab.active         { background: var(--indigo); color: #fff; }
+
+        /* ── notifications.html ── */
+        [data-theme="system"] .notif-item                { background: var(--card-bg); }
+        [data-theme="system"] .notif-item:hover          { background: var(--card-hover-bg); }
+        [data-theme="system"] .notif-icon-col            { background: var(--ink-2); border-color: var(--border); }
+        [data-theme="system"] .notif-icon                { background: var(--ink-3); border-color: var(--border); }
+        [data-theme="system"] .notif-empty               { background: var(--card-bg); }
+        [data-theme="system"] .notif-empty-title         { color: var(--text); }
+
+        /* ── create_election.html ── */
+        [data-theme="system"] .form-main                 { background: var(--card-bg); }
+        [data-theme="system"] .form-section              { background: var(--card-bg); }
+        [data-theme="system"] .form-actions-bar          { background: var(--ink-2); }
+        [data-theme="system"] .sidebar-card-head         { background: var(--ink-2); }
+        [data-theme="system"] .checkbox-item             { background: var(--card-bg); color: var(--text); }
+        [data-theme="system"] .checkbox-item:hover       { background: var(--indigo-dim); color: var(--indigo); }
+        [data-theme="system"] .checkbox-item input[type="checkbox"] {
+            background: var(--ink-3);
+            border-color: var(--border);
+        }
+        [data-theme="system"] .checkbox-item input[type="checkbox"]:checked {
+            background: var(--indigo);
+            border-color: var(--indigo);
+        }
+        [data-theme="system"] .constituency-grid         { background: var(--border); border-color: var(--border); }
+        [data-theme="system"] .constituency-search       { background: var(--ink-2); color: var(--text); border-color: var(--border); }
+        [data-theme="system"] .constituency-search:focus { border-color: var(--indigo); }
+
+        /* ── blo_voter_verification.html ── */
+        [data-theme="system"] .voter-table               { background: var(--card-bg); }
+        [data-theme="system"] .voter-table thead         { background: var(--ink-2); }
+        [data-theme="system"] .voter-table-wrap          { border-color: var(--border); }
+        [data-theme="system"] .voter-table tbody tr:hover { background: var(--indigo-dim) !important; }
+        [data-theme="system"] .blo-stat                  { background: var(--card-bg); border-color: var(--border); }
+        [data-theme="system"] .voter-avatar-placeholder  { background: var(--indigo-dim); }
+        [data-theme="system"] .search-input              { background: var(--ink-2); border-color: var(--border); color: var(--text); }
+        [data-theme="system"] .search-input:focus        { background: var(--input-focus-bg) !important; }
+        [data-theme="system"] .sort-btn                  { background: var(--ink-2); border-color: var(--border); color: var(--muted); }
+        [data-theme="system"] .sort-btn:hover            { background: var(--indigo-dim); border-color: var(--indigo); color: var(--indigo); }
+        [data-theme="system"] .sort-btn.active           { background: var(--indigo); border-color: var(--indigo); color: #fff; }
+        [data-theme="system"] .file-input-label          { border-color: var(--border); color: var(--muted); }
+        [data-theme="system"] .file-input-label:hover    { background: var(--indigo-dim); border-color: var(--indigo); color: var(--indigo); }
+        [data-theme="system"] .blo-info-banner           { background: var(--indigo-dim); border-color: rgba(129,140,248,0.25); }
+
+        /* ── election_insights.html ── */
+        [data-theme="system"] .hero-selector             { background: var(--ink-2); border-color: var(--border); }
+        [data-theme="system"] .hero-selector-label       { background: var(--ink-3); color: var(--muted); border-color: var(--border); }
+       [data-theme="system"] .hero-selector-wrap select {
+    background: var(--ink-2) !important;
+    color: var(--text);
+}
+/* inside @media (prefers-color-scheme: dark) */
+[data-theme="system"] .hero-selector-wrap { color-scheme: dark; }
+        [data-theme="system"] .stat-card                 { background: var(--card-bg); }
+        [data-theme="system"] .stat-card:hover           { background: var(--card-hover-bg) !important; }
+
 
         /* Native selects */
         /* policy_detail.html textarea focus */
@@ -559,6 +766,16 @@
             background: var(--warm-dim);
             border-left-color: var(--warm);
         }
+         [data-theme="system"] .stat-card:hover           { background: var(--card-hover-bg) !important; }
+        [data-theme="system"] .data-table tbody tr:hover { background: var(--indigo-dim) !important; }
+
+        /* representatives.html — rep card hover */
+        [data-theme="system"] .rep-card:hover            { background: var(--card-hover-bg) !important; box-shadow: 0 8px 40px rgba(0,0,0,0.3); }
+        [data-theme="system"] .stat-card:hover           { background: var(--card-hover-bg) !important; }
+        [data-theme="system"] .data-table tbody tr:hover { background: var(--indigo-dim) !important; }
+
+        /* representatives.html — rep card hover */
+        [data-theme="system"] .rep-card:hover            { background: var(--card-hover-bg) !important; box-shadow: 0 8px 40px rgba(0,0,0,0.3); }
 
     }
 
@@ -1324,3 +1541,5 @@
     {% block extra_js %}<script src="https://unpkg.com/html5-qrcode"></script>{% endblock %}
 </body>
 </html>
+
+

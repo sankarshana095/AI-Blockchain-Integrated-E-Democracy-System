@@ -403,13 +403,32 @@
 }
 .lightbox-img.fading { opacity: 0; }
 
+/* ── FIX: All lightbox chrome is hidden by default,
+         only shown when overlay is active ── */
+.lightbox-close,
+.lightbox-arrow,
+.lightbox-counter,
+.lightbox-dots {
+    display: none;          /* hidden until lightbox opens */
+}
+.lightbox-overlay.active ~ .lightbox-close,
+.lightbox-overlay.active ~ .lightbox-arrow,
+.lightbox-overlay.active ~ .lightbox-counter,
+.lightbox-overlay.active ~ .lightbox-dots {
+    display: grid;          /* shown when overlay has .active */
+}
+/* arrows and counter need their own display type */
+.lightbox-overlay.active ~ .lightbox-arrow  { display: grid; }
+.lightbox-overlay.active ~ .lightbox-counter { display: block; }
+.lightbox-overlay.active ~ .lightbox-dots    { display: flex; }
+
 .lightbox-close {
     position: fixed; top: 1.5rem; right: 1.5rem;
     width: 44px; height: 44px;
     background: rgba(255,255,255,0.08);
     border: 1px solid rgba(255,255,255,0.15);
     color: #fff; font-size: 1.1rem;
-    display: grid; place-items: center;
+    place-items: center;
     cursor: pointer; z-index: 9010;
     font-family: var(--font-mono);
     transition: background 0.2s;
@@ -422,7 +441,7 @@
     background: rgba(255,255,255,0.07);
     border: 1px solid rgba(255,255,255,0.12);
     color: #fff; font-family: var(--font-mono); font-size: 1.1rem;
-    display: grid; place-items: center;
+    place-items: center;
     cursor: pointer; z-index: 9010;
     transition: background 0.2s, transform 0.2s;
     user-select: none;
@@ -432,7 +451,9 @@
 .lightbox-arrow.prev:hover { transform: translateY(-50%) translateX(-2px); }
 .lightbox-arrow.next { right: 1.25rem; }
 .lightbox-arrow.next:hover { transform: translateY(-50%) translateX(2px); }
-.lightbox-arrow[hidden] { display: none; }
+
+/* hide individual arrows when only 1 image */
+.lightbox-arrow.lb-hidden { display: none !important; }
 
 .lightbox-counter {
     position: fixed; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
@@ -442,7 +463,7 @@
 }
 .lightbox-dots {
     position: fixed; bottom: 1.25rem; left: 50%; transform: translateX(-50%);
-    display: flex; gap: 0.4rem; z-index: 9010;
+    gap: 0.4rem; z-index: 9010;
 }
 .lightbox-dot {
     width: 6px; height: 6px; border-radius: 50%;
@@ -796,7 +817,11 @@
 
 </div>
 
-<!-- ── LIGHTBOX (reuses detail.html's lightbox for gallery images) ── -->
+<!-- ── LIGHTBOX ─────────────────────────────────────────────
+     The overlay MUST come first in the DOM so the CSS sibling
+     selector (.lightbox-overlay.active ~ ...) can target the
+     close button, arrows, counter and dots.
+──────────────────────────────────────────────────────────── -->
 <div class="lightbox-overlay" id="lightbox" onclick="lbClickOutside(event)">
     <div class="lightbox-inner">
         <img class="lightbox-img" id="lightboxImg" src="" alt="">
@@ -824,7 +849,7 @@
     const dotsEl  = document.getElementById('lightboxDots');
     const closeEl = document.getElementById('lightboxClose');
 
-    document.querySelectorAll('.image-gallery').forEach((group, gIdx) => {
+    document.querySelectorAll('.image-gallery').forEach((group) => {
         const imgs = Array.from(group.querySelectorAll('.gallery-img-wrap img'));
         imgs.forEach((el, i) => {
             el.parentElement.addEventListener('click', () =>
@@ -835,52 +860,65 @@
     function openLightbox(srcs, idx) {
         images = srcs; current = idx; open = true;
         document.body.style.overflow = 'hidden';
-        buildDots(); showImage(current, false);
-        overlay.classList.add('active');
-        closeEl.hidden = false;
+        buildDots();
+        showImage(current, false);
+        overlay.classList.add('active'); // CSS sibling selector reveals chrome
     }
+
     window.closeLightbox = function () {
-        overlay.classList.remove('active');
+        overlay.classList.remove('active'); // CSS sibling selector hides chrome
         document.body.style.overflow = '';
         open = false;
         setTimeout(() => { img.src = ''; }, 300);
     };
+
     window.lbClickOutside = function (e) {
         if (e.target === overlay || e.target === overlay.firstElementChild) closeLightbox();
     };
+
     window.lbMove = function (dir) {
         if (!open) return;
         current = (current + dir + images.length) % images.length;
         showImage(current, true);
     };
+
     function showImage(idx, animate) {
         if (animate) {
             img.classList.add('fading');
             setTimeout(() => { img.src = images[idx]; img.classList.remove('fading'); }, 180);
-        } else { img.src = images[idx]; }
-        prev.hidden = images.length <= 1;
-        next.hidden = images.length <= 1;
-        counter.textContent = images.length > 1 ? (idx+1) + ' / ' + images.length : '';
-        document.querySelectorAll('.lightbox-dot').forEach((d,i) =>
+        } else {
+            img.src = images[idx];
+        }
+
+        // Hide individual arrows when only 1 image
+        prev.classList.toggle('lb-hidden', images.length <= 1);
+        next.classList.toggle('lb-hidden', images.length <= 1);
+
+        counter.textContent = images.length > 1 ? (idx + 1) + ' / ' + images.length : '';
+
+        document.querySelectorAll('.lightbox-dot').forEach((d, i) =>
             d.classList.toggle('active', i === idx));
     }
+
     function buildDots() {
         dotsEl.innerHTML = '';
         if (images.length <= 1) return;
         images.forEach((_, i) => {
             const d = document.createElement('button');
             d.className = 'lightbox-dot' + (i === current ? ' active' : '');
-            d.setAttribute('aria-label', 'Image ' + (i+1));
+            d.setAttribute('aria-label', 'Image ' + (i + 1));
             d.onclick = () => { current = i; showImage(i, true); };
             dotsEl.appendChild(d);
         });
     }
+
     document.addEventListener('keydown', e => {
         if (!open) return;
         if (e.key === 'Escape')     closeLightbox();
         if (e.key === 'ArrowRight') lbMove(1);
         if (e.key === 'ArrowLeft')  lbMove(-1);
     });
+
     let tx = 0;
     overlay.addEventListener('touchstart', e => { tx = e.touches[0].clientX; });
     overlay.addEventListener('touchend',   e => {

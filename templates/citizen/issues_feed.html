@@ -18,18 +18,13 @@
 }
 
 /* ── MAIN FEED COLUMN ─────────────────────────────────────── */
-.feed-main {}
-
-/* Feed header */
 .feed-header {
     display: flex; align-items: flex-end; justify-content: space-between;
     gap: 1.5rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     padding-bottom: 1.5rem;
     border-bottom: 1px solid var(--border);
 }
-
-.feed-header-left {}
 .feed-header-tag {
     display: flex; align-items: center; gap: 0.5rem;
     font-family: var(--font-mono);
@@ -76,103 +71,135 @@
 .sort-tab:hover { color: var(--indigo); background: var(--indigo-dim); }
 .sort-tab.active { color: #fff; background: var(--indigo); }
 
+/* ── STATUS FILTER BAR ────────────────────────────────────── */
+.status-filter-bar {
+    display: flex; align-items: center; gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+.status-filter-label {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-right: 0.25rem;
+    flex-shrink: 0;
+}
+.sf-btn {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.45rem 0.9rem;
+    border: 1px solid var(--border);
+    background: var(--ink);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.sf-btn .sf-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.sf-btn:hover { border-color: var(--indigo); color: var(--indigo); background: var(--indigo-dim); }
+
+.sf-btn.active[data-status="all"]         { background: var(--indigo); border-color: var(--indigo); color: #fff; }
+.sf-btn.active[data-status="open"]        { background: var(--indigo-dim); border-color: var(--indigo); color: var(--indigo); }
+.sf-btn.active[data-status="in_progress"] { background: rgba(147,51,234,0.1); border-color: #9333ea; color: #9333ea; }
+.sf-btn.active[data-status="pending"]     { background: var(--warm-dim); border-color: var(--warm); color: var(--warm); }
+.sf-btn.active[data-status="resolved"]    { background: var(--teal-dim); border-color: var(--teal); color: var(--teal); }
+.sf-btn.active[data-status="closed"]      { background: var(--ink-3); border-color: var(--muted); color: var(--text-2); }
+
+.sf-dot.all         { background: var(--indigo); }
+.sf-dot.open        { background: var(--indigo); }
+.sf-dot.in_progress { background: #9333ea; }
+.sf-dot.pending     { background: var(--warm); }
+.sf-dot.resolved    { background: var(--teal); }
+.sf-dot.closed      { background: var(--muted); }
+
 /* Issue list */
-.issue-list { display: flex; flex-direction: column; gap: 1px; background: var(--border); border: 1px solid var(--border); }
+.issue-list {
+    display: flex; flex-direction: column; gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+}
 
 /* ── ISSUE CARD ───────────────────────────────────────────── */
 .issue-card {
     display: flex;
-    background: var(--ink);
+    background: var(--card-bg);
     transition: background 0.2s;
     position: relative;
 }
 .issue-card::after {
     content: '';
-    position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
+    position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
     background: var(--indigo);
     transform: scaleY(0); transform-origin: top;
-    transition: transform 0.3s ease;
+    transition: transform 0.25s ease;
 }
-.issue-card:hover { background: #fafafe; }
+.issue-card:hover { background: var(--card-hover-bg); }
 .issue-card:hover::after { transform: scaleY(1); }
 
 /* Vote column */
 .vote-column {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.3rem;
-    padding: 1.5rem 1rem 1.5rem 1.5rem;
-    flex-shrink: 0;
-    width: 64px;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 0.3rem;
+    padding: 1.5rem 0.75rem 1.5rem 1.25rem;
+    flex-shrink: 0; width: 64px;
+    background: var(--ink-3);
+    border-right: 1px solid var(--border);
 }
-
 .vote-btn {
-    width: 28px; height: 28px;
-    background: none;
-    border: 1px solid var(--border);
+    width: 30px; height: 30px;
+    background: none; border: 1px solid var(--border);
     display: grid; place-items: center;
-    cursor: pointer;
-    color: var(--muted);
+    cursor: pointer; color: var(--muted);
     font-size: 0.6rem;
     transition: border-color 0.2s, color 0.2s, background 0.2s;
-    line-height: 1;
     padding: 0;
 }
-.vote-btn:hover { border-color: var(--indigo); color: var(--indigo); background: var(--indigo-dim); }
-.vote-btn.up.active  { border-color: var(--indigo); color: #fff; background: var(--indigo); }
-.vote-btn.down.active { border-color: #dc2626;    color: #fff; background: #dc2626; }
+.vote-btn:hover               { border-color: var(--indigo); color: var(--indigo); background: var(--indigo-dim); }
+.vote-btn.up.active           { border-color: var(--indigo); color: #fff; background: var(--indigo); }
+.vote-btn.down.active         { border-color: #dc2626; color: #fff; background: #dc2626; }
 
 .vote-score {
     font-family: var(--font-disp);
     font-size: 1.2rem;
-    color: var(--text);
-    line-height: 1;
-    text-align: center;
-    min-width: 2rem;
+    color: var(--text); line-height: 1; text-align: center;
 }
 .vote-score.positive { color: var(--indigo); }
 .vote-score.negative { color: #dc2626; }
 
 /* Issue content */
 .issue-content {
-    flex: 1;
-    padding: 1.5rem 1.75rem 1.5rem 0.5rem;
-    min-width: 0;
+    flex: 1; padding: 1.25rem 1.5rem;
+    min-width: 0; display: flex; flex-direction: column; gap: 0.5rem;
 }
 
 /* Meta top */
 .issue-meta-top {
-    display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;
-    margin-bottom: 0.6rem;
+    display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
 }
 .issue-username {
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    letter-spacing: 0.1em;
-    color: var(--indigo);
-    text-transform: uppercase;
+    font-family: var(--font-mono); font-size: 0.65rem;
+    letter-spacing: 0.1em; color: var(--indigo); text-transform: uppercase;
 }
-.meta-sep {
-    color: var(--border);
-    font-size: 0.7rem;
-}
+.meta-sep { color: var(--border); font-size: 0.7rem; }
 .issue-time {
-    font-family: var(--font-mono);
-    font-size: 0.62rem;
-    color: var(--muted);
-    letter-spacing: 0.06em;
+    font-family: var(--font-mono); font-size: 0.62rem;
+    color: var(--muted); letter-spacing: 0.06em;
 }
 
 /* Status pills */
 .status-pill {
-    font-family: var(--font-mono);
-    font-size: 0.56rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 0.18rem 0.55rem;
-    border-radius: 2px;
-    white-space: nowrap;
+    font-family: var(--font-mono); font-size: 0.56rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.18rem 0.55rem; border-radius: 2px; white-space: nowrap;
 }
 .status-pill.open        { color: var(--indigo); background: var(--indigo-dim); border: 1px solid rgba(79,70,229,0.2); }
 .status-pill.pending     { color: var(--warm);   background: var(--warm-dim);   border: 1px solid rgba(245,158,11,0.2); }
@@ -182,176 +209,116 @@
 
 /* Category tag */
 .category-tag {
-    font-family: var(--font-mono);
-    font-size: 0.58rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    background: var(--ink-2);
-    border: 1px solid var(--border);
-    padding: 0.18rem 0.55rem;
+    font-family: var(--font-mono); font-size: 0.58rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); background: var(--ink-2);
+    border: 1px solid var(--border); padding: 0.18rem 0.55rem;
 }
 
-/* Issue title link */
+/* Issue title */
 .issue-title-link {
     display: block;
-    font-family: var(--font-body);
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--text);
-    text-decoration: none;
-    line-height: 1.4;
-    margin-bottom: 0.6rem;
+    font-family: var(--font-disp); font-size: 1.35rem;
+    color: var(--text); text-decoration: none; line-height: 1.2;
     transition: color 0.2s;
 }
 .issue-title-link:hover { color: var(--indigo); }
 
-/* Image preview */
-.issue-image-preview {
-    margin-bottom: 0.75rem;
-    overflow: hidden;
-    max-height: 180px;
-    border: 1px solid var(--border);
-}
-.issue-image-preview img {
-    width: 100%; display: block;
-    object-fit: cover; max-height: 180px;
-    filter: brightness(0.96);
-    transition: filter 0.2s, transform 0.3s;
-}
-.issue-card:hover .issue-image-preview img {
-    filter: brightness(1);
-    transform: scale(1.01);
-}
-
 /* Description preview */
 .issue-preview {
-    font-size: 0.85rem;
-    color: var(--muted);
-    line-height: 1.7;
-    margin-bottom: 1rem;
+    font-size: 0.88rem; color: var(--muted); line-height: 1.7;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 
-/* Issue footer */
+/* Footer */
 .issue-footer {
     display: flex; align-items: center; gap: 1.25rem;
+    padding-top: 0.6rem; border-top: 1px solid var(--border); margin-top: auto;
 }
 .issue-footer-item {
     display: inline-flex; align-items: center; gap: 0.4rem;
-    font-family: var(--font-mono);
-    font-size: 0.62rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--muted);
-    text-decoration: none;
-    transition: color 0.2s;
-    cursor: pointer;
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); text-decoration: none;
+    transition: color 0.2s; cursor: pointer;
     background: none; border: none; padding: 0;
 }
 .issue-footer-item:hover { color: var(--indigo); }
-.issue-footer-item svg { opacity: 0.6; }
+
+.issue-read-link {
+    margin-left: auto;
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--indigo); text-decoration: none;
+    opacity: 0; transform: translateX(-4px);
+    transition: opacity 0.2s, transform 0.2s;
+}
+.issue-card:hover .issue-read-link { opacity: 1; transform: translateX(0); }
+
+/* ── RIGHT THUMBNAIL (same style as policy feed) ──────────── */
+.issue-thumb {
+    display: flex; align-items: center; justify-content: center;
+    padding: 1.25rem 1.5rem 1.25rem 0;
+    flex-shrink: 0;
+}
+.issue-thumb img {
+    width: 110px; height: 80px;
+    object-fit: cover; display: block;
+    border: 1px solid var(--border);
+    transition: opacity 0.2s;
+}
+.issue-card:hover .issue-thumb img { opacity: 0.9; }
 
 /* Empty state */
 .feed-empty {
-    background: var(--ink);
-    border: 1px solid var(--border);
-    padding: 4rem 2rem;
-    text-align: center;
+    background: var(--card-bg); border: 1px solid var(--border);
+    padding: 4rem 2rem; text-align: center;
 }
 .feed-empty-icon {
-    font-family: var(--font-disp);
-    font-size: 4rem;
-    color: rgba(79,70,229,0.1);
-    line-height: 1;
-    margin-bottom: 1rem;
+    font-family: var(--font-disp); font-size: 4rem;
+    color: rgba(79,70,229,0.1); line-height: 1; margin-bottom: 1rem;
 }
 .feed-empty p {
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 1.5rem;
+    font-family: var(--font-mono); font-size: 0.68rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 1.5rem;
 }
 
 /* ── SIDEBAR ──────────────────────────────────────────────── */
 .feed-sidebar {
-    position: sticky;
-    top: calc(var(--nav-h) + 2rem);
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
+    position: sticky; top: calc(var(--nav-h) + 2rem);
+    display: flex; flex-direction: column; gap: 1.25rem;
 }
-
-.sidebar-card {
-    background: var(--ink);
-    border: 1px solid var(--border);
-    overflow: hidden;
-}
+.sidebar-card { background: var(--card-bg); border: 1px solid var(--border); overflow: hidden; }
 .sidebar-card-header {
-    padding: 0.85rem 1.25rem;
-    border-bottom: 1px solid var(--border);
+    padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--border);
     background: var(--ink-2);
 }
 .sidebar-card-title {
-    font-family: var(--font-mono);
-    font-size: 0.62rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--indigo);
-    display: flex; align-items: center; gap: 0.5rem;
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--indigo); display: flex; align-items: center; gap: 0.5rem;
 }
 .sidebar-card-title::before { content: ''; width: 12px; height: 1px; background: var(--indigo); }
 .sidebar-card-body { padding: 1.25rem; }
 
-/* Status legend */
 .status-legend { display: flex; flex-direction: column; gap: 0.6rem; }
-.legend-row {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 0.75rem;
-}
-.legend-label {
-    font-size: 0.8rem;
-    color: var(--text);
-}
-.legend-count {
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    color: var(--muted);
-}
+.legend-row { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+.legend-label { font-size: 0.8rem; color: var(--text); }
 
-/* Category filter */
 .cat-filter-list { display: flex; flex-direction: column; gap: 2px; }
 .cat-filter-btn {
     display: flex; align-items: center; justify-content: space-between;
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    background: none; border: none;
-    padding: 0.55rem 0.75rem;
-    cursor: pointer;
-    text-align: left;
-    width: 100%;
-    transition: color 0.2s, background 0.2s;
-    border-radius: 2px;
+    font-family: var(--font-mono); font-size: 0.65rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); background: none; border: none;
+    padding: 0.55rem 0.75rem; cursor: pointer;
+    text-align: left; width: 100%;
+    transition: color 0.2s, background 0.2s; border-radius: 2px;
 }
 .cat-filter-btn:hover  { color: var(--indigo); background: var(--indigo-dim); }
 .cat-filter-btn.active { color: var(--indigo); background: var(--indigo-dim); font-weight: 700; }
-.cat-count {
-    font-size: 0.58rem;
-    color: var(--muted);
-    background: var(--ink-2);
-    border: 1px solid var(--border);
-    padding: 0.1rem 0.4rem;
-    border-radius: 2px;
-    flex-shrink: 0;
-}
 
 /* ── RESPONSIVE ───────────────────────────────────────────── */
 @media (max-width: 1024px) {
@@ -361,9 +328,10 @@
 @media (max-width: 640px) {
     .feed-page { padding: 1.5rem 1rem 3rem; }
     .feed-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
-    .feed-header-right { flex-wrap: wrap; }
-    .vote-column { padding: 1rem 0.75rem; width: 52px; }
-    .issue-content { padding: 1rem 1rem 1rem 0.5rem; }
+    .vote-column { padding: 1rem 0.5rem; width: 52px; }
+    .issue-content { padding: 1rem; }
+    .issue-thumb { display: none; }
+    .status-filter-bar { gap: 0.4rem; }
 }
 </style>
 {% endblock %}
@@ -382,7 +350,6 @@
                 <h1 class="feed-title">Civic <em>Issues</em></h1>
             </div>
             <div class="feed-header-right">
-                <!-- Sort tabs -->
                 <div class="sort-tabs">
                     <button class="sort-tab active" data-sort="top">Top</button>
                     <button class="sort-tab" data-sort="new">New</button>
@@ -394,31 +361,48 @@
             </div>
         </div>
 
+        <!-- ── STATUS FILTER BAR ──────────────────────────── -->
+        <div class="status-filter-bar">
+            <span class="status-filter-label">Filter:</span>
+            <button class="sf-btn active" data-status="all">
+                <span class="sf-dot all"></span> All
+            </button>
+            <button class="sf-btn" data-status="open">
+                <span class="sf-dot open"></span> Open
+            </button>
+            <button class="sf-btn" data-status="in_progress">
+                <span class="sf-dot in_progress"></span> In Progress
+            </button>
+            <button class="sf-btn" data-status="pending">
+                <span class="sf-dot pending"></span> Pending
+            </button>
+            <button class="sf-btn" data-status="resolved">
+                <span class="sf-dot resolved"></span> Resolved
+            </button>
+            <button class="sf-btn" data-status="closed">
+                <span class="sf-dot closed"></span> Closed
+            </button>
+        </div>
+
         <!-- Issue list -->
         {% if issues %}
             <div class="issue-list" id="issueList">
                 {% for issue in issues %}
-                    <div class="issue-card reveal" data-status="{{ issue.status|lower }}" data-score="{{ issue.score }}" data-time="{{ issue.created_at }}">
+                    <div class="issue-card reveal"
+                         data-status="{{ issue.status|lower|replace(' ','_') }}"
+                         data-score="{{ issue.score }}"
+                         data-time="{{ issue.created_at }}">
 
                         <!-- Vote column -->
                         <div class="vote-column">
-                            <button
-                                class="vote-btn up {% if issue.user_vote == 'up' %}active{% endif %}"
-                                onclick="voteIssue('{{ issue.id }}', 'up')"
-                                title="Upvote"
-                            >
+                            <button class="vote-btn up {% if issue.user_vote == 'up' %}active{% endif %}"
+                                    onclick="voteIssue('{{ issue.id }}', 'up')" title="Upvote">
                                 <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l8 8H4z"/></svg>
                             </button>
-
-                            <span class="vote-score {% if issue.score > 0 %}positive{% elif issue.score < 0 %}negative{% endif %}" id="score-{{ issue.id }}">
-                                {{ issue.score }}
-                            </span>
-
-                            <button
-                                class="vote-btn down {% if issue.user_vote == 'down' %}active{% endif %}"
-                                onclick="voteIssue('{{ issue.id }}', 'down')"
-                                title="Downvote"
-                            >
+                            <span class="vote-score {% if issue.score > 0 %}positive{% elif issue.score < 0 %}negative{% endif %}"
+                                  id="score-{{ issue.id }}">{{ issue.score }}</span>
+                            <button class="vote-btn down {% if issue.user_vote == 'down' %}active{% endif %}"
+                                    onclick="voteIssue('{{ issue.id }}', 'down')" title="Downvote">
                                 <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 20l-8-8h16z"/></svg>
                             </button>
                         </div>
@@ -428,7 +412,7 @@
                             <div class="issue-meta-top">
                                 <span class="issue-username">u/{{ issue.username }}</span>
                                 <span class="meta-sep">·</span>
-                                <span class="status-pill {{ issue.status|lower|replace(' ', '_') }}">{{ issue.status }}</span>
+                                <span class="status-pill {{ issue.status|lower|replace(' ','_') }}">{{ issue.status }}</span>
                                 <span class="meta-sep">·</span>
                                 <span class="category-tag">{{ issue.category }}</span>
                                 <span class="meta-sep">·</span>
@@ -438,12 +422,6 @@
                             <a href="{{ url_for('citizen.issue_detail', issue_id=issue.id) }}" class="issue-title-link">
                                 {{ issue.title }}
                             </a>
-
-                            {% if issue.first_image %}
-                                <div class="issue-image-preview">
-                                    <img src="{{ issue.first_image }}" alt="{{ issue.title }}" loading="lazy">
-                                </div>
-                            {% endif %}
 
                             <p class="issue-preview">
                                 {{ issue.description[:200] }}{% if issue.description|length > 200 %}…{% endif %}
@@ -456,7 +434,8 @@
                                     </svg>
                                     {{ issue.comment_count }} Comments
                                 </a>
-                                <button class="issue-footer-item" onclick="navigator.clipboard.writeText(window.location.origin + '{{ url_for('citizen.issue_detail', issue_id=issue.id) }}')">
+                                <button class="issue-footer-item"
+                                        onclick="navigator.clipboard.writeText(window.location.origin + '{{ url_for('citizen.issue_detail', issue_id=issue.id) }}')">
                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
                                         <polyline points="16 6 12 2 8 6"/>
@@ -464,8 +443,18 @@
                                     </svg>
                                     Share
                                 </button>
+                                <a href="{{ url_for('citizen.issue_detail', issue_id=issue.id) }}" class="issue-read-link">
+                                    View →
+                                </a>
                             </div>
                         </div>
+
+                        <!-- Thumbnail right side -->
+                        {% if issue.first_image %}
+                        <div class="issue-thumb">
+                            <img src="{{ issue.first_image }}" alt="{{ issue.title }}" loading="lazy">
+                        </div>
+                        {% endif %}
 
                     </div>
                 {% endfor %}
@@ -493,9 +482,7 @@
             </div>
             <div class="sidebar-card-body" style="padding: 0.5rem 0;">
                 <div class="cat-filter-list">
-                    <button class="cat-filter-btn active" data-cat="all">
-                        All Categories
-                    </button>
+                    <button class="cat-filter-btn active" data-cat="all">All Categories</button>
                     <button class="cat-filter-btn" data-cat="roads">Roads</button>
                     <button class="cat-filter-btn" data-cat="water">Water</button>
                     <button class="cat-filter-btn" data-cat="electricity">Electricity</button>
@@ -530,6 +517,10 @@
                         <span class="status-pill resolved">Resolved</span>
                         <span class="legend-label">Issue closed</span>
                     </div>
+                    <div class="legend-row">
+                        <span class="status-pill closed">Closed</span>
+                        <span class="legend-label">No further action</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -551,7 +542,6 @@
         </div>
 
     </div>
-
 </div>
 {% endblock %}
 
@@ -559,51 +549,53 @@
 {% block extra_js %}
 <script src="{{ url_for('static', filename='js/issue.js') }}"></script>
 <script>
-    // Sort tabs
+    // ── SORT TABS ─────────────────────────────────────────────
     document.querySelectorAll('.sort-tab').forEach(tab => {
         tab.addEventListener('click', () => {
             document.querySelectorAll('.sort-tab').forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
-
-            const sort   = tab.dataset.sort;
-            const list   = document.getElementById('issueList');
-            const cards  = [...list.querySelectorAll('.issue-card')];
-
+            const sort  = tab.dataset.sort;
+            const list  = document.getElementById('issueList');
+            const cards = [...list.querySelectorAll('.issue-card')];
             cards.sort((a, b) => {
-                if (sort === 'top') {
-                    return parseInt(b.dataset.score) - parseInt(a.dataset.score);
-                }
-
-                if (sort === 'new') {
-                    return new Date(b.dataset.time) - new Date(a.dataset.time);
-                }
-
-                if (sort === 'open') {
-                    const aOpen = a.dataset.status === 'open' ? -1 : 1;
-                    const bOpen = b.dataset.status === 'open' ? -1 : 1;
-                    return aOpen - bOpen;
-                }
-
+                if (sort === 'top')  return parseInt(b.dataset.score) - parseInt(a.dataset.score);
+                if (sort === 'new')  return new Date(b.dataset.time) - new Date(a.dataset.time);
+                if (sort === 'open') return (a.dataset.status === 'open' ? -1 : 1) - (b.dataset.status === 'open' ? -1 : 1);
                 return 0;
             });
-
             cards.forEach(c => list.appendChild(c));
         });
     });
 
-    // Category filter
+    // ── COMBINED FILTER (status bar + category sidebar) ───────
+    let activeStatus = 'all';
+    let activeCat    = 'all';
+
+    function applyFilters() {
+        document.querySelectorAll('.issue-card').forEach(card => {
+            const statusMatch = activeStatus === 'all' || card.dataset.status === activeStatus;
+            const catEl       = card.querySelector('.category-tag');
+            const cardCat     = catEl ? catEl.textContent.trim().toLowerCase() : '';
+            const catMatch    = activeCat === 'all' || cardCat === activeCat;
+            card.style.display = (statusMatch && catMatch) ? '' : 'none';
+        });
+    }
+
+    document.querySelectorAll('.sf-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.sf-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeStatus = btn.dataset.status;
+            applyFilters();
+        });
+    });
+
     document.querySelectorAll('.cat-filter-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.cat-filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-
-            const cat   = btn.dataset.cat.toLowerCase();
-            const cards = document.querySelectorAll('.issue-card');
-
-            cards.forEach(card => {
-                const cardCat = card.querySelector('.category-tag')?.textContent.trim().toLowerCase() ?? '';
-                card.style.display = (cat === 'all' || cardCat === cat) ? '' : 'none';
-            });
+            activeCat = btn.dataset.cat.toLowerCase();
+            applyFilters();
         });
     });
 </script>

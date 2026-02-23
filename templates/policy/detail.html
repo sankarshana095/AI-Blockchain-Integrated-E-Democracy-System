@@ -460,28 +460,39 @@
 }
 .lightbox-img.fading { opacity: 0; }
 
-/* Close button */
+/* ── FIX: All lightbox chrome hidden by default,
+         revealed only when overlay is active ── */
+.lightbox-close,
+.lightbox-arrow,
+.lightbox-counter,
+.lightbox-dots {
+    display: none;
+}
+.lightbox-overlay.active ~ .lightbox-close  { display: grid; }
+.lightbox-overlay.active ~ .lightbox-arrow  { display: grid; }
+.lightbox-overlay.active ~ .lightbox-counter { display: block; }
+.lightbox-overlay.active ~ .lightbox-dots    { display: flex; }
+
 .lightbox-close {
     position: fixed; top: 1.5rem; right: 1.5rem;
     width: 44px; height: 44px;
     background: rgba(255,255,255,0.08);
     border: 1px solid rgba(255,255,255,0.15);
     color: #fff; font-size: 1.1rem;
-    display: grid; place-items: center;
+    place-items: center;
     cursor: pointer; z-index: 9010;
     font-family: var(--font-mono);
     transition: background 0.2s;
 }
 .lightbox-close:hover { background: rgba(255,255,255,0.18); }
 
-/* Prev / Next arrows */
 .lightbox-arrow {
     position: fixed; top: 50%; transform: translateY(-50%);
     width: 48px; height: 56px;
     background: rgba(255,255,255,0.07);
     border: 1px solid rgba(255,255,255,0.12);
     color: #fff; font-family: var(--font-mono); font-size: 1.1rem;
-    display: grid; place-items: center;
+    place-items: center;
     cursor: pointer; z-index: 9010;
     transition: background 0.2s, transform 0.2s;
     user-select: none;
@@ -491,9 +502,10 @@
 .lightbox-arrow.prev:hover { transform: translateY(-50%) translateX(-2px); }
 .lightbox-arrow.next { right: 1.25rem; }
 .lightbox-arrow.next:hover { transform: translateY(-50%) translateX(2px); }
-.lightbox-arrow[hidden] { display: none; }
 
-/* Counter — e.g. 2 / 5 */
+/* Hide individual arrows when only 1 image */
+.lightbox-arrow.lb-hidden { display: none !important; }
+
 .lightbox-counter {
     position: fixed; bottom: 1.75rem; left: 50%; transform: translateX(-50%);
     font-family: var(--font-mono); font-size: 0.65rem;
@@ -502,15 +514,15 @@
     z-index: 9010;
 }
 
-/* Dot indicators */
 .lightbox-dots {
     position: fixed; bottom: 1.25rem; left: 50%; transform: translateX(-50%);
-    display: flex; gap: 0.4rem; z-index: 9010;
+    gap: 0.4rem; z-index: 9010;
 }
 .lightbox-dot {
     width: 6px; height: 6px; border-radius: 50%;
     background: rgba(255,255,255,0.25);
     cursor: pointer; transition: background 0.2s, transform 0.2s;
+    border: none;
 }
 .lightbox-dot.active { background: var(--indigo); transform: scale(1.4); }
 
@@ -518,16 +530,13 @@
    REDDIT-STYLE COMMENT THREADS
 ═══════════════════════════════════════════════════════════ */
 
-/* Each comment is a flex row: gutter | body */
 .comment-card {
     display: flex;
     gap: 0;
-    /* indent capped at level 6 via --indent CSS var */
     padding-left: calc(var(--indent, 0) * 1.4rem);
     position: relative;
 }
 
-/* Clickable left spine line */
 .comment-gutter {
     width: 20px;
     flex-shrink: 0;
@@ -548,18 +557,15 @@
 }
 .comment-gutter:hover::before { background: var(--indigo); }
 
-/* Right side — everything except the gutter */
 .comment-body-wrap {
     flex: 1;
-    min-width: 0;        /* prevent overflow of long words */
+    min-width: 0;
     padding: 0.6rem 0 0.5rem 0.5rem;
     border-top: 1px solid var(--border);
 }
 
-/* First-level comments get no border-top */
 .comment-card[style*="--indent: 0"] > .comment-body-wrap { border-top: none; }
 
-/* ── HEADER ROW ──────────────────────────────────────────── */
 .comment-header {
     display: flex;
     align-items: center;
@@ -568,7 +574,6 @@
     margin-bottom: 0.45rem;
 }
 
-/* Collapse button */
 .collapse-btn {
     width: 18px; height: 18px;
     border: 1px solid var(--border);
@@ -585,7 +590,6 @@
 }
 .collapse-btn:hover { border-color: var(--indigo); color: var(--indigo); }
 
-/* Avatar circle */
 .comment-avatar {
     width: 22px; height: 22px;
     border-radius: 50%;
@@ -598,7 +602,6 @@
 }
 .comment-ai .comment-avatar { background: var(--teal-dim); border-color: rgba(13,148,136,0.2); color: var(--teal); }
 
-/* Username */
 .comment-username {
     font-family: var(--font-mono);
     font-size: 0.7rem;
@@ -607,7 +610,6 @@
     color: var(--text);
 }
 
-/* Badges */
 .cb {
     font-family: var(--font-mono);
     font-size: 0.55rem;
@@ -622,7 +624,6 @@
 .opp-badge { background: var(--teal-dim);   color: var(--teal);   border: 1px solid rgba(13,148,136,0.25); }
 .ai-badge  { background: var(--warm-dim);   color: #b45309;       border: 1px solid rgba(245,158,11,0.25); }
 
-/* ── INLINE VOTE ─────────────────────────────────────────── */
 .comment-vote-inline {
     display: flex; align-items: center; gap: 0.2rem;
     margin-left: 0.2rem;
@@ -645,14 +646,12 @@
 .cv-score.pos { color: var(--indigo); }
 .cv-score.neg { color: #dc2626; }
 
-/* Time */
 .comment-time {
     font-family: var(--font-mono); font-size: 0.6rem;
     letter-spacing: 0.04em; color: var(--muted);
     margin-left: auto;
 }
 
-/* ── COMMENT TEXT ────────────────────────────────────────── */
 .comment-text {
     font-size: 0.88rem; color: var(--text);
     line-height: 1.7; margin-bottom: 0.5rem;
@@ -668,7 +667,6 @@
     padding: 0.5rem 0.75rem;
 }
 
-/* ── ACTIONS ─────────────────────────────────────────────── */
 .comment-actions { display: flex; gap: 0.75rem; margin-bottom: 0.35rem; }
 .ca-btn {
     font-family: var(--font-mono); font-size: 0.6rem;
@@ -679,7 +677,6 @@
 }
 .ca-btn:hover { color: var(--indigo); }
 
-/* ── REPLY FORM ──────────────────────────────────────────── */
 .reply-form-inner { margin-bottom: 0.5rem; }
 .reply-input-row { display: flex; gap: 0.5rem; align-items: flex-end; }
 .reply-input-row textarea {
@@ -700,10 +697,8 @@
 }
 .reply-submit-btn:hover { background: var(--indigo-dark); }
 
-/* ── REPLIES CONTAINER ───────────────────────────────────── */
 .comment-replies { margin-top: 0.25rem; }
 
-/* Collapsed state */
 .comment-body-wrap.collapsed .comment-text,
 .comment-body-wrap.collapsed .comment-actions,
 .comment-body-wrap.collapsed .reply-form-inner,
@@ -855,7 +850,6 @@
             </div>
         </div>
 
-        <!-- Comments -->
     </div>
 
     <!-- ══ SIDEBAR ════════════════════════════════════════ -->
@@ -985,7 +979,10 @@
 
 <script src="{{ url_for('static', filename='js/issue.js') }}"></script>
 
-<!-- ── LIGHTBOX ──────────────────────────────────────────── -->
+<!-- ── LIGHTBOX ─────────────────────────────────────────────
+     The overlay MUST come first so the CSS sibling selector
+     (.lightbox-overlay.active ~ ...) targets the chrome below.
+──────────────────────────────────────────────────────────── -->
 <div class="lightbox-overlay" id="lightbox" onclick="lbClickOutside(event)">
     <div class="lightbox-inner">
         <img class="lightbox-img" id="lightboxImg" src="" alt="">
@@ -999,33 +996,24 @@
 
 <script>
 (function () {
-    /* ── State ─────────────────────────────────────────── */
-    let images  = [];   // array of src strings for current gallery
+    let images  = [];
     let current = 0;
     let open    = false;
 
-    /* ── Grab elements ─────────────────────────────────── */
     const overlay = document.getElementById('lightbox');
     const img     = document.getElementById('lightboxImg');
     const prev    = document.getElementById('lightboxPrev');
     const next    = document.getElementById('lightboxNext');
     const counter = document.getElementById('lightboxCounter');
     const dotsEl  = document.getElementById('lightboxDots');
-    const closeEl = document.getElementById('lightboxClose');
 
-    /* ── Attach click to every .policy-image ───────────── */
     document.querySelectorAll('.policy-images').forEach((group, gIdx) => {
         const imgs = Array.from(group.querySelectorAll('.policy-image'));
         imgs.forEach((el, i) => {
-            el.dataset.galleryGroup = gIdx;
-            el.dataset.galleryIdx   = i;
-            el.addEventListener('click', () => openLightbox(
-                imgs.map(x => x.src), i
-            ));
+            el.addEventListener('click', () => openLightbox(imgs.map(x => x.src), i));
         });
     });
 
-    /* ── Open ──────────────────────────────────────────── */
     function openLightbox(srcs, idx) {
         images  = srcs;
         current = idx;
@@ -1033,31 +1021,26 @@
         document.body.style.overflow = 'hidden';
         buildDots();
         showImage(current, false);
-        overlay.classList.add('active');
-        closeEl.hidden = false;
+        overlay.classList.add('active'); // CSS sibling selector reveals all chrome
     }
 
-    /* ── Close ─────────────────────────────────────────── */
     window.closeLightbox = function () {
-        overlay.classList.remove('active');
+        overlay.classList.remove('active'); // CSS sibling selector hides all chrome
         document.body.style.overflow = '';
         open = false;
         setTimeout(() => { img.src = ''; }, 300);
     };
 
-    /* ── Click outside image ───────────────────────────── */
     window.lbClickOutside = function (e) {
         if (e.target === overlay || e.target === overlay.firstElementChild) closeLightbox();
     };
 
-    /* ── Navigate ──────────────────────────────────────── */
     window.lbMove = function (dir) {
         if (!open) return;
         current = (current + dir + images.length) % images.length;
         showImage(current, true);
     };
 
-    /* ── Show image with fade ──────────────────────────── */
     function showImage(idx, animate) {
         if (animate) {
             img.classList.add('fading');
@@ -1068,18 +1051,15 @@
         } else {
             img.src = images[idx];
         }
-        // arrows
-        prev.hidden = images.length <= 1;
-        next.hidden = images.length <= 1;
-        // counter
+        // Toggle individual arrows via class (not hidden attr) to stay CSS-friendly
+        prev.classList.toggle('lb-hidden', images.length <= 1);
+        next.classList.toggle('lb-hidden', images.length <= 1);
         counter.textContent = images.length > 1 ? (idx + 1) + ' / ' + images.length : '';
-        // dots
         document.querySelectorAll('.lightbox-dot').forEach((d, i) => {
             d.classList.toggle('active', i === idx);
         });
     }
 
-    /* ── Build dot indicators ──────────────────────────── */
     function buildDots() {
         dotsEl.innerHTML = '';
         if (images.length <= 1) return;
@@ -1092,7 +1072,6 @@
         });
     }
 
-    /* ── Keyboard nav ──────────────────────────────────── */
     document.addEventListener('keydown', e => {
         if (!open) return;
         if (e.key === 'Escape')     closeLightbox();
@@ -1100,7 +1079,6 @@
         if (e.key === 'ArrowLeft')  lbMove(-1);
     });
 
-    /* ── Touch swipe ───────────────────────────────────── */
     let touchStartX = 0;
     overlay.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
     overlay.addEventListener('touchend',   e => {
@@ -1125,7 +1103,6 @@ function toggleReply(id) {
     form.style.display = isHidden ? 'block' : 'none';
     if (isHidden) form.querySelector('textarea').focus();
 }
-
 </script>
 
 {% endblock %}
