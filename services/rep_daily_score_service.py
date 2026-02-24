@@ -7,7 +7,6 @@ from models.representative import (
 
 def store_today_rep_score(rep_user_id: str, election_id: str, constituency_id: str):
     today = date.today()
-
     # Prevent duplicate entry
     existing = get_daily_rep_score(rep_user_id, election_id, today)
     if existing:

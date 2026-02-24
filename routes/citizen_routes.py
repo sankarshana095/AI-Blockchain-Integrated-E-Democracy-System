@@ -68,9 +68,9 @@ def dashboard():
     policy_posts = get_policy_feed(constituency_id)[:5]
 
     # 🧠 Live AI constituency brief
-    live_summary = generate_constituency_brief(constituency_id)
-
     brief_row = get_brief(constituency_id)
+    live_summary = brief_row["summary_text"] if brief_row else "No civic summary available."
+
     last_updated = brief_row["generated_at"] if brief_row else None
     minutes_ago = None
     if last_updated:

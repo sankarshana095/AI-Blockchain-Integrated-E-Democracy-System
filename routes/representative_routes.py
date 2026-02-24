@@ -143,7 +143,7 @@ def resolve_issue(issue_id):
         note=request.form.get("note")
     )
 
-    return redirect(url_for("representative.issue_management"))
+    return redirect(url_for("representative.dashboard"))
 
 @bp.route("/issues/<issue_id>/accept", methods=["POST"])
 @login_required
@@ -154,7 +154,7 @@ def accept(issue_id):
 
     if not note or not estimated_start:
         flash("Note and estimated start time are required.", "error")
-        return redirect(url_for("representative.issue_management"))
+        return redirect(url_for("representative.dashboard"))
 
     accept_issue(
         issue_id=issue_id,
@@ -164,7 +164,7 @@ def accept(issue_id):
     )
 
     flash("Issue accepted successfully.", "success")
-    return redirect(url_for("representative.issue_management"))
+    return redirect(url_for("representative.dashboard"))
 
 @bp.route("/issues/<issue_id>/progress", methods=["POST"])
 @login_required
@@ -175,7 +175,7 @@ def progress(issue_id):
 
     if not note or not estimated_completion:
         flash("Note and estimated completion time are required.", "error")
-        return redirect(url_for("representative.issue_management"))
+        return redirect(url_for("representative.dashboard"))
 
     mark_in_progress(
         issue_id=issue_id,
@@ -185,7 +185,7 @@ def progress(issue_id):
     )
 
     flash("Issue marked as in progress.", "success")
-    return redirect(url_for("representative.issue_management"))
+    return redirect(url_for("representative.dashboard"))
 
 @bp.route("/issues/<issue_id>/resolve", methods=["POST"])
 @login_required
@@ -204,7 +204,7 @@ def resolve(issue_id):
     )
 
     flash("Issue marked as resolved.", "success")
-    return redirect(url_for("representative.issue_management"))
+    return redirect(url_for("representative.dashboard"))
 
 @bp.route("/issues/<issue_id>/reject", methods=["POST"])
 @login_required
@@ -214,7 +214,7 @@ def reject(issue_id):
 
     if not note:
         flash("Rejection reason is required.", "error")
-        return redirect(url_for("representative.issue_management"))
+        return redirect(url_for("representative.dashboard"))
 
     reject_issue(
         issue_id=issue_id,
@@ -223,4 +223,4 @@ def reject(issue_id):
     )
 
     flash("Issue rejected.", "success")
-    return redirect(url_for("representative.issue_management"))
+    return redirect(url_for("representative.dashboard"))

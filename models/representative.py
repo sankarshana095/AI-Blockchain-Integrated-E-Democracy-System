@@ -219,7 +219,7 @@ def get_elected_representative_by_constituency(constituency_id: str):
     reps = get_representatives_by_constituency(constituency_id)
 
     for rep in reps:
-        if rep.get("type") == "ELECTED_REP":
+        if rep.get("type") == "ELECTED_REP" and rep.get("status") == "ACTIVE":
             return rep
 
     return None
@@ -284,37 +284,6 @@ from datetime import date
 
 def get_current_representative_by_constituency(constituency_id: str):
     reps = get_elected_representative_by_constituency(constituency_id)
-
-    if not reps:
-        return None
-
-    # If single dict returned, convert to list
-    if isinstance(reps, dict):
-        reps = [reps]
-
-    today = date.today()
-
-    for rep in reps:
-        start = rep.get("term_start")
-        end = rep.get("term_end")
-
-        if not start or not end:
-            continue
-
-        if isinstance(start, str):
-            start = date.fromisoformat(start)
-        if isinstance(end, str):
-            end = date.fromisoformat(end)
-
-        if start <= today <= end:
-            return rep
-
-    return None
-
-def get_current_representatives_by_constituency(constituency_id: str):
-    reps = get_representatives_by_constituency(constituency_id)
-    print(reps)
-
     if not reps:
         return None
 
