@@ -927,4 +927,10 @@
     });
 })();
 </script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+  document.querySelectorAll('.ai-markdown').forEach(el => {
+      el.innerHTML = marked.parse(el.textContent.trim());
+  });
+</script>
 {% endblock %}
