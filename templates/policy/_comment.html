@@ -64,7 +64,7 @@
         </div>
 
         <!-- Comment text -->
-        <div class="comment-text">{{ comment.content }}</div>
+        <div class="comment-text {% if comment.ai_generated %}ai-markdown{% endif %}">{{ comment.content }}</div>
 
         <!-- Actions -->
         <div class="comment-actions">

@@ -81,12 +81,12 @@
         </div><!-- /comment-header -->
 
         <!-- ── Text ────────────────────────────────────────── -->
-        <p class="comment-text
-            {% if comment.user_id == '00000000-0000-0000-0000-000000000001' %}text-ai{% endif %}
-            {% if comment.is_official and comment.role == 'ELECTED_REP' %}text-official{% endif %}
-            {% if comment.is_official and comment.role != 'ELECTED_REP' %}text-opposition{% endif %}">
-            {{ comment.comment }}
-        </p>
+<div class="comment-text
+    {% if comment.user_id == '00000000-0000-0000-0000-000000000001' %}text-ai ai-markdown{% endif %}
+    {% if comment.is_official and comment.role == 'ELECTED_REP' %}text-official{% endif %}
+    {% if comment.is_official and comment.role != 'ELECTED_REP' %}text-opposition{% endif %}">
+    {{ comment.comment }}
+</div>
 
         <!-- ── Actions ─────────────────────────────────────── -->
         <div class="comment-actions">
@@ -384,6 +384,42 @@
 .comment-body-wrap.collapsed .reply-form-wrap,
 .comment-body-wrap.collapsed .comment-replies { display: none; }
 .comment-body-wrap.collapsed .comment-header   { opacity: 0.55; }
+
+/* ── AI MARKDOWN CONTENT ─────────────────────────────────── */
+.text-ai ul, .text-ai ol {
+    margin: 0.5rem 0 0.5rem 1.25rem;
+    padding: 0;
+}
+.text-ai li {
+    margin-bottom: 0.35rem;
+    line-height: 1.6;
+}
+.text-ai p {
+    margin: 0.4rem 0;
+}
+.text-ai h1, .text-ai h2, .text-ai h3 {
+    margin: 0.6rem 0 0.3rem 0;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--teal);
+}
+.text-ai strong {
+    font-weight: 700;
+    color: var(--text);
+}
+.text-ai blockquote {
+    border-left: 2px solid var(--teal);
+    margin: 0.5rem 0;
+    padding: 0.25rem 0.75rem;
+    color: var(--muted);
+    font-style: italic;
+}
+.text-ai code {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    background: rgba(0,0,0,0.08);
+    padding: 0.1rem 0.3rem;
+}
 </style>
 
 <script>

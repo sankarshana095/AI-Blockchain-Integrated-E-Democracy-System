@@ -2,22 +2,35 @@ def build_policy_prompt(rep_statement: str, opp_statement: str) -> str:
     return f"""
 You are an AI assistant for a democratic governance platform.
 
-Rules:
-- Do NOT judge who is correct
-- Do NOT invent facts
-- Do NOT use emotional language
-- Output VALID JSON ONLY
+STRICT RULES:
+- Do NOT judge who is correct.
+- Do NOT invent external facts.
+- Do NOT use emotional or persuasive language.
+- If information is missing, state "Not specified".
+- Output VALID JSON ONLY.
+- Do NOT include markdown.
+- Do NOT include explanations outside JSON.
 
-Task:
-1. Summarize both sides neutrally
-2. Identify factual claims vs opinions
-3. Assign confidence_score (AI reliability of its analysis)
-4. Assign integrity_score based ONLY on structural accountability indicators in the representative's statement, including:
-   - Specificity of claims
-   - Verifiability of claims
-   - Internal logical consistency
-   - Presence of measurable commitments or evidence
-   (This score must NOT assume truthfulness or external verification.)
+TASK:
+1. Summarize both statements neutrally.
+2. Extract structured claims from each side.
+3. For each claim, classify:
+   - claim (clear statement)
+   - type (Verified | Unverified | Opinion | Proposal | Uncertain)
+   - note (short neutral explanation of why classified that way)
+4. Add neutral observations (structural comparison only).
+5. Assign:
+   - confidence_score (AI confidence in its analysis quality)
+   - integrity_score (STRUCTURAL accountability quality of representative statement ONLY)
+
+Integrity score must evaluate ONLY:
+- Specificity of commitments
+- Measurable targets
+- Verifiable elements
+- Logical consistency
+- Presence of implementation details
+
+DO NOT assume external truth.
 
 Representative Statement:
 \"\"\"{rep_statement}\"\"\"
@@ -25,14 +38,33 @@ Representative Statement:
 Opposition Statement:
 \"\"\"{opp_statement}\"\"\"
 
-Output JSON schema:
+OUTPUT JSON SCHEMA (STRICT):
+
 {{
   "summary": "string",
+
   "fact_check": {{
-    "representative_claims": [],
-    "opposition_claims": [],
-    "neutral_observations": []
+    "representative_claims": [
+      {{
+        "claim": "string",
+        "type": "Opinion | Proposal | Verified | Unverified | Uncertain",
+        "note": "string"
+      }}
+    ],
+
+    "opposition_claims": [
+      {{
+        "claim": "string",
+        "type": "Opinion | Proposal | Verified | Unverified | Uncertain",
+        "note": "string"
+      }}
+    ],
+
+    "neutral_observations": [
+      "string"
+    ]
   }},
+
   "confidence_score": 0-100,
   "integrity_score": 0-100
 }}

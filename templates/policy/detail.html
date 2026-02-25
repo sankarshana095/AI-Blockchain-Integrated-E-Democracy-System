@@ -706,6 +706,31 @@
     display: none;
 }
 .comment-body-wrap.collapsed .comment-header { opacity: 0.6; }
+
+.ai-markdown ul,
+.ai-markdown ol {
+    padding-left: 1.5rem;
+    margin: 0.4rem 0;
+}
+
+.ai-markdown li {
+    margin-bottom: 0.25rem;
+    line-height: 1.6;
+}
+
+.ai-markdown p {
+    margin: 0.4rem 0;
+}
+
+.ai-markdown h3 {
+    font-size: 0.95rem;
+    margin: 0.75rem 0 0.3rem;
+    color: var(--text);
+}
+
+.ai-markdown strong {
+    color: var(--text);
+}
 </style>
 {% endblock %}
 
@@ -890,13 +915,13 @@
                     {% if fc.representative_claims %}
                     <div class="ai-claims">
                         <div class="ai-claims-label">🏛 Representative Claims</div>
-                        {% for item in fc.representative_claims %}
-                        <div class="claim-item">
-                            <strong>{{ item.claim }}</strong>
-                            <small>{{ item.note }}</small>
-                            <span class="claim-tag {{ item.type | lower | replace(' ', '-') }}">{{ item.type }}</span>
-                        </div>
-                        {% endfor %}
+{% for item in fc.representative_claims %}
+<div class="claim-item">
+    <strong>{{ item.claim }}</strong>
+    <small>{{ item.note }}</small>
+    <span class="claim-tag {{ item.type | lower | replace(' ', '-') }}">{{ item.type }}</span>
+</div>
+{% endfor %}
                     </div>
                     {% endif %}
 
@@ -1103,6 +1128,13 @@ function toggleReply(id) {
     form.style.display = isHidden ? 'block' : 'none';
     if (isHidden) form.querySelector('textarea').focus();
 }
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+<script>
+    document.querySelectorAll('.ai-markdown').forEach(el => {
+        el.innerHTML = marked.parse(el.textContent);
+    });
 </script>
 
 {% endblock %}
