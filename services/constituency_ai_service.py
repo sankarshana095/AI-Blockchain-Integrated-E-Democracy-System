@@ -3,8 +3,9 @@ from datetime import timedelta
 from utils.helpers import utc_now
 from models.constituency_brief import get_brief, save_brief
 from models.constituency_activity import get_constituency_activity_snapshot
-from services.ai_client import run_comment_reply, AIClientError
+#from services.ai_client import run_comment_reply, AIClientError
 from datetime import datetime, timezone
+from services.constituency_ml_service import generate_constituency_summary
 
 
 # --------------------------------------------------
@@ -99,8 +100,14 @@ def generate_constituency_brief(constituency_id: str) -> str:
 
                 if age < REFRESH_INTERVAL:
                     return cached["summary_text"]
+    snapshot = get_constituency_activity_snapshot(constituency_id)
 
+    summary = generate_constituency_summary(snapshot)
 
+    save_brief(constituency_id, summary)
+    return summary
+
+    '''
     # 🔁 Need fresh summary
     snapshot = get_constituency_activity_snapshot(constituency_id)
 
@@ -113,3 +120,4 @@ def generate_constituency_brief(constituency_id: str) -> str:
 
     except AIClientError:
         return cached["summary_text"] if cached else "No civic summary available."
+    '''

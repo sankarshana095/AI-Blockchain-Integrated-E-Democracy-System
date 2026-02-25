@@ -28,10 +28,14 @@ def run_constituency_brief_job():
 
             snapshot = get_constituency_activity_snapshot(constituency_id)
 
-            prompt = build_constituency_brief_prompt(snapshot)
+            '''prompt = build_constituency_brief_prompt(snapshot)
 
             summary = run_comment_reply(prompt)
 
+            save_brief(constituency_id, summary)'''
+            from services.constituency_ml_service import generate_constituency_summary
+
+            summary = generate_constituency_summary(snapshot)
             save_brief(constituency_id, summary)
 
             print(f"✅ Saved summary for {constituency_id}")
