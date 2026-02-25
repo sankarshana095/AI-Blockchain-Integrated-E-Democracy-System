@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ title if title else "E-Democracy System" }}</title>
+    <link rel="icon" type="image/svg+xml" 
+href="data:image/svg+xml,
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>
+<path fill='%234f46e5' d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/>
+</svg>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Hint to browser: honour dark/light at the OS level for native UI (scrollbars, inputs) -->
     <meta name="color-scheme" content="light dark">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -53,7 +57,6 @@
         --input-focus-bg:   #ffffff;
         --nav-scrolled-bg:  rgba(255,255,255,0.55);
 
-        /* Native UI elements follow theme */
         color-scheme: light;
     }
 
@@ -113,10 +116,6 @@
         }
     }
 
-    /* ═══ SMOOTH THEME TRANSITIONS ═══
-       Apply only to layout/text elements, NOT to SVG, canvas,
-       animation containers, or cursor elements.
-    ══════════════════════════════════ */
     *,
     *::before,
     *::after {
@@ -125,7 +124,6 @@
         padding: 0;
     }
 
-    /* Transition only on non-graphical elements */
     :not(svg):not(canvas):not(img):not(.cursor-dot):not(.cursor-ring):not(.logo-mark *),
     :not(svg):not(canvas):not(img):not(.cursor-dot):not(.cursor-ring):not(.logo-mark *)::before,
     :not(svg):not(canvas):not(img):not(.cursor-dot):not(.cursor-ring):not(.logo-mark *)::after {
@@ -137,19 +135,11 @@
             outline-color    .25s ease;
     }
 
-    /* Noise overlay — never transition (it's a fixed texture) */
     body::before { transition: none !important; }
 
-    /* ═══ GLOBAL DARK SURFACE OVERRIDES ═══
-       Covers all hardcoded #fff / #f8f8fd backgrounds across every template.
-       Grouped by template for clarity.
-    ══════════════════════════════════════ */
-
-    /* ── base.html existing overrides ── */
+    /* ═══ GLOBAL DARK SURFACE OVERRIDES ═══ */
     [data-theme="dark"] *[style*="background:#fff"],
-    [data-theme="dark"] *[style*="background: #fff"] {
-        background: var(--card-bg) !important;
-    }
+    [data-theme="dark"] *[style*="background: #fff"] { background: var(--card-bg) !important; }
 
     [data-theme="dark"] .desc-card,
     [data-theme="dark"] .section-card,
@@ -170,11 +160,7 @@
     [data-theme="dark"] textarea:focus,
     [data-theme="dark"] input:focus { background: var(--input-focus-bg) !important; }
 
-    [data-theme="dark"] .timeline-dot:not(.active):not(.resolved) {
-        background: var(--card-bg);
-        border-color: var(--border);
-    }
-
+    [data-theme="dark"] .timeline-dot:not(.active):not(.resolved) { background: var(--card-bg); border-color: var(--border); }
     [data-theme="dark"] .ai-summary-text { background: var(--indigo-dim); }
     [data-theme="dark"] .comment-body.ai-body { background: var(--indigo-dim); }
     [data-theme="dark"] .comment-official .comment-text { background: var(--indigo-dim); }
@@ -184,300 +170,162 @@
     [data-theme="dark"] .vote-bar-btn { background: transparent; }
     [data-theme="dark"] .vote-bar-btn:hover { background: var(--indigo-dim); }
 
-    /* ── deo_dashboard.html ── */
     [data-theme="dark"] .action-card { background: var(--card-bg); }
     [data-theme="dark"] .action-card:hover { background: var(--card-hover-bg) !important; }
     [data-theme="dark"] .responsibilities-card { background: var(--card-bg); }
-
-    /* ── voter_mgmt.html ── */
     [data-theme="dark"] .voter-table tbody tr:not(.edit-row):hover { background: var(--indigo-dim) !important; }
-
-    /* ── po_dashboard.html ── */
     [data-theme="dark"] .panel { background: var(--card-bg); }
     [data-theme="dark"] .field input[type="text"]:focus,
     [data-theme="dark"] .field input[type="number"]:focus,
     [data-theme="dark"] .field select:focus { background: var(--input-focus-bg) !important; }
     [data-theme="dark"] .otp-input:focus { background: var(--input-focus-bg) !important; }
     [data-theme="dark"] .otp-input:not(:placeholder-shown) { background: var(--indigo-dim); }
-
-    /* ── nomination.html ── */
     [data-theme="dark"] .form-panel { background: var(--card-bg); }
     [data-theme="dark"] .form-group input:focus,
     [data-theme="dark"] .form-group select:focus { background: var(--input-focus-bg) !important; }
     [data-theme="dark"] .select-dropdown { background: var(--card-bg); }
     [data-theme="dark"] .select-option:hover,
     [data-theme="dark"] .select-option.focused { background: var(--indigo-dim); color: var(--indigo); }
-
-    /* ── evote_waiting.html ── */
     [data-theme="dark"] .evote-card { background: var(--card-bg); }
-
-    /* ── verify_vote.html ── */
     [data-theme="dark"] .select-search-box:focus,
     [data-theme="dark"] .custom-select-wrap.open .select-search-box { background: var(--input-focus-bg) !important; }
     [data-theme="dark"] .select-search-box { background: var(--ink-2); }
     [data-theme="dark"] .hash-input:focus { background: var(--input-focus-bg) !important; }
     [data-theme="dark"] .result-body { background: var(--card-bg); }
     [data-theme="dark"] .custom-select-wrap .select-dropdown { background: var(--card-bg); }
-
-    /* ── vote.html (cast vote) ── */
     [data-theme="dark"] .vote-card { background: var(--card-bg); }
-    [data-theme="dark"] .candidate-option input[type="radio"] {
-        background: var(--ink-3);
-        border-color: var(--border);
-    }
-    [data-theme="dark"] .candidate-option input[type="radio"]:checked {
-        background: var(--indigo);
-        border-color: var(--indigo);
-    }
-    [data-theme="dark"] .candidate-option:has(input:checked) {
-        background: var(--indigo-dim);
-    }
+    [data-theme="dark"] .candidate-option input[type="radio"] { background: var(--ink-3); border-color: var(--border); }
+    [data-theme="dark"] .candidate-option input[type="radio"]:checked { background: var(--indigo); border-color: var(--indigo); }
+    [data-theme="dark"] .candidate-option:has(input:checked) { background: var(--indigo-dim); }
     [data-theme="dark"] .candidate-option:hover { background: var(--ink-2); }
-
-    /* ── manage_ro.html ── */
     [data-theme="dark"] .table-search { background: var(--ink-2) !important; border-color: var(--border); }
-
-    /* ── Shared: catch-all ── */
     [data-theme="dark"] .table-card,
     [data-theme="dark"] .result-panel .result-body,
     [data-theme="dark"] .evote-card-head,
     [data-theme="dark"] .vote-card-head { background: var(--ink-2); }
-
-    /* ── index.html ── */
-    /* .chain-block, .feature-item:hover, .role-card:hover, .step-num use #fff */
-    [data-theme="dark"] .chain-block {
-        background: var(--card-bg);
-        border-color: var(--border);
-        box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-    }
+    [data-theme="dark"] .chain-block { background: var(--card-bg); border-color: var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
     [data-theme="dark"] .feature-item { background: var(--card-bg); }
     [data-theme="dark"] .feature-item:hover { background: var(--card-hover-bg); }
     [data-theme="dark"] .role-card { background: var(--card-bg); }
     [data-theme="dark"] .role-card:hover { background: var(--card-hover-bg); }
-    [data-theme="dark"] .step-num {
-        background: var(--card-bg);
-        border-color: var(--border);
-        box-shadow: 0 2px 12px rgba(0,0,0,0.3);
-    }
-    [data-theme="dark"] .process-step:hover .step-num {
-        background: var(--indigo);
-        border-color: var(--indigo);
-    }
-
-    /* ── about.html ── */
-    /* .tech-card, .timeline-item, .team-card hover use #fff */
+    [data-theme="dark"] .step-num { background: var(--card-bg); border-color: var(--border); box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+    [data-theme="dark"] .process-step:hover .step-num { background: var(--indigo); border-color: var(--indigo); }
     [data-theme="dark"] .tech-card { background: var(--card-bg); }
     [data-theme="dark"] .tech-card:hover { background: var(--card-hover-bg); }
     [data-theme="dark"] .timeline-item { background: var(--card-bg); }
     [data-theme="dark"] .timeline-item:hover { background: var(--card-hover-bg); }
     [data-theme="dark"] .team-card { background: var(--card-bg); }
     [data-theme="dark"] .team-card:hover { background: var(--card-hover-bg); }
-
-    /* ── election_schedule.html ── */
-    /* .election-card base and hover use --ink and #fafafe */
     [data-theme="dark"] .election-card { background: var(--card-bg); }
-    [data-theme="dark"] .election-card:hover {
-        background: var(--card-hover-bg);
-        box-shadow: 0 4px 24px rgba(0,0,0,0.3);
-    }
-
-    /* ── election_insights.html ── */
-    /* .stat-card:hover uses #fafafe; data-table tbody tr:hover uses #f8f8fd */
+    [data-theme="dark"] .election-card:hover { background: var(--card-hover-bg); box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
     [data-theme="dark"] .stat-card { background: var(--card-bg); }
     [data-theme="dark"] .stat-card:hover { background: var(--card-hover-bg) !important; }
-     [data-theme="dark"] .stat-card:hover            { background: var(--card-hover-bg) !important; }
-    [data-theme="dark"] .data-table tbody tr:hover  { background: var(--indigo-dim) !important; }
-
-    /* representatives.html — rep card hover */
-    [data-theme="dark"] .rep-card:hover             { background: var(--card-hover-bg) !important; box-shadow: 0 8px 40px rgba(0,0,0,0.3); }
-    [data-theme="dark"] .stat-card:hover            { background: var(--card-hover-bg) !important; }
-    [data-theme="dark"] .data-table tbody tr:hover  { background: var(--indigo-dim) !important; }
-
-    /* representatives.html — rep card hover */
-    [data-theme="dark"] .rep-card:hover             { background: var(--card-hover-bg) !important; box-shadow: 0 8px 40px rgba(0,0,0,0.3); }
-
-
-
+    [data-theme="dark"] .data-table tbody tr:hover { background: var(--indigo-dim) !important; }
+    [data-theme="dark"] .rep-card:hover { background: var(--card-hover-bg) !important; box-shadow: 0 8px 40px rgba(0,0,0,0.3); }
     [data-theme="dark"] .stat-cell { background: var(--card-bg); }
     [data-theme="dark"] .stat-cell:hover { background: var(--card-hover-bg) !important; }
-    [data-theme="dark"] .data-table tbody tr:hover { background: var(--indigo-dim) !important; }
     [data-theme="dark"] .bento-cell { background: var(--card-bg); }
     [data-theme="dark"] .grid-cell { background: var(--card-bg); }
     [data-theme="dark"] .full-card { background: var(--card-bg); }
-
-    /* ── rep_dashboard.html ── */
-    /* .issue-table tbody tr:hover uses #f8f8fd; .stat-cell uses var(--ink) */
     [data-theme="dark"] .issue-table tbody tr:hover { background: var(--indigo-dim) !important; }
-
-    /* ── public_roll.html ── */
     [data-theme="dark"] .roll-table tbody tr:hover { background: var(--indigo-dim) !important; }
     [data-theme="dark"] .selection-card { background: var(--card-bg); }
-
-    /* ── policy_feed.html + policy_detail.html ── */
-    /* .list-item:hover in about.html uses #fff for problem/solution panels */
     [data-theme="dark"] .list-item:hover { background: var(--indigo-dim) !important; }
-
-    /* ── rep_dashboard sidebar perf card ── */
     [data-theme="dark"] .perf-card { background: var(--indigo-dark); }
-
-    /* ── rep_accountability.html ── */
-    [data-theme="dark"] .acc-score-strip           { background: var(--card-bg); }
-    [data-theme="dark"] .acc-strip-item            { background: var(--card-bg); border-color: var(--border); }
-    [data-theme="dark"] .dim-card                  { background: var(--card-bg); }
-    [data-theme="dark"] .dim-card-head             { background: var(--ink-2); }
-    [data-theme="dark"] .dim-icon                  { background: var(--ink-3); border-color: var(--border); }
-    [data-theme="dark"] .dim-weight                { background: var(--ink-3); }
-    [data-theme="dark"] .avg-card                  { background: var(--card-bg); }
-    [data-theme="dark"] .avg-card-head             { background: var(--ink-2); }
-    [data-theme="dark"] .avg-score-big             { background: var(--ink-2); border-color: var(--border); }
-    [data-theme="dark"] .formula-card              { background: var(--ink-2); }
-    [data-theme="dark"] .acc-alert.warn            { background: var(--warm-dim); }
-    [data-theme="dark"] .acc-alert.pre-danger      { background: rgba(234,88,12,0.12); }
-    [data-theme="dark"] .acc-alert.danger          { background: rgba(220,38,38,0.12); }
-    [data-theme="dark"] .acc-body                  { background: var(--ink-2); }
-    [data-theme="dark"] .flow-num                  { background: var(--ink-2); border-color: var(--border); }
-    [data-theme="dark"] .flow-num.active           { background: var(--indigo); border-color: var(--indigo); }
-
-    /* ── my_issues.html ── */
-    [data-theme="dark"] .my-stat                   { background: var(--card-bg); }
-    [data-theme="dark"] .my-stat:hover             { background: var(--card-hover-bg) !important; }
-    [data-theme="dark"] .issue-card                { background: var(--card-bg); }
-    [data-theme="dark"] .issue-card:hover          { background: var(--card-hover-bg) !important; }
-    [data-theme="dark"] .vote-column               { background: var(--ink-2); border-color: var(--border); }
-
-    /* ── audit_logs.html ── */
-    [data-theme="dark"] .audit-stat                { background: var(--card-bg); }
-    [data-theme="dark"] .audit-stat:hover          { background: var(--card-hover-bg) !important; }
+    [data-theme="dark"] .acc-score-strip { background: var(--card-bg); }
+    [data-theme="dark"] .acc-strip-item { background: var(--card-bg); border-color: var(--border); }
+    [data-theme="dark"] .dim-card { background: var(--card-bg); }
+    [data-theme="dark"] .dim-card-head { background: var(--ink-2); }
+    [data-theme="dark"] .dim-icon { background: var(--ink-3); border-color: var(--border); }
+    [data-theme="dark"] .dim-weight { background: var(--ink-3); }
+    [data-theme="dark"] .avg-card { background: var(--card-bg); }
+    [data-theme="dark"] .avg-card-head { background: var(--ink-2); }
+    [data-theme="dark"] .avg-score-big { background: var(--ink-2); border-color: var(--border); }
+    [data-theme="dark"] .formula-card { background: var(--ink-2); }
+    [data-theme="dark"] .acc-alert.warn { background: var(--warm-dim); }
+    [data-theme="dark"] .acc-alert.pre-danger { background: rgba(234,88,12,0.12); }
+    [data-theme="dark"] .acc-alert.danger { background: rgba(220,38,38,0.12); }
+    [data-theme="dark"] .acc-body { background: var(--ink-2); }
+    [data-theme="dark"] .flow-num { background: var(--ink-2); border-color: var(--border); }
+    [data-theme="dark"] .flow-num.active { background: var(--indigo); border-color: var(--indigo); }
+    [data-theme="dark"] .my-stat { background: var(--card-bg); }
+    [data-theme="dark"] .my-stat:hover { background: var(--card-hover-bg) !important; }
+    [data-theme="dark"] .issue-card { background: var(--card-bg); }
+    [data-theme="dark"] .issue-card:hover { background: var(--card-hover-bg) !important; }
+    [data-theme="dark"] .vote-column { background: var(--ink-2); border-color: var(--border); }
+    [data-theme="dark"] .audit-stat { background: var(--card-bg); }
+    [data-theme="dark"] .audit-stat:hover { background: var(--card-hover-bg) !important; }
     [data-theme="dark"] .audit-table tbody tr:hover { background: var(--indigo-dim) !important; }
-
-    /* ── manage_ceo.html ── */
-    [data-theme="dark"] .ceo-stat                  { background: var(--card-bg); }
-    [data-theme="dark"] .ceo-stat:hover            { background: var(--card-hover-bg) !important; }
-    [data-theme="dark"] .data-table tbody tr:hover { background: var(--indigo-dim) !important; }
-    [data-theme="dark"] .state-tag                 { background: var(--ink-2); border-color: var(--border); color: var(--text); }
-    [data-theme="dark"] .filter-tabs               { border-color: var(--border); }
-    [data-theme="dark"] .filter-tab                { background: var(--ink-2); color: var(--muted); border-color: var(--border); }
-    [data-theme="dark"] .filter-tab:hover          { background: var(--indigo-dim); color: var(--indigo); }
-    [data-theme="dark"] .filter-tab.active         { background: var(--indigo); color: #fff; }
-
-    /* ── notifications.html ── */
-    [data-theme="dark"] .notif-item                { background: var(--card-bg); }
-    [data-theme="dark"] .notif-item:hover          { background: var(--card-hover-bg); }
-    [data-theme="dark"] .notif-icon-col            { background: var(--ink-2); border-color: var(--border); }
-    [data-theme="dark"] .notif-icon                { background: var(--ink-3); border-color: var(--border); }
-    [data-theme="dark"] .notif-empty               { background: var(--card-bg); }
-    [data-theme="dark"] .notif-empty-title         { color: var(--text); }
-
-    /* ── create_election.html ── */
-    [data-theme="dark"] .form-main                 { background: var(--card-bg); }
-    [data-theme="dark"] .form-section              { background: var(--card-bg); }
-    [data-theme="dark"] .form-actions-bar          { background: var(--ink-2); }
-    /* .sidebar-card already covered above; just add the head */
-    [data-theme="dark"] .sidebar-card-head         { background: var(--ink-2); }
-    [data-theme="dark"] .checkbox-item             { background: var(--card-bg); color: var(--text); }
-    [data-theme="dark"] .checkbox-item:hover       { background: var(--indigo-dim); color: var(--indigo); }
-    [data-theme="dark"] .checkbox-item input[type="checkbox"] {
-        background: var(--ink-3);
-        border-color: var(--border);
-    }
-    [data-theme="dark"] .checkbox-item input[type="checkbox"]:checked {
-        background: var(--indigo);
-        border-color: var(--indigo);
-    }
-    [data-theme="dark"] .constituency-grid         { background: var(--border); border-color: var(--border); }
-    [data-theme="dark"] .constituency-search       { background: var(--ink-2); color: var(--text); border-color: var(--border); }
+    [data-theme="dark"] .ceo-stat { background: var(--card-bg); }
+    [data-theme="dark"] .ceo-stat:hover { background: var(--card-hover-bg) !important; }
+    [data-theme="dark"] .state-tag { background: var(--ink-2); border-color: var(--border); color: var(--text); }
+    [data-theme="dark"] .filter-tabs { border-color: var(--border); }
+    [data-theme="dark"] .filter-tab { background: var(--ink-2); color: var(--muted); border-color: var(--border); }
+    [data-theme="dark"] .filter-tab:hover { background: var(--indigo-dim); color: var(--indigo); }
+    [data-theme="dark"] .filter-tab.active { background: var(--indigo); color: #fff; }
+    [data-theme="dark"] .notif-item { background: var(--card-bg); }
+    [data-theme="dark"] .notif-item:hover { background: var(--card-hover-bg); }
+    [data-theme="dark"] .notif-icon-col { background: var(--ink-2); border-color: var(--border); }
+    [data-theme="dark"] .notif-icon { background: var(--ink-3); border-color: var(--border); }
+    [data-theme="dark"] .notif-empty { background: var(--card-bg); }
+    [data-theme="dark"] .notif-empty-title { color: var(--text); }
+    [data-theme="dark"] .form-main { background: var(--card-bg); }
+    [data-theme="dark"] .form-section { background: var(--card-bg); }
+    [data-theme="dark"] .form-actions-bar { background: var(--ink-2); }
+    [data-theme="dark"] .sidebar-card-head { background: var(--ink-2); }
+    [data-theme="dark"] .checkbox-item { background: var(--card-bg); color: var(--text); }
+    [data-theme="dark"] .checkbox-item:hover { background: var(--indigo-dim); color: var(--indigo); }
+    [data-theme="dark"] .checkbox-item input[type="checkbox"] { background: var(--ink-3); border-color: var(--border); }
+    [data-theme="dark"] .checkbox-item input[type="checkbox"]:checked { background: var(--indigo); border-color: var(--indigo); }
+    [data-theme="dark"] .constituency-grid { background: var(--border); border-color: var(--border); }
+    [data-theme="dark"] .constituency-search { background: var(--ink-2); color: var(--text); border-color: var(--border); }
     [data-theme="dark"] .constituency-search:focus { border-color: var(--indigo); }
     [data-theme="dark"] .status-pill.amber-pill,
-    [data-theme="dark"] .page-title-sub            { color: var(--muted); }
-
-    /* ── blo_voter_verification.html ── */
-    [data-theme="dark"] .voter-table               { background: var(--card-bg); }
-    [data-theme="dark"] .voter-table thead         { background: var(--ink-2); }
-    [data-theme="dark"] .voter-table-wrap          { border-color: var(--border); }
+    [data-theme="dark"] .page-title-sub { color: var(--muted); }
+    [data-theme="dark"] .voter-table { background: var(--card-bg); }
+    [data-theme="dark"] .voter-table thead { background: var(--ink-2); }
+    [data-theme="dark"] .voter-table-wrap { border-color: var(--border); }
     [data-theme="dark"] .voter-table tbody tr:hover { background: var(--indigo-dim) !important; }
-    [data-theme="dark"] .blo-stat                  { background: var(--card-bg); border-color: var(--border); }
-    [data-theme="dark"] .voter-avatar-placeholder  { background: var(--indigo-dim); }
-    [data-theme="dark"] .search-input              { background: var(--ink-2); border-color: var(--border); color: var(--text); }
-    [data-theme="dark"] .search-input:focus        { background: var(--input-focus-bg) !important; }
-    [data-theme="dark"] .sort-btn                  { background: var(--ink-2); border-color: var(--border); color: var(--muted); }
-    [data-theme="dark"] .sort-btn:hover            { background: var(--indigo-dim); border-color: var(--indigo); color: var(--indigo); }
-    [data-theme="dark"] .sort-btn.active           { background: var(--indigo); border-color: var(--indigo); color: #fff; }
-    [data-theme="dark"] .file-input-label          { border-color: var(--border); color: var(--muted); }
-    [data-theme="dark"] .file-input-label:hover    { background: var(--indigo-dim); border-color: var(--indigo); color: var(--indigo); }
-    [data-theme="dark"] .blo-info-banner           { background: var(--indigo-dim); border-color: rgba(129,140,248,0.25); }
-
-    /* ── election_insights.html ── */
-    [data-theme="dark"] .hero-selector             { background: var(--ink-2); border-color: var(--border); }
-    [data-theme="dark"] .hero-selector-label       { background: var(--ink-3); color: var(--muted); border-color: var(--border); }
-    [data-theme="dark"] .hero-selector-wrap select {
-    background: var(--ink-2) !important;
-    color: var(--text);
-}
-[data-theme="dark"] .hero-selector-wrap { color-scheme: dark; }
-    /* .stat-card is a new class name in insights — different from rep_dashboard .stat-cell */
-    [data-theme="dark"] .stat-card                 { background: var(--card-bg); }
-    [data-theme="dark"] .stat-card:hover           { background: var(--card-hover-bg) !important; }
-
-
-    /* ── Selects and native inputs across all pages ── */
-    /* ── policy_detail.html — textarea focus overrides ── */
+    [data-theme="dark"] .blo-stat { background: var(--card-bg); border-color: var(--border); }
+    [data-theme="dark"] .voter-avatar-placeholder { background: var(--indigo-dim); }
+    [data-theme="dark"] .search-input { background: var(--ink-2); border-color: var(--border); color: var(--text); }
+    [data-theme="dark"] .search-input:focus { background: var(--input-focus-bg) !important; }
+    [data-theme="dark"] .sort-btn { background: var(--ink-2); border-color: var(--border); color: var(--muted); }
+    [data-theme="dark"] .sort-btn:hover { background: var(--indigo-dim); border-color: var(--indigo); color: var(--indigo); }
+    [data-theme="dark"] .sort-btn.active { background: var(--indigo); border-color: var(--indigo); color: #fff; }
+    [data-theme="dark"] .file-input-label { border-color: var(--border); color: var(--muted); }
+    [data-theme="dark"] .file-input-label:hover { background: var(--indigo-dim); border-color: var(--indigo); color: var(--indigo); }
+    [data-theme="dark"] .blo-info-banner { background: var(--indigo-dim); border-color: rgba(129,140,248,0.25); }
+    [data-theme="dark"] .hero-selector { background: var(--ink-2); border-color: var(--border); }
+    [data-theme="dark"] .hero-selector-label { background: var(--ink-3); color: var(--muted); border-color: var(--border); }
+    [data-theme="dark"] .hero-selector-wrap select { background: var(--ink-2) !important; color: var(--text); }
+    [data-theme="dark"] .hero-selector-wrap { color-scheme: dark; }
     [data-theme="dark"] .counter-form-wrap textarea:focus { background: var(--input-focus-bg) !important; }
     [data-theme="dark"] .new-comment-form textarea:focus  { background: var(--input-focus-bg) !important; }
     [data-theme="dark"] .reply-input-wrap textarea:focus  { background: var(--input-focus-bg) !important; }
     [data-theme="dark"] .reply-input-row textarea:focus   { background: var(--input-focus-bg) !important; }
-
-    [data-theme="dark"] select {
-        background: var(--ink-2);
-        color: var(--text);
-        border-color: var(--border);
-    }
+    [data-theme="dark"] select { background: var(--ink-2); color: var(--text); border-color: var(--border); }
     [data-theme="dark"] select:focus { background: var(--input-focus-bg); }
-
-    /* ── live_results.html ── */
-    /* .results-selector-strip, .selector-wrap select, .results-prompt,
-       .results-summary, .results-chart all use hardcoded #fff */
     [data-theme="dark"] .results-selector-strip { background: var(--card-bg); }
-    [data-theme="dark"] .selector-wrap select {
-        background: var(--ink-2);
-        color: var(--text);
-        border-color: var(--border);
-    }
+    [data-theme="dark"] .selector-wrap select { background: var(--ink-2); color: var(--text); border-color: var(--border); }
     [data-theme="dark"] .selector-wrap select:focus { background: var(--input-focus-bg); }
     [data-theme="dark"] .results-prompt { background: var(--card-bg); }
     [data-theme="dark"] .results-summary { background: var(--card-bg); }
     [data-theme="dark"] .results-chart { background: var(--card-bg); }
-
-    /* ── no_election.html ── */
-    /* .no-election-card uses #fff; .back-btn:hover uses #fff */
     [data-theme="dark"] .no-election-card { background: var(--card-bg); }
     [data-theme="dark"] .back-btn { background: var(--ink-2); color: var(--text); }
     [data-theme="dark"] .back-btn:hover { background: var(--card-hover-bg); }
-
-    /* ── results_dashboard.html (final results) ── */
-    /* .select-search-box, .select-dropdown, .podium-card use #fff */
-    /* .runner-badge uses #f3f4f6; notice text uses hardcoded amber values */
-    [data-theme="dark"] .select-search-box { background: var(--ink-2); }
     [data-theme="dark"] .select-search-box.open,
     [data-theme="dark"] .select-search-box:focus { background: var(--input-focus-bg); }
     [data-theme="dark"] .select-dropdown { background: var(--card-bg); }
     [data-theme="dark"] .podium-card { background: var(--card-bg); }
     [data-theme="dark"] .podium-card.winner { background: var(--ink-2); }
-    [data-theme="dark"] .runner-badge {
-        background: var(--ink-3);
-        color: var(--text-2);
-        border-color: var(--border);
-    }
-    /* Notice block: harden amber text to use CSS var instead of hardcoded hex */
+    [data-theme="dark"] .runner-badge { background: var(--ink-3); color: var(--text-2); border-color: var(--border); }
     [data-theme="dark"] .notice-title { color: var(--warm); }
     [data-theme="dark"] .notice-text { color: var(--warm-light); }
-    [data-theme="dark"] .no-election-notice {
-        background: var(--warm-dim);
-        border-left-color: var(--warm);
-    }
+    [data-theme="dark"] .no-election-notice { background: var(--warm-dim); border-left-color: var(--warm); }
 
-    /* ══════════════════════════════════════════════════════════
-       SYSTEM-DARK MIRRORS — exact copy of every dark rule above
-    ══════════════════════════════════════════════════════════ */
+    /* ═══ SYSTEM-DARK MIRRORS ═══ */
     @media (prefers-color-scheme: dark) {
         [data-theme="system"] .desc-card,
         [data-theme="system"] .section-card,
@@ -491,116 +339,67 @@
         [data-theme="system"] .feed-empty,
         [data-theme="system"] .timeline-dot,
         [data-theme="system"] .comment-card { background: var(--card-bg); }
-
         [data-theme="system"] .issue-card:hover,
         [data-theme="system"] .policy-card:hover { background: var(--card-hover-bg); }
-
         [data-theme="system"] textarea:focus,
         [data-theme="system"] input:focus { background: var(--input-focus-bg) !important; }
-
-        [data-theme="system"] .timeline-dot:not(.active):not(.resolved) {
-            background: var(--card-bg);
-            border-color: var(--border);
-        }
+        [data-theme="system"] .timeline-dot:not(.active):not(.resolved) { background: var(--card-bg); border-color: var(--border); }
         [data-theme="system"] .claim-item { background: var(--ink-2); }
         [data-theme="system"] .pc-vote-col { background: var(--ink-3); }
         [data-theme="system"] .vote-bar-btn { background: transparent; }
         [data-theme="system"] .vote-bar-btn:hover { background: var(--indigo-dim); }
         [data-theme="system"] .ai-summary-text { background: var(--indigo-dim); }
-
-        /* deo_dashboard.html */
+        [data-theme="system"] .comment-body.ai-body { background: var(--indigo-dim); }
+        [data-theme="system"] .comment-official .comment-text { background: var(--indigo-dim); }
+        [data-theme="system"] .comment-ai .comment-text { background: var(--warm-dim); }
         [data-theme="system"] .action-card { background: var(--card-bg); }
         [data-theme="system"] .action-card:hover { background: var(--card-hover-bg) !important; }
         [data-theme="system"] .responsibilities-card { background: var(--card-bg); }
-
-        /* voter_mgmt.html */
         [data-theme="system"] .voter-table tbody tr:not(.edit-row):hover { background: var(--indigo-dim) !important; }
-
-        /* po_dashboard.html */
         [data-theme="system"] .panel { background: var(--card-bg); }
         [data-theme="system"] .field input[type="text"]:focus,
         [data-theme="system"] .field input[type="number"]:focus,
         [data-theme="system"] .field select:focus { background: var(--input-focus-bg) !important; }
         [data-theme="system"] .otp-input:focus { background: var(--input-focus-bg) !important; }
         [data-theme="system"] .otp-input:not(:placeholder-shown) { background: var(--indigo-dim); }
-
-        /* nomination.html */
         [data-theme="system"] .form-panel { background: var(--card-bg); }
         [data-theme="system"] .form-group input:focus,
         [data-theme="system"] .form-group select:focus { background: var(--input-focus-bg) !important; }
         [data-theme="system"] .select-dropdown { background: var(--card-bg); }
         [data-theme="system"] .select-option:hover,
         [data-theme="system"] .select-option.focused { background: var(--indigo-dim); color: var(--indigo); }
-
-        /* evote_waiting.html */
         [data-theme="system"] .evote-card { background: var(--card-bg); }
-
-        /* verify_vote.html */
         [data-theme="system"] .select-search-box:focus,
         [data-theme="system"] .custom-select-wrap.open .select-search-box { background: var(--input-focus-bg) !important; }
         [data-theme="system"] .select-search-box { background: var(--ink-2); }
         [data-theme="system"] .hash-input:focus { background: var(--input-focus-bg) !important; }
         [data-theme="system"] .result-body { background: var(--card-bg); }
         [data-theme="system"] .custom-select-wrap .select-dropdown { background: var(--card-bg); }
-
-        /* vote.html */
         [data-theme="system"] .vote-card { background: var(--card-bg); }
-        [data-theme="system"] .candidate-option input[type="radio"] {
-            background: var(--ink-3);
-            border-color: var(--border);
-        }
-        [data-theme="system"] .candidate-option input[type="radio"]:checked {
-            background: var(--indigo);
-            border-color: var(--indigo);
-        }
+        [data-theme="system"] .candidate-option input[type="radio"] { background: var(--ink-3); border-color: var(--border); }
+        [data-theme="system"] .candidate-option input[type="radio"]:checked { background: var(--indigo); border-color: var(--indigo); }
         [data-theme="system"] .candidate-option:has(input:checked) { background: var(--indigo-dim); }
         [data-theme="system"] .candidate-option:hover { background: var(--ink-2); }
-
-        /* manage_ro.html */
         [data-theme="system"] .table-search { background: var(--ink-2) !important; border-color: var(--border); }
-
-        /* Shared */
         [data-theme="system"] .table-card,
         [data-theme="system"] .result-panel .result-body,
         [data-theme="system"] .evote-card-head,
         [data-theme="system"] .vote-card-head { background: var(--ink-2); }
-
-        /* index.html */
-        [data-theme="system"] .chain-block {
-            background: var(--card-bg);
-            border-color: var(--border);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-        }
+        [data-theme="system"] .chain-block { background: var(--card-bg); border-color: var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
         [data-theme="system"] .feature-item { background: var(--card-bg); }
         [data-theme="system"] .feature-item:hover { background: var(--card-hover-bg); }
         [data-theme="system"] .role-card { background: var(--card-bg); }
         [data-theme="system"] .role-card:hover { background: var(--card-hover-bg); }
-        [data-theme="system"] .step-num {
-            background: var(--card-bg);
-            border-color: var(--border);
-            box-shadow: 0 2px 12px rgba(0,0,0,0.3);
-        }
-        [data-theme="system"] .process-step:hover .step-num {
-            background: var(--indigo);
-            border-color: var(--indigo);
-        }
-
-        /* about.html */
+        [data-theme="system"] .step-num { background: var(--card-bg); border-color: var(--border); box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+        [data-theme="system"] .process-step:hover .step-num { background: var(--indigo); border-color: var(--indigo); }
         [data-theme="system"] .tech-card { background: var(--card-bg); }
         [data-theme="system"] .tech-card:hover { background: var(--card-hover-bg); }
         [data-theme="system"] .timeline-item { background: var(--card-bg); }
         [data-theme="system"] .timeline-item:hover { background: var(--card-hover-bg); }
         [data-theme="system"] .team-card { background: var(--card-bg); }
         [data-theme="system"] .team-card:hover { background: var(--card-hover-bg); }
-
-        /* election_schedule.html */
         [data-theme="system"] .election-card { background: var(--card-bg); }
-        [data-theme="system"] .election-card:hover {
-            background: var(--card-hover-bg);
-            box-shadow: 0 4px 24px rgba(0,0,0,0.3);
-        }
-
-        /* election_insights.html */
+        [data-theme="system"] .election-card:hover { background: var(--card-hover-bg); box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
         [data-theme="system"] .stat-card { background: var(--card-bg); }
         [data-theme="system"] .stat-card:hover { background: var(--card-hover-bg) !important; }
         [data-theme="system"] .stat-cell { background: var(--card-bg); }
@@ -609,174 +408,104 @@
         [data-theme="system"] .bento-cell { background: var(--card-bg); }
         [data-theme="system"] .grid-cell { background: var(--card-bg); }
         [data-theme="system"] .full-card { background: var(--card-bg); }
-
-        /* rep_dashboard.html */
         [data-theme="system"] .issue-table tbody tr:hover { background: var(--indigo-dim) !important; }
-
-        /* public_roll.html */
         [data-theme="system"] .roll-table tbody tr:hover { background: var(--indigo-dim) !important; }
         [data-theme="system"] .selection-card { background: var(--card-bg); }
-
-        /* about.html problem/solution list items */
         [data-theme="system"] .list-item:hover { background: var(--indigo-dim) !important; }
-
-        /* rep_dashboard perf card */
         [data-theme="system"] .perf-card { background: var(--indigo-dark); }
-        /* ── rep_accountability.html ── */
-        [data-theme="system"] .acc-score-strip           { background: var(--card-bg); }
-        [data-theme="system"] .acc-strip-item            { background: var(--card-bg); border-color: var(--border); }
-        [data-theme="system"] .dim-card                  { background: var(--card-bg); }
-        [data-theme="system"] .dim-card-head             { background: var(--ink-2); }
-        [data-theme="system"] .dim-icon                  { background: var(--ink-3); border-color: var(--border); }
-        [data-theme="system"] .dim-weight                { background: var(--ink-3); }
-        [data-theme="system"] .avg-card                  { background: var(--card-bg); }
-        [data-theme="system"] .avg-card-head             { background: var(--ink-2); }
-        [data-theme="system"] .avg-score-big             { background: var(--ink-2); border-color: var(--border); }
-        [data-theme="system"] .formula-card              { background: var(--ink-2); }
-        [data-theme="system"] .acc-alert.warn            { background: var(--warm-dim); }
-        [data-theme="system"] .acc-alert.pre-danger      { background: rgba(234,88,12,0.12); }
-        [data-theme="system"] .acc-alert.danger          { background: rgba(220,38,38,0.12); }
-        [data-theme="system"] .acc-body                  { background: var(--ink-2); }
-        [data-theme="system"] .flow-num                  { background: var(--ink-2); border-color: var(--border); }
-        [data-theme="system"] .flow-num.active           { background: var(--indigo); border-color: var(--indigo); }
-
-        /* ── my_issues.html ── */
-        [data-theme="system"] .my-stat                   { background: var(--card-bg); }
-        [data-theme="system"] .my-stat:hover             { background: var(--card-hover-bg) !important; }
-        [data-theme="system"] .issue-card                { background: var(--card-bg); }
-        [data-theme="system"] .issue-card:hover          { background: var(--card-hover-bg) !important; }
-        [data-theme="system"] .vote-column               { background: var(--ink-2); border-color: var(--border); }
-
-        /* ── audit_logs.html ── */
-        [data-theme="system"] .audit-stat                { background: var(--card-bg); }
-        [data-theme="system"] .audit-stat:hover          { background: var(--card-hover-bg) !important; }
+        [data-theme="system"] .acc-score-strip { background: var(--card-bg); }
+        [data-theme="system"] .acc-strip-item { background: var(--card-bg); border-color: var(--border); }
+        [data-theme="system"] .dim-card { background: var(--card-bg); }
+        [data-theme="system"] .dim-card-head { background: var(--ink-2); }
+        [data-theme="system"] .dim-icon { background: var(--ink-3); border-color: var(--border); }
+        [data-theme="system"] .dim-weight { background: var(--ink-3); }
+        [data-theme="system"] .avg-card { background: var(--card-bg); }
+        [data-theme="system"] .avg-card-head { background: var(--ink-2); }
+        [data-theme="system"] .avg-score-big { background: var(--ink-2); border-color: var(--border); }
+        [data-theme="system"] .formula-card { background: var(--ink-2); }
+        [data-theme="system"] .acc-alert.warn { background: var(--warm-dim); }
+        [data-theme="system"] .acc-alert.pre-danger { background: rgba(234,88,12,0.12); }
+        [data-theme="system"] .acc-alert.danger { background: rgba(220,38,38,0.12); }
+        [data-theme="system"] .acc-body { background: var(--ink-2); }
+        [data-theme="system"] .flow-num { background: var(--ink-2); border-color: var(--border); }
+        [data-theme="system"] .flow-num.active { background: var(--indigo); border-color: var(--indigo); }
+        [data-theme="system"] .my-stat { background: var(--card-bg); }
+        [data-theme="system"] .my-stat:hover { background: var(--card-hover-bg) !important; }
+        [data-theme="system"] .issue-card { background: var(--card-bg); }
+        [data-theme="system"] .issue-card:hover { background: var(--card-hover-bg) !important; }
+        [data-theme="system"] .vote-column { background: var(--ink-2); border-color: var(--border); }
+        [data-theme="system"] .audit-stat { background: var(--card-bg); }
+        [data-theme="system"] .audit-stat:hover { background: var(--card-hover-bg) !important; }
         [data-theme="system"] .audit-table tbody tr:hover { background: var(--indigo-dim) !important; }
-
-        /* ── manage_ceo.html ── */
-        [data-theme="system"] .ceo-stat                  { background: var(--card-bg); }
-        [data-theme="system"] .ceo-stat:hover            { background: var(--card-hover-bg) !important; }
-        [data-theme="system"] .data-table tbody tr:hover { background: var(--indigo-dim) !important; }
-        [data-theme="system"] .state-tag                 { background: var(--ink-2); border-color: var(--border); color: var(--text); }
-        [data-theme="system"] .filter-tabs               { border-color: var(--border); }
-        [data-theme="system"] .filter-tab                { background: var(--ink-2); color: var(--muted); border-color: var(--border); }
-        [data-theme="system"] .filter-tab:hover          { background: var(--indigo-dim); color: var(--indigo); }
-        [data-theme="system"] .filter-tab.active         { background: var(--indigo); color: #fff; }
-
-        /* ── notifications.html ── */
-        [data-theme="system"] .notif-item                { background: var(--card-bg); }
-        [data-theme="system"] .notif-item:hover          { background: var(--card-hover-bg); }
-        [data-theme="system"] .notif-icon-col            { background: var(--ink-2); border-color: var(--border); }
-        [data-theme="system"] .notif-icon                { background: var(--ink-3); border-color: var(--border); }
-        [data-theme="system"] .notif-empty               { background: var(--card-bg); }
-        [data-theme="system"] .notif-empty-title         { color: var(--text); }
-
-        /* ── create_election.html ── */
-        [data-theme="system"] .form-main                 { background: var(--card-bg); }
-        [data-theme="system"] .form-section              { background: var(--card-bg); }
-        [data-theme="system"] .form-actions-bar          { background: var(--ink-2); }
-        [data-theme="system"] .sidebar-card-head         { background: var(--ink-2); }
-        [data-theme="system"] .checkbox-item             { background: var(--card-bg); color: var(--text); }
-        [data-theme="system"] .checkbox-item:hover       { background: var(--indigo-dim); color: var(--indigo); }
-        [data-theme="system"] .checkbox-item input[type="checkbox"] {
-            background: var(--ink-3);
-            border-color: var(--border);
-        }
-        [data-theme="system"] .checkbox-item input[type="checkbox"]:checked {
-            background: var(--indigo);
-            border-color: var(--indigo);
-        }
-        [data-theme="system"] .constituency-grid         { background: var(--border); border-color: var(--border); }
-        [data-theme="system"] .constituency-search       { background: var(--ink-2); color: var(--text); border-color: var(--border); }
+        [data-theme="system"] .ceo-stat { background: var(--card-bg); }
+        [data-theme="system"] .ceo-stat:hover { background: var(--card-hover-bg) !important; }
+        [data-theme="system"] .state-tag { background: var(--ink-2); border-color: var(--border); color: var(--text); }
+        [data-theme="system"] .filter-tabs { border-color: var(--border); }
+        [data-theme="system"] .filter-tab { background: var(--ink-2); color: var(--muted); border-color: var(--border); }
+        [data-theme="system"] .filter-tab:hover { background: var(--indigo-dim); color: var(--indigo); }
+        [data-theme="system"] .filter-tab.active { background: var(--indigo); color: #fff; }
+        [data-theme="system"] .notif-item { background: var(--card-bg); }
+        [data-theme="system"] .notif-item:hover { background: var(--card-hover-bg); }
+        [data-theme="system"] .notif-icon-col { background: var(--ink-2); border-color: var(--border); }
+        [data-theme="system"] .notif-icon { background: var(--ink-3); border-color: var(--border); }
+        [data-theme="system"] .notif-empty { background: var(--card-bg); }
+        [data-theme="system"] .notif-empty-title { color: var(--text); }
+        [data-theme="system"] .form-main { background: var(--card-bg); }
+        [data-theme="system"] .form-section { background: var(--card-bg); }
+        [data-theme="system"] .form-actions-bar { background: var(--ink-2); }
+        [data-theme="system"] .sidebar-card-head { background: var(--ink-2); }
+        [data-theme="system"] .checkbox-item { background: var(--card-bg); color: var(--text); }
+        [data-theme="system"] .checkbox-item:hover { background: var(--indigo-dim); color: var(--indigo); }
+        [data-theme="system"] .checkbox-item input[type="checkbox"] { background: var(--ink-3); border-color: var(--border); }
+        [data-theme="system"] .checkbox-item input[type="checkbox"]:checked { background: var(--indigo); border-color: var(--indigo); }
+        [data-theme="system"] .constituency-grid { background: var(--border); border-color: var(--border); }
+        [data-theme="system"] .constituency-search { background: var(--ink-2); color: var(--text); border-color: var(--border); }
         [data-theme="system"] .constituency-search:focus { border-color: var(--indigo); }
-
-        /* ── blo_voter_verification.html ── */
-        [data-theme="system"] .voter-table               { background: var(--card-bg); }
-        [data-theme="system"] .voter-table thead         { background: var(--ink-2); }
-        [data-theme="system"] .voter-table-wrap          { border-color: var(--border); }
+        [data-theme="system"] .status-pill.amber-pill,
+        [data-theme="system"] .page-title-sub { color: var(--muted); }
+        [data-theme="system"] .voter-table { background: var(--card-bg); }
+        [data-theme="system"] .voter-table thead { background: var(--ink-2); }
+        [data-theme="system"] .voter-table-wrap { border-color: var(--border); }
         [data-theme="system"] .voter-table tbody tr:hover { background: var(--indigo-dim) !important; }
-        [data-theme="system"] .blo-stat                  { background: var(--card-bg); border-color: var(--border); }
-        [data-theme="system"] .voter-avatar-placeholder  { background: var(--indigo-dim); }
-        [data-theme="system"] .search-input              { background: var(--ink-2); border-color: var(--border); color: var(--text); }
-        [data-theme="system"] .search-input:focus        { background: var(--input-focus-bg) !important; }
-        [data-theme="system"] .sort-btn                  { background: var(--ink-2); border-color: var(--border); color: var(--muted); }
-        [data-theme="system"] .sort-btn:hover            { background: var(--indigo-dim); border-color: var(--indigo); color: var(--indigo); }
-        [data-theme="system"] .sort-btn.active           { background: var(--indigo); border-color: var(--indigo); color: #fff; }
-        [data-theme="system"] .file-input-label          { border-color: var(--border); color: var(--muted); }
-        [data-theme="system"] .file-input-label:hover    { background: var(--indigo-dim); border-color: var(--indigo); color: var(--indigo); }
-        [data-theme="system"] .blo-info-banner           { background: var(--indigo-dim); border-color: rgba(129,140,248,0.25); }
-
-        /* ── election_insights.html ── */
-        [data-theme="system"] .hero-selector             { background: var(--ink-2); border-color: var(--border); }
-        [data-theme="system"] .hero-selector-label       { background: var(--ink-3); color: var(--muted); border-color: var(--border); }
-       [data-theme="system"] .hero-selector-wrap select {
-    background: var(--ink-2) !important;
-    color: var(--text);
-}
-/* inside @media (prefers-color-scheme: dark) */
-[data-theme="system"] .hero-selector-wrap { color-scheme: dark; }
-        [data-theme="system"] .stat-card                 { background: var(--card-bg); }
-        [data-theme="system"] .stat-card:hover           { background: var(--card-hover-bg) !important; }
-
-
-        /* Native selects */
-        /* policy_detail.html textarea focus */
+        [data-theme="system"] .blo-stat { background: var(--card-bg); border-color: var(--border); }
+        [data-theme="system"] .voter-avatar-placeholder { background: var(--indigo-dim); }
+        [data-theme="system"] .search-input { background: var(--ink-2); border-color: var(--border); color: var(--text); }
+        [data-theme="system"] .search-input:focus { background: var(--input-focus-bg) !important; }
+        [data-theme="system"] .sort-btn { background: var(--ink-2); border-color: var(--border); color: var(--muted); }
+        [data-theme="system"] .sort-btn:hover { background: var(--indigo-dim); border-color: var(--indigo); color: var(--indigo); }
+        [data-theme="system"] .sort-btn.active { background: var(--indigo); border-color: var(--indigo); color: #fff; }
+        [data-theme="system"] .file-input-label { border-color: var(--border); color: var(--muted); }
+        [data-theme="system"] .file-input-label:hover { background: var(--indigo-dim); border-color: var(--indigo); color: var(--indigo); }
+        [data-theme="system"] .blo-info-banner { background: var(--indigo-dim); border-color: rgba(129,140,248,0.25); }
+        [data-theme="system"] .hero-selector { background: var(--ink-2); border-color: var(--border); }
+        [data-theme="system"] .hero-selector-label { background: var(--ink-3); color: var(--muted); border-color: var(--border); }
+        [data-theme="system"] .hero-selector-wrap select { background: var(--ink-2) !important; color: var(--text); }
+        [data-theme="system"] .hero-selector-wrap { color-scheme: dark; }
         [data-theme="system"] .counter-form-wrap textarea:focus { background: var(--input-focus-bg) !important; }
         [data-theme="system"] .new-comment-form textarea:focus  { background: var(--input-focus-bg) !important; }
         [data-theme="system"] .reply-input-wrap textarea:focus  { background: var(--input-focus-bg) !important; }
         [data-theme="system"] .reply-input-row textarea:focus   { background: var(--input-focus-bg) !important; }
-
-                [data-theme="system"] select {
-            background: var(--ink-2);
-            color: var(--text);
-            border-color: var(--border);
-        }
+        [data-theme="system"] select { background: var(--ink-2); color: var(--text); border-color: var(--border); }
         [data-theme="system"] select:focus { background: var(--input-focus-bg); }
-        /* live_results.html */
         [data-theme="system"] .results-selector-strip { background: var(--card-bg); }
-        [data-theme="system"] .selector-wrap select {
-            background: var(--ink-2);
-            color: var(--text);
-            border-color: var(--border);
-        }
+        [data-theme="system"] .selector-wrap select { background: var(--ink-2); color: var(--text); border-color: var(--border); }
         [data-theme="system"] .selector-wrap select:focus { background: var(--input-focus-bg); }
         [data-theme="system"] .results-prompt { background: var(--card-bg); }
         [data-theme="system"] .results-summary { background: var(--card-bg); }
         [data-theme="system"] .results-chart { background: var(--card-bg); }
-
-        /* no_election.html */
         [data-theme="system"] .no-election-card { background: var(--card-bg); }
         [data-theme="system"] .back-btn { background: var(--ink-2); color: var(--text); }
         [data-theme="system"] .back-btn:hover { background: var(--card-hover-bg); }
-
-        /* results_dashboard.html */
         [data-theme="system"] .select-search-box { background: var(--ink-2); }
         [data-theme="system"] .select-search-box.open,
         [data-theme="system"] .select-search-box:focus { background: var(--input-focus-bg); }
-        [data-theme="system"] .select-dropdown { background: var(--card-bg); }
         [data-theme="system"] .podium-card { background: var(--card-bg); }
         [data-theme="system"] .podium-card.winner { background: var(--ink-2); }
-        [data-theme="system"] .runner-badge {
-            background: var(--ink-3);
-            color: var(--text-2);
-            border-color: var(--border);
-        }
+        [data-theme="system"] .runner-badge { background: var(--ink-3); color: var(--text-2); border-color: var(--border); }
         [data-theme="system"] .notice-title { color: var(--warm); }
         [data-theme="system"] .notice-text { color: var(--warm-light); }
-        [data-theme="system"] .no-election-notice {
-            background: var(--warm-dim);
-            border-left-color: var(--warm);
-        }
-         [data-theme="system"] .stat-card:hover           { background: var(--card-hover-bg) !important; }
-        [data-theme="system"] .data-table tbody tr:hover { background: var(--indigo-dim) !important; }
-
-        /* representatives.html — rep card hover */
-        [data-theme="system"] .rep-card:hover            { background: var(--card-hover-bg) !important; box-shadow: 0 8px 40px rgba(0,0,0,0.3); }
-        [data-theme="system"] .stat-card:hover           { background: var(--card-hover-bg) !important; }
-        [data-theme="system"] .data-table tbody tr:hover { background: var(--indigo-dim) !important; }
-
-        /* representatives.html — rep card hover */
-        [data-theme="system"] .rep-card:hover            { background: var(--card-hover-bg) !important; box-shadow: 0 8px 40px rgba(0,0,0,0.3); }
-
+        [data-theme="system"] .no-election-notice { background: var(--warm-dim); border-left-color: var(--warm); }
+        [data-theme="system"] .rep-card:hover { background: var(--card-hover-bg) !important; box-shadow: 0 8px 40px rgba(0,0,0,0.3); }
     }
 
     html { scroll-behavior: smooth; }
@@ -815,10 +544,7 @@
         transform: translate(-50%, -50%);
         transition: none;
     }
-    .cursor-dot {
-        width: 6px; height: 6px;
-        background: var(--indigo);
-    }
+    .cursor-dot { width: 6px; height: 6px; background: var(--indigo); }
     .cursor-ring {
         width: 34px; height: 34px;
         border: 1.5px solid color-mix(in srgb, var(--indigo) 40%, transparent);
@@ -831,6 +557,12 @@
         background: var(--indigo-dim);
     }
 
+    /* ═══ HIDE CURSOR ON TOUCH ═══ */
+    @media (hover: none) and (pointer: coarse) {
+        body { cursor: auto; }
+        .cursor-dot, .cursor-ring { display: none !important; }
+    }
+
     /* ═══ NAVBAR ═══ */
     .navbar {
         position: fixed; top: 0; left: 0; right: 0; z-index: 200;
@@ -838,10 +570,7 @@
         display: flex; align-items: center; justify-content: space-between;
         padding: 0 2.5rem 0 1.2rem;
         border-bottom: 1px solid transparent;
-        transition:
-            background-color .35s ease,
-            border-color     .35s ease,
-            box-shadow       .35s ease;
+        transition: background-color .35s ease, border-color .35s ease, box-shadow .35s ease;
         will-change: background-color;
     }
     .navbar.scrolled {
@@ -875,51 +604,33 @@
     .hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
     /* Logo */
-    .navbar-logo-wrap {
-        display: flex; align-items: center;
-        margin-left: 0.4rem; flex: 1;
-    }
-    .logo {
-        display: flex; align-items: center;
-        gap: 0.85rem; text-decoration: none; position: relative;
-    }
+    .navbar-logo-wrap { display: flex; align-items: center; margin-left: 0.4rem; flex: 1; }
+    .logo { display: flex; align-items: center; gap: 0.85rem; text-decoration: none; position: relative; }
 
     .logo-mark { position: relative; width: 44px; height: 44px; flex-shrink: 0; }
     .logo-mark svg.hex-bg {
         position: absolute; inset: 0; width: 100%; height: 100%;
         animation: logo-rotate 18s linear infinite;
-        transform-origin: center;
-        transition: none;
+        transform-origin: center; transition: none;
     }
     .logo-mark svg.hex-inner {
         position: absolute; inset: 10px;
         width: calc(100% - 20px); height: calc(100% - 20px);
         animation: logo-rotate-rev 12s linear infinite;
-        transform-origin: center;
-        transition: none;
+        transform-origin: center; transition: none;
     }
     .logo-mark .logo-core {
         position: absolute; inset: 0;
         display: flex; align-items: center; justify-content: center;
     }
-    .logo-mark .logo-core svg {
-        width: 16px; height: 16px;
-        fill: var(--indigo);
-        transition: fill .25s ease;
-    }
+    .logo-mark .logo-core svg { width: 16px; height: 16px; fill: var(--indigo); transition: fill .25s ease; }
 
     @keyframes logo-rotate     { from{transform:rotate(0deg)}  to{transform:rotate(360deg)} }
     @keyframes logo-rotate-rev { from{transform:rotate(0deg)}  to{transform:rotate(-360deg)} }
 
     .logo-wordmark { display: flex; flex-direction: column; line-height: 1; gap: 1px; }
-    .logo-wordmark-top {
-        font-family: var(--font-disp); font-size: 1.45rem;
-        letter-spacing: 0.06em; color: var(--indigo); line-height: 1;
-    }
-    .logo-wordmark-bottom {
-        font-family: var(--font-mono); font-size: 0.58rem;
-        letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); line-height: 1;
-    }
+    .logo-wordmark-top { font-family: var(--font-disp); font-size: 1.45rem; letter-spacing: 0.06em; color: var(--indigo); line-height: 1; }
+    .logo-wordmark-bottom { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); line-height: 1; }
     .logo-pip {
         display: inline-block; width: 5px; height: 5px; border-radius: 50%;
         background: var(--warm); margin-left: 2px; vertical-align: middle;
@@ -947,32 +658,23 @@
         transition: background .2s, border-color .2s, transform .2s, box-shadow .2s;
         flex-shrink: 0;
     }
-    .nav-profile-link:hover {
-        background: var(--indigo-mid); border-color: var(--indigo);
-        transform: scale(1.08); box-shadow: 0 0 0 4px rgba(79,70,229,0.12);
-    }
-    .nav-profile-link svg {
-        width: 16px; height: 16px; stroke: currentColor; fill: none;
-        stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
-    }
+    .nav-profile-link:hover { background: var(--indigo-mid); border-color: var(--indigo); transform: scale(1.08); box-shadow: 0 0 0 4px rgba(79,70,229,0.12); }
+    .nav-profile-link svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
     .nav-cta {
         font-family: var(--font-mono); font-size: .78rem; font-weight: 700;
         letter-spacing: .12em; text-transform: uppercase;
         background: var(--indigo); color: #fff; padding: .65rem 1.6rem;
         text-decoration: none;
         clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
-        transition: background-color .2s, transform .2s;
-        display: inline-block;
+        transition: background-color .2s, transform .2s; display: inline-block;
     }
     .nav-cta:hover { background: var(--indigo-dark); transform: translateY(-1px); }
 
     /* ═══ SIDEBAR OVERLAY ═══ */
     .sidebar-overlay {
         position: fixed; inset: 0;
-        background: rgba(15,15,20,.55);
-        backdrop-filter: blur(4px);
-        z-index: 299; opacity: 0; pointer-events: none;
-        transition: opacity .4s ease;
+        background: rgba(15,15,20,.55); backdrop-filter: blur(4px);
+        z-index: 299; opacity: 0; pointer-events: none; transition: opacity .4s ease;
     }
     .sidebar-overlay.active { opacity: 1; pointer-events: all; }
 
@@ -995,10 +697,7 @@
         border-bottom: 1px solid var(--border);
         min-height: var(--nav-h); flex-shrink: 0;
     }
-    .sidebar-logo {
-        font-family: var(--font-mono); font-size: .72rem; font-weight: 700;
-        letter-spacing: .2em; text-transform: uppercase; color: var(--indigo);
-    }
+    .sidebar-logo { font-family: var(--font-mono); font-size: .72rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--indigo); }
     .sidebar-close {
         width: 36px; height: 36px; background: var(--ink-2);
         border: 1px solid var(--border); border-radius: 50%;
@@ -1034,19 +733,11 @@
         transition: background-color .15s, border-color .15s;
     }
     .sidebar-nav a:hover .nav-icon { background: var(--indigo-dim); border-color: rgba(79,70,229,.25); }
-    .nav-icon svg {
-        width: 15px; height: 15px; stroke: var(--muted); fill: none;
-        stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
-        transition: stroke .15s;
-    }
+    .nav-icon svg { width: 15px; height: 15px; stroke: var(--muted); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: stroke .15s; }
     .sidebar-nav a:hover .nav-icon svg { stroke: var(--indigo); }
 
     .nav-label { flex: 1; font-size: .95rem; }
-    .nav-arrow {
-        font-size: .8rem; color: var(--muted);
-        opacity: 0; transform: translateX(-4px);
-        transition: opacity .15s, transform .15s;
-    }
+    .nav-arrow { font-size: .8rem; color: var(--muted); opacity: 0; transform: translateX(-4px); transition: opacity .15s, transform .15s; }
     .sidebar-nav a:hover .nav-arrow { opacity: 1; transform: translateX(0); }
 
     .ext-badge {
@@ -1057,52 +748,24 @@
     }
 
     /* ═══ THEME TOGGLE ═══ */
-    .theme-toggle-wrap {
-        padding: 1rem 1.75rem;
-        border-top: 1px solid var(--border);
-        flex-shrink: 0;
-    }
-    .theme-toggle-label {
-        font-family: var(--font-mono); font-size: .6rem; font-weight: 700;
-        letter-spacing: .25em; text-transform: uppercase;
-        color: var(--muted); margin-bottom: .75rem; display: block;
-    }
-    .theme-toggle {
-        display: grid; grid-template-columns: 1fr 1fr 1fr;
-        gap: 3px;
-        background: var(--ink-2);
-        border: 1px solid var(--border);
-        border-radius: 6px;
-        padding: 3px;
-    }
+    .theme-toggle-wrap { padding: 1rem 1.75rem; border-top: 1px solid var(--border); flex-shrink: 0; }
+    .theme-toggle-label { font-family: var(--font-mono); font-size: .6rem; font-weight: 700; letter-spacing: .25em; text-transform: uppercase; color: var(--muted); margin-bottom: .75rem; display: block; }
+    .theme-toggle { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3px; background: var(--ink-2); border: 1px solid var(--border); border-radius: 6px; padding: 3px; }
     .theme-btn {
         display: flex; align-items: center; justify-content: center; gap: .4rem;
         padding: .55rem .5rem;
         font-family: var(--font-mono); font-size: .65rem; font-weight: 600;
-        letter-spacing: .08em; text-transform: uppercase;
-        color: var(--muted);
-        background: transparent; border: none; border-radius: 4px;
-        cursor: pointer;
+        letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+        background: transparent; border: none; border-radius: 4px; cursor: pointer;
         transition: background-color .2s, color .2s;
     }
-    .theme-btn svg {
-        width: 12px; height: 12px; stroke: currentColor; fill: none;
-        stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
-        flex-shrink: 0;
-        transition: stroke .2s;
-    }
+    .theme-btn svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; transition: stroke .2s; }
     .theme-btn:hover { color: var(--indigo); }
-    .theme-btn.active {
-        background: var(--indigo);
-        color: #fff;
-    }
+    .theme-btn.active { background: var(--indigo); color: #fff; }
     .theme-btn.active svg { stroke: #fff; }
 
     /* ═══ SIDEBAR FOOTER ═══ */
-    .sidebar-footer {
-        padding: 1.5rem 1.75rem;
-        border-top: 1px solid var(--border); flex-shrink: 0;
-    }
+    .sidebar-footer { padding: 1.5rem 1.75rem; border-top: 1px solid var(--border); flex-shrink: 0; }
     .sidebar-cta {
         display: flex; align-items: center; justify-content: center; gap: .5rem;
         width: 100%; padding: .95rem 1.5rem;
@@ -1113,11 +776,7 @@
         transition: background-color .2s;
     }
     .sidebar-cta:hover { background: var(--indigo-dark); }
-    .sidebar-meta {
-        margin-top: 1rem; font-family: var(--font-mono); font-size: .62rem;
-        font-weight: 500; letter-spacing: .1em; text-transform: uppercase;
-        color: var(--muted); text-align: center; line-height: 1.7;
-    }
+    .sidebar-meta { margin-top: 1rem; font-family: var(--font-mono); font-size: .62rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); text-align: center; line-height: 1.7; }
     .sidebar-meta a { color: var(--teal); text-decoration: none; }
     .sidebar-meta a:hover { text-decoration: underline; }
 
@@ -1171,10 +830,7 @@
         transition: border-color .2s, color .2s;
         position: relative; overflow: hidden; cursor: pointer;
     }
-    .btn-outline::before {
-        content: ''; position: absolute; inset: 0; background: var(--indigo-dim);
-        transform: scaleX(0); transform-origin: left; transition: transform .25s ease; z-index: 0;
-    }
+    .btn-outline::before { content: ''; position: absolute; inset: 0; background: var(--indigo-dim); transform: scaleX(0); transform-origin: left; transition: transform .25s ease; z-index: 0; }
     .btn-outline span { position: relative; z-index: 1; }
     .btn-outline:hover { border-color: var(--indigo); color: var(--indigo); }
     .btn-outline:hover::before { transform: scaleX(1); }
@@ -1192,15 +848,18 @@
 
     /* ═══ FOOTER ═══ */
     .footer {
-        border-top: 1px solid var(--border); padding: 2.5rem 4rem;
+        border-top: 1px solid var(--border);
+        padding: 2.5rem 4rem;
         display: flex; align-items: center; justify-content: space-between;
         background: var(--ink-2);
+        flex-wrap: wrap;
+        gap: 1.25rem;
     }
     .footer-copy {
         font-family: var(--font-mono); font-size: .72rem; font-weight: 500;
         letter-spacing: .1em; color: var(--muted); text-transform: uppercase;
     }
-    .footer-links { display: flex; gap: 2.5rem; list-style: none; }
+    .footer-links { display: flex; gap: 2.5rem; list-style: none; flex-wrap: wrap; }
     .footer-links a {
         font-family: var(--font-mono); font-size: .72rem; font-weight: 600;
         letter-spacing: .1em; text-transform: uppercase; color: var(--muted);
@@ -1218,10 +877,7 @@
         letter-spacing: .22em; text-transform: uppercase; color: var(--indigo); margin-bottom: 1.2rem;
     }
     .section-tag::before { content: ''; width: 24px; height: 1.5px; background: var(--indigo); }
-    .section-title {
-        font-family: var(--font-disp); font-size: clamp(2.8rem,5.5vw,5rem);
-        line-height: .93; margin-bottom: 1.5rem; color: var(--text); letter-spacing: .01em;
-    }
+    .section-title { font-family: var(--font-disp); font-size: clamp(2.8rem,5.5vw,5rem); line-height: .93; margin-bottom: 1.5rem; color: var(--text); letter-spacing: .01em; }
 
     /* ═══ KEYFRAMES ═══ */
     @keyframes fade-up      { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
@@ -1231,23 +887,48 @@
     @keyframes ticker-scroll{ 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
     @keyframes flash-in     { from{opacity:0;transform:translateX(12px)} to{opacity:1;transform:translateX(0)} }
 
-    /* ═══ REDUCED MOTION SUPPORT ═══ */
+    /* ═══ REDUCED MOTION ═══ */
     @media (prefers-reduced-motion: reduce) {
-        *,
-        *::before,
-        *::after {
-            animation-duration: .01ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: .01ms !important;
-        }
+        *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
         .reveal { opacity: 1; transform: none; }
     }
 
+    /* ═══ RESPONSIVE — TABLET ═══ */
     @media (max-width: 900px) {
         .navbar { padding: 0 1.2rem 0 1rem; }
         .logo-wordmark-bottom { display: none; }
         .section { padding: 5rem 2rem; }
-        .footer { flex-direction: column; gap: 1.2rem; text-align: center; padding: 2.5rem 2rem; }
+        .footer { padding: 2rem 2rem; }
+        .footer-links { gap: 1.5rem; }
+    }
+
+    /* ═══ RESPONSIVE — MOBILE ═══ */
+    @media (max-width: 600px) {
+        .footer {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 2rem 1.5rem;
+            gap: 1.25rem;
+        }
+        .footer-copy { font-size: .65rem; }
+        .footer-links {
+            gap: 1rem 1.5rem;
+            justify-content: center;
+        }
+        .footer-links a { font-size: .65rem; }
+
+        /* Flash notifications full-width on mobile */
+        .flash-container {
+            left: 1rem; right: 1rem; max-width: none;
+        }
+
+        /* Nav user badge — shorten on very small screens */
+        .nav-user-badge {
+            font-size: .6rem;
+            padding: .3rem .6rem;
+            letter-spacing: .08em;
+        }
     }
     </style>
 
@@ -1396,7 +1077,7 @@
                 </div>
                 <div class="logo-wordmark">
                     <span class="logo-wordmark-top">E-Democracy<span class="logo-pip"></span></span>
-                    <span class="logo-wordmark-bottom">Civic&nbsp;Blockchain&nbsp;Platform</span>
+                    <span class="logo-wordmark-bottom">Civic&nbsp;Platform</span>
                 </div>
             </a>
         </div>
@@ -1412,8 +1093,6 @@
                         </svg>
                     </a>
                 {% endif %}
-            {% else %}
-                <a href="{{ url_for('auth.login') }}" class="nav-cta">Login →</a>
             {% endif %}
         </div>
     </header>
@@ -1432,12 +1111,14 @@
         {% block content %}{% endblock %}
     </div>
 
+    <!-- ═══ FOOTER ═══ -->
     <footer class="footer">
         <span class="footer-copy">© {{ current_year if current_year else "2026" }} E-Democracy Platform · AI–Blockchain Integrated System</span>
         <ul class="footer-links">
             <li><a href="{{ url_for('public.election_schedule') }}">Schedule</a></li>
             <li><a href="{{ url_for('public_results.dashboard') }}">Results</a></li>
             <li><a href="{{ url_for('verify_vote.verify_vote_page') }}">Verify</a></li>
+            <li><a href="{{ url_for('public.about') }}">About</a></li>
             <li><a href="https://sepolia.etherscan.io/address/0x51bE814c9F2C2ec5799fA872A25A0735723fae0e" target="_blank">Contract ↗</a></li>
         </ul>
     </footer>
@@ -1451,7 +1132,6 @@
                 btn.classList.toggle('active', btn.dataset.theme === theme);
             });
         }
-
         (function(){
             var current = localStorage.getItem('theme') || 'system';
             document.querySelectorAll('.theme-btn').forEach(btn => {
@@ -1463,9 +1143,7 @@
         const cursorDot  = document.getElementById('cursorDot');
         const cursorRing = document.getElementById('cursorRing');
         let mx=0, my=0, rx=0, ry=0;
-
         document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
-
         (function tick(){
             rx += (mx - rx) * .14;
             ry += (my - ry) * .14;
@@ -1541,5 +1219,3 @@
     {% block extra_js %}<script src="https://unpkg.com/html5-qrcode"></script>{% endblock %}
 </body>
 </html>
-
-

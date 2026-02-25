@@ -4,7 +4,7 @@
 {% block extra_css %}
 <style>
 /* ═══════════════════════════════════════════════════════════
-   LANDING PAGE
+   LANDING PAGE — fully responsive
 ═══════════════════════════════════════════════════════════ */
 
 /* ── HERO ─────────────────────────────────────────────────── */
@@ -36,7 +36,7 @@
 
 .hero-inner {
     position: relative; z-index: 2;
-    max-width: 1000px;
+    max-width: 1000px; width: 100%;
     text-align: center;
 }
 
@@ -63,7 +63,7 @@
 
 .hero-title {
     font-family: var(--font-disp);
-    font-size: clamp(4rem, 10vw, 9rem);
+    font-size: clamp(3.2rem, 10vw, 9rem);
     line-height: 0.92;
     letter-spacing: 0.01em;
     color: var(--text);
@@ -78,7 +78,8 @@
 }
 
 .hero-subtitle-line {
-    display: flex; align-items: center; justify-content: center; gap: 1.5rem;
+    display: flex; align-items: center; justify-content: center;
+    flex-wrap: wrap; gap: 0.75rem 1.5rem;
     margin: 2rem 0 3rem;
     opacity: 0;
     animation: fade-up 0.9s 0.6s forwards;
@@ -91,7 +92,10 @@
     color: var(--text-2);
     font-weight: 500;
 }
-.hero-subtitle-line .sep { width: 40px; height: 1px; background: rgba(79,70,229,0.2); }
+.hero-subtitle-line .sep {
+    width: 40px; height: 1px;
+    background: rgba(79,70,229,0.2);
+}
 
 .hero-actions {
     display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
@@ -162,7 +166,7 @@
 /* ── STATS STRIP ─────────────────────────────────────────── */
 .stats-strip {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     border-bottom: 1px solid var(--border);
     opacity: 0;
     animation: fade-up 0.8s 1s forwards;
@@ -396,7 +400,7 @@
 }
 .cta-title {
     font-family: var(--font-disp);
-    font-size: clamp(3rem, 7vw, 6rem);
+    font-size: clamp(2.8rem, 7vw, 6rem);
     line-height: 0.92; margin-bottom: 1.5rem; color: #fff;
 }
 .cta-title em { color: var(--warm-light); font-style: normal; }
@@ -410,17 +414,158 @@
 .cta-section .btn-outline { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.9); }
 .cta-section .btn-outline:hover { border-color: rgba(255,255,255,0.7); color: #fff; }
 
-/* ── RESPONSIVE ───────────────────────────────────────────── */
-@media (max-width: 900px) {
-    .hero { padding: 2rem 2rem 3rem; }
-    .stats-strip { grid-template-columns: repeat(2, 1fr); }
-    .stat-cell:nth-child(2) { border-right: none; }
-    .about-section { grid-template-columns: 1fr; gap: 3rem; }
-    .chain-visual { display: none; }
-    .roles-grid { grid-template-columns: 1fr; }
-    .process-steps { grid-template-columns: 1fr 1fr; gap: 2rem; }
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE — TABLET  (≤ 1024px)
+═══════════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+    .about-section { gap: 3.5rem; }
+    .roles-grid { grid-template-columns: 1fr 1fr; }
+    .process-steps { grid-template-columns: repeat(3, 1fr); gap: 2rem 1.5rem; }
     .process-steps::before { display: none; }
-    .cta-section { padding: 5rem 2rem; }
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE — MOBILE  (≤ 768px)
+═══════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+    /* ── Hero ── */
+    .hero {
+        padding: 6rem 1.5rem 3rem;
+        min-height: calc(100svh - 0px);
+        align-items: flex-start;
+        padding-top: calc(var(--nav-h) + 3rem);
+    }
+    .hero-inner { text-align: center; }
+
+    .hero-label {
+        font-size: 0.72rem;
+        padding: 0.45rem 0.9rem;
+        letter-spacing: 0.1em;
+        margin-bottom: 1.75rem;
+    }
+
+    .hero-title {
+        font-size: clamp(3rem, 14vw, 5rem);
+        line-height: 0.94;
+        word-break: break-word;
+    }
+
+    .hero-subtitle-line {
+        gap: 0.5rem 1rem;
+        margin: 1.5rem 0 2rem;
+    }
+    .hero-subtitle-line .sep { display: none; }
+    .hero-subtitle-line span { font-size: 0.78rem; letter-spacing: 0.1em; }
+
+    .hero-actions {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        gap: 0.75rem;
+    }
+    .hero-actions .btn-primary,
+    .hero-actions .btn-pages-menu {
+        width: 100%;
+        justify-content: center;
+        padding: 1rem 1.5rem;
+        clip-path: none; /* remove skew on mobile for full-width */
+    }
+
+    /* ── Ticker ── */
+    .ticker-item { font-size: 0.7rem; gap: 1.2rem; padding: 0 1.2rem; }
+
+    /* ── Stats ── */
+    .stats-strip {
+        grid-template-columns: 1fr;
+        animation: none; opacity: 1;
+    }
+    .stat-cell {
+        padding: 2rem 1.5rem;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+    }
+    .stat-cell:last-child { border-bottom: none; }
+    .stat-number { font-size: 2.4rem; }
+
+    /* ── About ── */
+    .about-section {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+    }
+    .about-left p { max-width: 100%; font-size: 0.97rem; }
+    .chain-visual { display: none; }
+
+    .feature-grid { grid-template-columns: 1fr; }
+    .feature-item { padding: 1.25rem; }
+
+    /* ── Roles ── */
+    .roles-grid {
+        grid-template-columns: 1fr;
+        border: none;
+        background: transparent;
+        gap: 1px;
+    }
+    .role-card {
+        padding: 2rem 1.5rem;
+        border: 1px solid var(--border);
+    }
+    .role-card::before { font-size: 4rem; opacity: 0.6; }
+    .role-card h3 { font-size: 1.75rem; }
+    .role-card p { font-size: 0.92rem; margin-bottom: 1.5rem; }
+
+    .roles-header { margin-bottom: 2.5rem; }
+    .roles-header p { font-size: 0.95rem; }
+
+    /* ── Process ── */
+    .process-steps {
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem 1rem;
+        margin-top: 2.5rem;
+    }
+    .process-step { padding: 0 0.5rem; }
+    .step-num { width: 48px; height: 48px; font-size: 1.2rem; margin-bottom: 1rem; }
+    .step-title { font-size: 0.75rem; letter-spacing: 0.06em; }
+    .step-desc { font-size: 0.83rem; }
+
+    /* last step centered when odd count */
+    .process-step:last-child:nth-child(odd) {
+        grid-column: 1 / -1;
+        max-width: 260px; margin: 0 auto;
+    }
+
+    /* ── CTA ── */
+    .cta-section { padding: 5rem 1.5rem; }
+    .cta-title { font-size: clamp(2.6rem, 11vw, 4rem); }
+    .cta-sub { font-size: 0.97rem; }
+    .cta-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .cta-actions .btn-primary,
+    .cta-actions .btn-outline {
+        width: 100%;
+        justify-content: center;
+        clip-path: none;
+    }
+    .cta-actions .btn-outline span { display: inline; }
+
+    /* ── Section spacing ── */
+    .section { padding: 4rem 1.5rem; }
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE — SMALL MOBILE  (≤ 400px)
+═══════════════════════════════════════════════════════════ */
+@media (max-width: 400px) {
+    .hero-title { font-size: clamp(2.6rem, 16vw, 3.4rem); }
+    .process-steps { grid-template-columns: 1fr; }
+    .process-step:last-child:nth-child(odd) { grid-column: auto; max-width: 100%; }
+    .stat-number { font-size: 2rem; }
+    .role-card { padding: 1.75rem 1.25rem; }
 }
 </style>
 {% endblock %}
@@ -452,12 +597,10 @@
         </div>
 
         <div class="hero-actions">
-            <!-- Primary CTA only -->
             <a href="{{ url_for('auth.login') }}" class="btn-primary">
                 Access Platform →
             </a>
 
-            <!-- Explore Pages — triggers sidebar -->
             <button
                 class="btn-pages-menu"
                 type="button"
@@ -478,14 +621,14 @@
     <div class="ticker">
         <span class="ticker-item"><span class="tag">LIVE</span> Blockchain-secured voting infrastructure online</span>
         <span class="ticker-item"><span class="tag">AUDIT</span> Public smart contract verifiable on Sepolia Testnet</span>
-        <span class="ticker-item"><span class="tag">SECURE</span> End-to-end encrypted ballot submission</span>
-        <span class="ticker-item"><span class="tag">AI</span> Machine-learning anomaly detection active</span>
-        <span class="ticker-item"><span class="tag">OPEN</span> Constituency results updated in real time</span>
+        <span class="ticker-item"><span class="tag">AI</span> Representative performance scoring active</span>
+        <span class="ticker-item"><span class="tag">SECURE</span> Merkle proof vote verification enabled</span>
+        <span class="ticker-item"><span class="tag">GOVERN</span> Constituency issue tracking &amp; resolution live</span>
         <span class="ticker-item"><span class="tag">LIVE</span> Blockchain-secured voting infrastructure online</span>
         <span class="ticker-item"><span class="tag">AUDIT</span> Public smart contract verifiable on Sepolia Testnet</span>
-        <span class="ticker-item"><span class="tag">SECURE</span> End-to-end encrypted ballot submission</span>
-        <span class="ticker-item"><span class="tag">AI</span> Machine-learning anomaly detection active</span>
-        <span class="ticker-item"><span class="tag">OPEN</span> Constituency results updated in real time</span>
+        <span class="ticker-item"><span class="tag">AI</span> Representative performance scoring active</span>
+        <span class="ticker-item"><span class="tag">SECURE</span> Merkle proof vote verification enabled</span>
+        <span class="ticker-item"><span class="tag">GOVERN</span> Constituency issue tracking &amp; resolution live</span>
     </div>
 </div>
 
@@ -496,16 +639,12 @@
         <div class="stat-label">Vote Verifiability</div>
     </div>
     <div class="stat-cell">
-        <div class="stat-number">0</div>
-        <div class="stat-label">Tamper Incidents</div>
+        <div class="stat-number" data-target="10">10</div>
+        <div class="stat-label">Distinct User Roles</div>
     </div>
     <div class="stat-cell">
-        <div class="stat-number" data-target="3">3</div>
-        <div class="stat-label">User Roles Supported</div>
-    </div>
-    <div class="stat-cell">
-        <div class="stat-number">∞</div>
-        <div class="stat-label">Public Auditability</div>
+        <div class="stat-number">4</div>
+        <div class="stat-label">Scoring Dimensions</div>
     </div>
 </div>
 
@@ -515,41 +654,41 @@
         <div class="about-left reveal">
             <div class="section-tag">What is this</div>
             <h2 class="section-title">
-                Next-gen<br>
-                civic <em>infrastructure</em>
+                Democracy<br>
+                beyond <em>election day</em>
             </h2>
             <p>
-                A next-generation e-governance platform combining blockchain immutability
-                with AI-driven analytics — delivering elections that are transparent,
-                tamper-proof, and publicly auditable by anyone.
+                A full-cycle civic governance platform that combines blockchain-secured elections
+                with AI-driven post-election accountability — keeping citizens, representatives,
+                and the Election Commission connected and transparent throughout every term.
             </p>
             <div class="feature-grid">
                 <div class="feature-item">
                     <div class="feature-icon">✔</div>
                     <div class="feature-text">
-                        <strong>E2E Verifiable</strong>
-                        Voters confirm their ballot was counted correctly
+                        <strong>E2E Verifiable Voting</strong>
+                        Every ballot gets a cryptographic receipt verifiable on-chain via Merkle proof
                     </div>
                 </div>
                 <div class="feature-item">
                     <div class="feature-icon">⛓</div>
                     <div class="feature-text">
-                        <strong>Blockchain Receipts</strong>
-                        Immutable vote records on a public chain
+                        <strong>Blockchain Immutability</strong>
+                        Votes are recorded as Ethereum smart contract events — no central authority can alter them
                     </div>
                 </div>
                 <div class="feature-item">
-                    <div class="feature-icon">⚖</div>
+                    <div class="feature-icon">📊</div>
                     <div class="feature-text">
-                        <strong>Accountability</strong>
-                        Constituency-level tracking and reporting
+                        <strong>AI Performance Scoring</strong>
+                        Representatives are continuously scored across accountability, engagement, integrity, and impact
                     </div>
                 </div>
                 <div class="feature-item">
-                    <div class="feature-icon">🔍</div>
+                    <div class="feature-icon">🏛</div>
                     <div class="feature-text">
-                        <strong>Public Audit</strong>
-                        Anyone can verify the full election ledger
+                        <strong>Civic Issue Tracking</strong>
+                        Citizens raise and track constituency problems — reps accept, resolve, and are held accountable for outcomes
                     </div>
                 </div>
             </div>
@@ -593,7 +732,7 @@
         <div class="roles-header reveal">
             <div class="section-tag">Participants</div>
             <h2 class="section-title">Who uses the platform?</h2>
-            <p>Three distinct roles, one unified system of democratic accountability.</p>
+            <p>Three pillars of democratic participation — one unified, accountable system.</p>
         </div>
         <div class="roles-grid">
             <div class="role-card reveal" data-num="01">
@@ -601,15 +740,15 @@
                     <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/></svg>
                 </div>
                 <h3>Citizens</h3>
-                <p>Vote securely, verify your ballot using on-chain receipts, and track election results in real time with complete transparency.</p>
-                <a href="{{ url_for('auth.login') }}" class="role-card-action">Cast Your Vote →</a>
+                <p>Vote securely at the booth and verify your ballot was counted using your personal receipt hash. Between elections, raise constituency issues, track resolution timelines, comment on representative policies, and confirm when your problems are actually fixed — directly influencing your rep's performance score.</p>
+                <a href="{{ url_for('auth.login') }}" class="role-card-action">Enter Citizen Portal →</a>
             </div>
             <div class="role-card reveal" data-num="02">
                 <div class="role-card-icon">
                     <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                 </div>
                 <h3>Representatives</h3>
-                <p>Engage your constituents directly, publish updates, and maintain a verifiable record of your accountability commitments.</p>
+                <p>Elected and opposition representatives manage constituency issues end-to-end — accepting, tracking, and resolving citizen concerns with full timeline transparency. Publish AI-integrity-scored policy posts, engage in public debates, and monitor your live performance score across accountability, engagement, and impact dimensions.</p>
                 <a href="{{ url_for('auth.login') }}" class="role-card-action">Representative Portal →</a>
             </div>
             <div class="role-card reveal" data-num="03">
@@ -617,7 +756,7 @@
                     <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 </div>
                 <h3>Election Commission</h3>
-                <p>Manage elections end-to-end with immutable audit trails, tamper-evident records, and AI-powered anomaly detection.</p>
+                <p>A seven-tier hierarchy — CEC, CEO, DEO, RO, ERO, BLO, and PO — each with scoped authority. Create and approve elections, manage candidate nominations, publish electoral rolls, authorize voters at booths, and oversee the full election lifecycle with immutable audit trails at every step.</p>
                 <a href="{{ url_for('auth.login') }}" class="role-card-action">Commission Dashboard →</a>
             </div>
         </div>
@@ -629,33 +768,33 @@
     <div class="process-section">
         <div class="reveal" style="text-align:center; margin-bottom:1rem;">
             <div class="section-tag" style="justify-content:center;">How it works</div>
-            <h2 class="section-title">From registration to result</h2>
+            <h2 class="section-title">From enrollment to accountability</h2>
         </div>
         <div class="process-steps reveal">
             <div class="process-step">
                 <div class="step-num">1</div>
-                <div class="step-title">Register</div>
-                <div class="step-desc">Verify identity &amp; create your secure voter account</div>
+                <div class="step-title">Get Enrolled</div>
+                <div class="step-desc">Your Electoral Registration Officer (ERO) verifies your identity and adds you to the constituency's official electoral roll</div>
             </div>
             <div class="process-step">
                 <div class="step-num">2</div>
-                <div class="step-title">Authenticate</div>
-                <div class="step-desc">Multi-factor login with cryptographic assurance</div>
+                <div class="step-title">Elect</div>
+                <div class="step-desc">Cast an encrypted ballot at your booth — your vote is recorded on the Ethereum blockchain</div>
             </div>
             <div class="process-step">
                 <div class="step-num">3</div>
-                <div class="step-title">Vote</div>
-                <div class="step-desc">Encrypted ballot submitted to the blockchain</div>
+                <div class="step-title">Verify</div>
+                <div class="step-desc">Use your anonymous receipt hash and Merkle proof to confirm your vote was counted</div>
             </div>
             <div class="process-step">
                 <div class="step-num">4</div>
-                <div class="step-title">Verify</div>
-                <div class="step-desc">Retrieve your receipt and confirm it was counted</div>
+                <div class="step-title">Govern</div>
+                <div class="step-desc">Raise local issues, follow resolution timelines, and engage with representative policy posts</div>
             </div>
             <div class="process-step">
                 <div class="step-num">5</div>
-                <div class="step-title">Audit</div>
-                <div class="step-desc">Public results verifiable by anyone, anywhere</div>
+                <div class="step-title">Hold Accountable</div>
+                <div class="step-desc">AI scores your rep continuously — poor performance can end their term before the next election</div>
             </div>
         </div>
     </div>
@@ -667,13 +806,13 @@
     <div class="cta-inner reveal">
         <div class="cta-eyebrow">● System online and accepting participants</div>
         <h2 class="cta-title">
-            The future of<br>
-            <em>democracy</em><br>
-            is verifiable.
+            Democracy<br>
+            <em>doesn't stop</em><br>
+            at the ballot.
         </h2>
         <p class="cta-sub">
-            Join a platform where every vote is cryptographically secured,<br>
-            publicly auditable, and permanently recorded.
+            Every vote is cryptographically secured and publicly auditable.<br>
+            Every representative is scored, tracked, and held accountable — every day.
         </p>
         <div class="cta-actions">
             <a href="{{ url_for('auth.login') }}" class="btn-primary btn-large">
