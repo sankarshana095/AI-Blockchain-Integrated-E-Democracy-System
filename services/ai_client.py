@@ -1,62 +1,65 @@
 import os
 import json
-import google.generativeai as genai
+from openai import OpenAI
 
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GROK_API_KEY = os.getenv("GROK_API_KEY")
 
-# You can switch models later without touching logic
-MODEL_NAME = "gemini-3-flash-preview"  
-# (If you specifically have preview access, use "gemini-1.5-flash-preview")
-
-
+MODEL_NAME = "grok-4-1-fast-reasoning"
 class AIClientError(Exception):
     pass
 
 
+def _get_client():
+    if not GROK_API_KEY:
+        raise AIClientError("GROK_API_KEY not configured")
+
+    return OpenAI(
+        api_key=GROK_API_KEY,
+        base_url="https://api.x.ai/v1"
+    )
+
+
+# -------- POLICY ANALYSIS (JSON OUTPUT) --------
 def run_policy_analysis(prompt: str) -> dict:
-    if not GEMINI_API_KEY:
-        raise AIClientError("GEMINI_API_KEY not configured")
-
     try:
-        genai.configure(api_key=GEMINI_API_KEY)
+        client = _get_client()
 
-        model = genai.GenerativeModel(
-            MODEL_NAME,
-            generation_config={
-                "temperature": 0.2,
-                "response_mime_type": "application/json"
-            }
+        response = client.chat.completions.create(
+            model=MODEL_NAME,
+            temperature=0.2,
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a policy analysis AI. Always respond with valid JSON only."
+                },
+                {"role": "user", "content": prompt}
+            ]
         )
 
-        response = model.generate_content(prompt)
-
-        # Gemini returns text, we force JSON
-        content = response.text.strip()
-
+        content = response.choices[0].message.content.strip()
         return json.loads(content)
 
     except Exception as e:
-        raise AIClientError(f"Gemini AI error: {str(e)}")
+        raise AIClientError(f"Grok AI error: {str(e)}")
 
+
+# -------- COMMENT REPLY (TEXT OUTPUT) --------
 def run_comment_reply(prompt: str) -> str:
-    if not GEMINI_API_KEY:
-        raise AIClientError("AI disabled (no API key)")
-
     try:
-        genai.configure(api_key=GEMINI_API_KEY)
-
-        model = genai.GenerativeModel(
-            MODEL_NAME,
-            generation_config={
-                "temperature": 0.3
-            }
+        client = _get_client()
+        response = client.chat.completions.create(
+            model=MODEL_NAME,
+            temperature=0.3,
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You generate concise, helpful civic discussion replies."
+                },
+                {"role": "user", "content": prompt}
+            ]
         )
-
-        response = model.generate_content(prompt)
-
-        return response.text.strip()
+        return response.choices[0].message.content.strip()
 
     except Exception as e:
-        raise AIClientError(f"Gemini AI error: {str(e)}")
-    
+        raise AIClientError(f"Grok AI error: {str(e)}")
