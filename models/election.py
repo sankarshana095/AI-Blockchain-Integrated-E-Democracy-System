@@ -64,7 +64,7 @@ def get_all_elections():
     elections=fetch_all(ELECTIONS_TABLE)
     for election in elections:
         state=get_state_name_by_state_id(election['state_id'])
-        election["state_name"]=state["state_name"],
+        election["state_name"]=state["state_name"]
         election["_start_time"]=format_datetime(election["start_time"])
         election["_end_time"]=election["end_time"]
         election["start_time"]=format_datetime(election["start_time"])
