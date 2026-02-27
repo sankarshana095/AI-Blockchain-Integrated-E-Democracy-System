@@ -8,7 +8,7 @@ def activate_election_if_needed(election):
     - Marks election ACTIVE when start_time is reached
     """
 
-    if election["status"] in ["ACTIVE", "COMPLETED"]:
+    if election["status"] in ["Draft","ACTIVE", "COMPLETED"]:
         return
 
     start_dt = parse_dt(election.get("start_time"))

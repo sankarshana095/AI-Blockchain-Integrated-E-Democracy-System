@@ -12,9 +12,6 @@ from models.election import get_all_elections
 from services.election_finalizer import finalize_election_if_needed
 from services.election_activation_service import activate_election_if_needed
 
-
-
-
 bp = Blueprint("presiding_officer", __name__, url_prefix="/po")
 
 
@@ -65,17 +62,27 @@ def dashboard():
 @login_required
 @role_required("PO")
 def authorize_voter():
-    voter_id_number = request.form.get("voter_user_id")
+    voter_id_number = request.form.get("voter_id_number")
     otp_input = request.form.get("otp")
     action = request.form.get("action")
 
     # -----------------------------
     # Validate voter user
     # -----------------------------
-    voter_user_id=get_user_id_by_voter_id_number(voter_id_number)
+    if not voter_id_number:
+        flash("Scan or enter voter ID first", "error")
+        return redirect(url_for("presiding_officer.dashboard"))
+
+    voter_user_id = get_user_id_by_voter_id_number(voter_id_number)
+
+    if not voter_user_id:
+        flash("No voter found with this ID", "error")
+        return redirect(url_for("presiding_officer.dashboard"))
+
     voter_user = get_user_by_id(voter_user_id)
+
     if not voter_user:
-        flash("Invalid voter user ID", "error")
+        flash("Voter account not found", "error")
         return redirect(url_for("presiding_officer.dashboard"))
 
     # -----------------------------
@@ -87,8 +94,7 @@ def authorize_voter():
 
         flash("OTP sent to voter's registered email ID", "success")
         return redirect(
-            url_for("presiding_officer.dashboard", voter=voter_user_id)
-        )
+            url_for("presiding_officer.dashboard", voter=voter_id_number))
 
     # -----------------------------
     # STEP 2: VERIFY OTP
@@ -97,13 +103,13 @@ def authorize_voter():
         if not otp_input:
             flash("Please enter OTP", "error")
             return redirect(
-                url_for("presiding_officer.dashboard", voter=voter_user_id)
+                url_for("presiding_officer.dashboard", voter=voter_id_number)
             )
 
         if not verify_otp(voter_user_id, otp_input):
             flash("Invalid or expired OTP", "error")
             return redirect(
-                url_for("presiding_officer.dashboard", voter=voter_user_id)
+                url_for("presiding_officer.dashboard", voter=voter_id_number)
             )
 
         # -----------------------------

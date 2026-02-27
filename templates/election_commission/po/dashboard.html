@@ -419,7 +419,7 @@
                 <div class="field">
                     <label>Voter ID</label>
                     <div class="voter-id-display empty" id="voterIdDisplay">Not scanned yet</div>
-                    <input type="hidden" id="voter_user_id" name="voter_user_id"
+                    <input type="hidden" id="voter_id_number" name="voter_id_number"
                            value="{{ request.args.get('voter', '') }}">
                 </div>
 
@@ -458,7 +458,7 @@
                 <!-- Manual input -->
                 <div class="field" id="manualField" style="display:none;">
                     <label>Voter User ID (manual)</label>
-                    <input type="text" id="voter_user_id_manual"
+                    <input type="text" id="voter_id_number_manual"
                            placeholder="Type voter ID…"
                            oninput="syncId(this.value)"
                            value="{{ request.args.get('voter', '') }}">
@@ -539,7 +539,7 @@
 <script>
 /* ── Voter ID helpers ────────────────────────────────────── */
 function setVoterId(val) {
-    document.getElementById('voter_user_id').value = val;
+    document.getElementById('voter_id_number').value = val;
     const d = document.getElementById('voterIdDisplay');
     if (val) {
         d.textContent = val;
@@ -553,14 +553,14 @@ function syncId(val) { setVoterId(val); }
 
 // pre-fill from query string
 (function() {
-    const v = document.getElementById('voter_user_id').value;
+    const v = document.getElementById('voter_id_number').value;
     if (v) { setVoterId(v); showManualInput(); }
 })();
 
 function showManualInput() {
     stopQRScan();
     document.getElementById('manualField').style.display = 'flex';
-    document.getElementById('voter_user_id_manual').focus();
+    document.getElementById('voter_id_number_manual').focus();
 }
 
 /* ── QR Scanner ──────────────────────────────────────────── */

@@ -174,7 +174,7 @@ def get_user_id_by_voter_id_number(voter_id_number: str):
     1. Fetch voter
     2. Get mapped user_id
     """
-
+    print(f"Fetching user_id for voter_id_number: {voter_id_number}")
     # Step 1: Get voter using voter_id_number
     voter = get_voter_by_voter_id_number(voter_id_number)
 
